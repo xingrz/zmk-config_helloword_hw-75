@@ -5,8 +5,13 @@
 
 config HW75_SSD16XX
 	bool "SSD16XX compatible display controller driver"
-	depends on SPI
-	depends on !SSD16XX
+	default y
+	depends on \
+		DT_HAS_SOLOMON_SSD1608_ENABLED || \
+		DT_HAS_SOLOMON_SSD1673_ENABLED || \
+		DT_HAS_SOLOMON_SSD1675A_ENABLED || \
+		DT_HAS_SOLOMON_SSD1681_ENABLED
+	select SPI
 	select HW75_SSD16XX_NO_BLANK_ON_INIT
 	help
 	  Enable driver for SSD16XX compatible controller.
