@@ -35,6 +35,7 @@ LOG_MODULE_REGISTER(ssd16xx);
 
 enum ssd16xx_profile_type {
 	SSD16XX_PROFILE_FULL = 0,
+	SSD16XX_PROFILE_PARTIAL,
 	SSD16XX_NUM_PROFILES,
 	SSD16XX_PROFILE_INVALID = SSD16XX_NUM_PROFILES,
 };
@@ -48,6 +49,17 @@ struct ssd16xx_quirks {
 	uint8_t pp_width_bits;
 	/* Width (bits) of integer type representing a y coordinate */
 	uint8_t pp_height_bits;
+
+	/*
+	 * Device specific flags to be included in
+	 * SSD16XX_CMD_UPDATE_CTRL2 for a full refresh.
+	 */
+	uint8_t ctrl2_full;
+	/*
+	 * Device specific flags to be included in
+	 * SSD16XX_CMD_UPDATE_CTRL2 for a partial refresh.
+	 */
+	uint8_t ctrl2_partial;
 };
 
 struct ssd16xx_data {
@@ -56,7 +68,6 @@ struct ssd16xx_data {
 #endif
 	bool read_supported;
 	uint8_t scan_mode;
-	uint8_t update_cmd;
 	bool blanking_on;
 	enum ssd16xx_profile_type profile;
 };
@@ -93,8 +104,6 @@ struct ssd16xx_config {
 
 	const struct ssd16xx_profile *profiles[SSD16XX_NUM_PROFILES];
 
-	struct ssd16xx_dt_array lut_default;
-
 	bool orientation;
 	uint16_t height;
 	uint16_t width;
@@ -104,6 +113,9 @@ struct ssd16xx_config {
 #ifdef CONFIG_HW75_SSD16XX_NO_BLANK_ON_INIT
 static int ssd16xx_controller_init(const struct device *dev);
 #endif
+
+static int ssd16xx_set_profile(const struct device *dev,
+			       enum ssd16xx_profile_type type);
 
 static inline void ssd16xx_busy_wait(const struct device *dev)
 {
@@ -306,9 +318,23 @@ static int ssd16xx_activate(const struct device *dev, uint8_t ctrl2)
 
 static int ssd16xx_update_display(const struct device *dev)
 {
-	struct ssd16xx_data *data = dev->data;
+	const struct ssd16xx_config *config = dev->config;
+	const struct ssd16xx_data *data = dev->data;
+	const struct ssd16xx_profile *p = config->profiles[data->profile];
+	const struct ssd16xx_quirks *quirks = config->quirks;
+	const bool load_lut = !p || p->lut.len == 0;
+	const bool load_temp = load_lut && config->tssv;
+	const bool partial = data->profile == SSD16XX_PROFILE_PARTIAL;
+	const uint8_t update_cmd =
+		SSD16XX_CTRL2_ENABLE_CLK |
+		SSD16XX_CTRL2_ENABLE_ANALOG |
+		(load_lut ? SSD16XX_CTRL2_LOAD_LUT : 0) |
+		(load_temp ? SSD16XX_CTRL2_LOAD_TEMPERATURE : 0) |
+		(partial ? quirks->ctrl2_partial : quirks->ctrl2_full) |
+		SSD16XX_CTRL2_DISABLE_ANALOG |
+		SSD16XX_CTRL2_DISABLE_CLK;
 
-	return ssd16xx_activate(dev, data->update_cmd);
+	return ssd16xx_activate(dev, update_cmd);
 }
 
 static int ssd16xx_blanking_off(const struct device *dev)
@@ -326,6 +352,12 @@ static int ssd16xx_blanking_off(const struct device *dev)
 static int ssd16xx_blanking_on(const struct device *dev)
 {
 	struct ssd16xx_data *data = dev->data;
+
+	if (!data->blanking_on) {
+		if (ssd16xx_set_profile(dev, SSD16XX_PROFILE_FULL)) {
+			return -EIO;
+		}
+	}
 
 	data->blanking_on = true;
 
@@ -436,6 +468,19 @@ static int ssd16xx_write(const struct device *dev, const uint16_t x,
 		ssd16xx_controller_init(dev);
 	}
 #endif
+
+	if (!data->blanking_on) {
+		/*
+		 * Blanking isn't on, so this is a partial
+		 * refresh. Request the partial profile. This
+		 * operation becomes a no-op if the profile is already
+		 * active.
+		 */
+		err = ssd16xx_set_profile(dev, SSD16XX_PROFILE_PARTIAL);
+		if (err < 0 && err != -ENOENT) {
+			return -EIO;
+		}
+	}
 
 	err = ssd16xx_set_window(dev, x, y, desc);
 	if (err < 0) {
@@ -641,28 +686,19 @@ static int ssd16xx_clear_cntlr_mem(const struct device *dev, uint8_t ram_cmd,
 static inline int ssd16xx_load_ws_from_otp_tssv(const struct device *dev)
 {
 	const struct ssd16xx_config *config = dev->config;
-	struct ssd16xx_data *data = dev->data;
-	int err;
 
 	/*
 	 * Controller has an integrated temperature sensor or external
 	 * temperature sensor is connected to the controller.
 	 */
 	LOG_INF("Select and load WS from OTP");
-	err = ssd16xx_write_uint8(dev, SSD16XX_CMD_TSENSOR_SELECTION,
-				  config->tssv);
-	if (err == 0) {
-		data->update_cmd |= SSD16XX_CTRL2_LOAD_LUT |
-				    SSD16XX_CTRL2_LOAD_TEMPERATURE;
-	}
-
-	return err;
+	return ssd16xx_write_uint8(dev, SSD16XX_CMD_TSENSOR_SELECTION,
+				   config->tssv);
 }
 
 static inline int ssd16xx_load_ws_from_otp(const struct device *dev)
 {
 	int16_t t = (SSD16XX_DEFAULT_TR_VALUE * SSD16XX_TR_SCALE_FACTOR);
-	struct ssd16xx_data *data = dev->data;
 	uint8_t tmp[2];
 	int err;
 
@@ -685,8 +721,6 @@ static inline int ssd16xx_load_ws_from_otp(const struct device *dev)
 		return err;
 	}
 
-	data->update_cmd |= SSD16XX_CTRL2_LOAD_LUT;
-
 	return 0;
 }
 
@@ -695,12 +729,9 @@ static int ssd16xx_load_lut(const struct device *dev,
 			    const struct ssd16xx_dt_array *lut)
 {
 	const struct ssd16xx_config *config = dev->config;
-	struct ssd16xx_data *data = dev->data;
 
 	if (lut && lut->len) {
 		LOG_DBG("Using user-provided LUT");
-		/* Don't load the default LUT on the next refresh */
-		data->update_cmd &= ~SSD16XX_CTRL2_LOAD_LUT;
 		return ssd16xx_write_cmd(dev, SSD16XX_CMD_UPDATE_LUT,
 					 lut->data, lut->len);
 	} else {
@@ -828,20 +859,6 @@ static int ssd16xx_set_profile(const struct device *dev,
 	return 0;
 }
 
-static int ssd16xx_load_ws_default(const struct device *dev)
-{
-	const struct ssd16xx_config *config = dev->config;
-
-	if (config->lut_default.len) {
-		return ssd16xx_write_cmd(dev, SSD16XX_CMD_UPDATE_LUT,
-					 config->lut_default.data,
-					 config->lut_default.len);
-	}
-
-	return 0;
-}
-
-
 static int ssd16xx_controller_init(const struct device *dev)
 {
 	const struct ssd16xx_config *config = dev->config;
@@ -876,12 +893,6 @@ static int ssd16xx_controller_init(const struct device *dev)
 		data->scan_mode = SSD16XX_DATA_ENTRY_XDYIY;
 	}
 
-	data->update_cmd = (SSD16XX_CTRL2_ENABLE_CLK |
-			      SSD16XX_CTRL2_ENABLE_ANALOG |
-			      SSD16XX_CTRL2_TO_PATTERN |
-			      SSD16XX_CTRL2_DISABLE_ANALOG |
-			      SSD16XX_CTRL2_DISABLE_CLK);
-
 	err = ssd16xx_set_profile(dev, SSD16XX_PROFILE_FULL);
 	if (err < 0) {
 		return err;
@@ -898,12 +909,7 @@ static int ssd16xx_controller_init(const struct device *dev)
 		return err;
 	}
 
-	err = ssd16xx_load_ws_default(dev);
-	if (err < 0) {
-		return err;
-	}
-
-	return ssd16xx_clear_cntlr_mem(dev, SSD16XX_CMD_WRITE_RAM, true);
+	return 0;
 }
 
 static int ssd16xx_init(const struct device *dev)
@@ -987,6 +993,8 @@ static struct ssd16xx_quirks quirks_solomon_ssd1608 = {
 	.max_height = 240,
 	.pp_width_bits = 16,
 	.pp_height_bits = 16,
+	.ctrl2_full = SSD16XX_GEN1_CTRL2_TO_PATTERN,
+	.ctrl2_partial = SSD16XX_GEN1_CTRL2_TO_PATTERN,
 };
 #endif
 
@@ -996,6 +1004,8 @@ static struct ssd16xx_quirks quirks_solomon_ssd1673 = {
 	.max_height = 150,
 	.pp_width_bits = 8,
 	.pp_height_bits = 8,
+	.ctrl2_full = SSD16XX_GEN1_CTRL2_TO_PATTERN,
+	.ctrl2_partial = SSD16XX_GEN1_CTRL2_TO_PATTERN,
 };
 #endif
 
@@ -1005,6 +1015,8 @@ static struct ssd16xx_quirks quirks_solomon_ssd1675a = {
 	.max_height = 160,
 	.pp_width_bits = 8,
 	.pp_height_bits = 16,
+	.ctrl2_full = SSD16XX_GEN1_CTRL2_TO_PATTERN,
+	.ctrl2_partial = SSD16XX_GEN1_CTRL2_TO_PATTERN,
 };
 #endif
 
@@ -1014,14 +1026,10 @@ static struct ssd16xx_quirks quirks_solomon_ssd1681 = {
 	.max_height = 200,
 	.pp_width_bits = 8,
 	.pp_height_bits = 16,
+	.ctrl2_full = SSD16XX_GEN2_CTRL2_DISPLAY,
+	.ctrl2_partial = SSD16XX_GEN2_CTRL2_DISPLAY | SSD16XX_GEN2_CTRL2_MODE2,
 };
 #endif
-
-#define LUT_DEFAULT_ASSIGN(n)						\
-		.lut_default = {					\
-			.data = lut_default_##n,			\
-			.len = sizeof(lut_default_##n),			\
-		},
 
 #define SOFTSTART_ASSIGN(n)						\
 		.softstart = {						\
@@ -1067,7 +1075,6 @@ static struct ssd16xx_quirks quirks_solomon_ssd1681 = {
 		    NULL)
 
 #define SSD16XX_DEFINE(n, quirks_ptr)					\
-	SSD16XX_MAKE_ARRAY_OPT(n, lut_default);				\
 	SSD16XX_MAKE_ARRAY_OPT(n, softstart);				\
 									\
 	DT_FOREACH_CHILD(n, SSD16XX_PROFILE);				\
@@ -1086,10 +1093,11 @@ static struct ssd16xx_quirks quirks_solomon_ssd1681 = {
 		.orientation = DT_PROP(n, orientation_flipped),		\
 		.tssv = DT_PROP_OR(n, tssv, 0),				\
 		.softstart = SSD16XX_ASSIGN_ARRAY(n, softstart),	\
-		.lut_default = SSD16XX_ASSIGN_ARRAY(n, lut_default),	\
 		.profiles = {						\
 			[SSD16XX_PROFILE_FULL] =			\
-			SSD16XX_PROFILE_PTR(DT_CHILD(n, full)),		\
+				SSD16XX_PROFILE_PTR(DT_CHILD(n, full)),	\
+			[SSD16XX_PROFILE_PARTIAL] =			\
+				SSD16XX_PROFILE_PTR(DT_CHILD(n, partial)),\
 		},							\
 	};								\
 									\
