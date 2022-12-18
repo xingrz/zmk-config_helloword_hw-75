@@ -15,9 +15,22 @@ zmk-config for Xikii HW-75 (瀚文 75)
 
 ## 快速定制
 
-本固件默认为针对 Mac 用户的按键布局。如果你需要在 Windows 上使用，可以自行修改 [`xikii_hw75.keymap`](config/boards/arm/xikii_hw75/xikii_hw75.keymap)。
-
 你可以直接 Fork 本仓库到自己账号名下，并启用 GitHub Actions。修改提交相关文件之后，在自己的 Actions 中耐心等待云端编译完成，然后下载固件并烧录。
+
+### 布局
+
+本固件默认为针对 Mac 用户的按键布局 (并且屏蔽了触摸条)。如果你需要在 Windows 上使用，可以自行修改 [`xikii_hw75.keymap`](config/boards/arm/xikii_hw75/xikii_hw75.keymap)。
+
+### 灯效
+
+ZMK 默认带了几种灯效。可以通过 Fn 组合键切换：
+
+* `Fn` + `Tab`: 开关
+* `Fn` + `Q`/`A`: 切换效果
+* `Fn` + `W`/`S`: 调整亮度
+* `Fn` + `E`/`D`: 调整色相
+* `Fn` + `R`/`F`: 调整饱和度
+* `Fn` + `T`/`G`: 调整动画速度
 
 ## 二次开发
 
