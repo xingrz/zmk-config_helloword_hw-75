@@ -1,0 +1,46 @@
+# Copyright (c) 2022 The ZMK Contributors
+# SPDX-License-Identifier: MIT
+
+description: 74HC165 shift register keyboard KSCAN controller
+
+compatible: "zmk,kscan-gpio-74hc165"
+
+include: [kscan.yaml, spi-device.yaml]
+
+properties:
+  label:
+    required: true
+
+  chain-length:
+    type: int
+    required: true
+    description: |
+      The number of devices in the daisy-chain.
+
+  scan-masks:
+    type: uint8-array
+    required: true
+    description: |
+      Bit mask of scanned bits for each daisy-chained device. Count of elements
+      in this array should be same with chain-length.
+
+  parallel-load-gpios:
+    type: phandle-array
+    required: true
+
+  debounce-press-ms:
+    type: int
+    default: 5
+    description: Debounce time for key press in milliseconds. Use 0 for eager debouncing.
+  debounce-release-ms:
+    type: int
+    default: 5
+    description: Debounce time for key release in milliseconds.
+  debounce-scan-period-ms:
+    type: int
+    default: 1
+    description: Time between reads in milliseconds when any key is pressed.
+  poll-period-ms:
+    type: int
+    default: 10
+    description: Time between reads in milliseconds when no key is pressed.

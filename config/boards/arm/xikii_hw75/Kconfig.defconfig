@@ -1,0 +1,19 @@
+# HW-75 board configuration
+
+# Copyright (c) 2022 The ZMK Contributors
+# SPDX-License-Identifier: MIT
+
+if BOARD_XIKII_HW75
+
+config BOARD
+	default "xikii_hw75"
+
+config ZMK_KEYBOARD_NAME
+	default "Xikii HW-75"
+
+config ZMK_USB
+	default y
+
+rsource "drivers/Kconfig"
+
+endif # BOARD_XIKII_HW75

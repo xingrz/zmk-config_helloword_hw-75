@@ -1,0 +1,7 @@
+identifier: xikii_hw75
+name: Xikii HW-75
+type: mcu
+arch: arm
+toolchain:
+  - zephyr
+  - gnuarmemb

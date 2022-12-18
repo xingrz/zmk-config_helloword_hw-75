@@ -1,0 +1,116 @@
+/*
+ * Copyright (c) 2022 The ZMK Contributors
+ * SPDX-License-Identifier: MIT
+ */
+
+/dts-v1/;
+#include <st/f1/stm32f103Xb.dtsi>
+#include <st/f1/stm32f103c(8-b)tx-pinctrl.dtsi>
+#include <dt-bindings/led/led.h>
+
+/ {
+	model = "Xikii HW-75";
+	compatible = "st,stm32f103";
+
+	chosen {
+		zephyr,code-partition = &code_partition;
+		zephyr,sram = &sram0;
+		zephyr,flash = &flash0;
+		zephyr,console = &usart1;
+		zmk,kscan = &kscan;
+		zmk,matrix_transform = &default_transform;
+		zmk,underglow = &led_strip;
+	};
+};
+
+&clk_hse {
+	clock-frequency = <DT_FREQ_M(8)>;
+	status = "okay";
+};
+
+&pll {
+	mul = <9>;
+	clocks = <&clk_hse>;
+	status = "okay";
+};
+
+&rcc {
+	clocks = <&pll>;
+	clock-frequency = <DT_FREQ_M(72)>;
+	ahb-prescaler = <1>;
+	apb1-prescaler = <2>;
+	apb2-prescaler = <1>;
+};
+
+&usb {
+	pinctrl-0 = <&usb_dm_pa11 &usb_dp_pa12>;
+	pinctrl-names = "default";
+	status = "okay";
+};
+
+&usart1 {
+	current-speed = <115200>;
+	pinctrl-0 = <&usart1_tx_pa9>;
+	pinctrl-names = "default";
+	status = "okay";
+};
+
+&spi1 {
+	pinctrl-0 = <&spi1_sck_master_pa5 &spi1_miso_master_pa6>;
+	pinctrl-names = "default";
+	status = "okay";
+
+	cs-gpios = <&gpiob 3 GPIO_ACTIVE_LOW>;
+
+	kscan: kscan-gpio-74hc165@0 {
+		compatible = "zmk,kscan-gpio-74hc165";
+		reg = <0>;
+		spi-max-frequency = <1000000>;
+		label = "KSCAN";
+		chain-length = <11>;
+		scan-masks = [FF FF FF FF FF FF FF FF FF FF FF];
+		parallel-load-gpios = <&gpiob 4 GPIO_ACTIVE_LOW>;
+	};
+};
+
+&spi2 {
+	pinctrl-0 = <&spi2_mosi_master_pb15>;
+	pinctrl-names = "default";
+	status = "okay";
+
+	led_strip: ws2812@0 {
+		compatible = "worldsemi,ws2812-spi";
+		label = "WS2812";
+
+		reg = <0>;
+		spi-max-frequency = <4000000>;
+
+		chain-length = <103>;
+		spi-one-frame = <0x70>;
+		spi-zero-frame = <0x40>;
+		color-mapping = <LED_COLOR_ID_GREEN LED_COLOR_ID_RED LED_COLOR_ID_BLUE>;
+	};
+};
+
+&flash0 {
+	partitions {
+		compatible = "fixed-partitions";
+		#address-cells = <1>;
+		#size-cells = <1>;
+
+		bootloader_partition: partition@0 {
+			label = "bootloader";
+			reg = <DT_SIZE_K(0) DT_SIZE_K(4)>;
+		};
+
+		code_partition: partition@1000 {
+			label = "code_partition";
+			reg = <DT_SIZE_K(4) DT_SIZE_K(122)>;
+		};
+
+		storage_partition: partition@f800 {
+			label = "storage";
+			reg = <DT_SIZE_K(126) DT_SIZE_K(2)>;
+		};
+	};
+};

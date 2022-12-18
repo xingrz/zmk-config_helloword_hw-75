@@ -1,0 +1,11 @@
+file_format: "1"
+id: xikii_hw75
+name: Xikii HW-75
+type: board
+arch: arm
+features:
+  - keys
+  - underglow
+outputs:
+  - usb
+url: https://github.com/peng-zhihui/HelloWord-Keyboard
