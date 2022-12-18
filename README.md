@@ -19,7 +19,9 @@ zmk-config for Xikii HW-75 (瀚文 75)
 
 ### 布局
 
-本固件默认为针对 Mac 用户的按键布局 (并且屏蔽了触摸条)。如果你需要在 Windows 上使用，可以自行修改 [`xikii_hw75.keymap`](config/xikii_hw75.keymap)。
+![keymap](keymap.png)
+
+本固件默认为针对 Mac 用户的按键布局 (并且屏蔽了触摸条)。如果你需要在 Windows 上使用，可以将本仓库 Fork 到自己账号下之后使用 [ZMK Keymap Editor](https://nickcoutsos.github.io/keymap-editor/) 修改，或手动编辑 [`xikii_hw75.keymap`](config/xikii_hw75.keymap) 文件。然后等待云端编译出新的固件。
 
 ### 灯效
 
