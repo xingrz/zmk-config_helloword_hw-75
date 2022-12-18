@@ -10,7 +10,8 @@ zmk-config for Xikii HW-75 (瀚文 75)
 ## 烧录 (针对一般用户)
 
 1. 请确保已经在 HW-75 中烧入了 DFU bootloader。详见[这篇文章](https://github.com/peng-zhihui/HelloWord-Keyboard/discussions/77)；
-2. 按住键盘的 Fn 键插入 USB，打开 [WebDFU](https://devanlai.github.io/webdfu/dfu-util/) 选择固件进行烧录。
+2. 从 [Releases](https://github.com/xingrz/zmk-config_xikii_hw-75/releases) 下载最新的固件；
+3. 按住键盘的 Fn 键插入 USB，打开 [WebDFU](https://devanlai.github.io/webdfu/dfu-util/) 选择固件进行烧录。
 
 ## 快速定制
 
