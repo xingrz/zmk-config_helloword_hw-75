@@ -5,13 +5,21 @@ zmk-config for Xikii HW-75 (瀚文 75)
 
 [瀚文 75 (HW-75)](https://github.com/peng-zhihui/HelloWord-Keyboard) 是一款由稚晖君 ([@peng-zhihui](https://github.com/peng-zhihui)) 设计、Xikii Industy 生产的模块化机械键盘。
 
-本仓库是针对 HW-75 的 [ZMK](https://github.com/zmkfirmware/zmk) 编译配置。请注意，虽然 HW-75 的设计是开源的，但是 Xikii 官方团的 PCB 在开源版基础上有细微调整。本配置仅针对官方团的 PCB 适配。
+本仓库是针对 HW-75 的 [ZMK](https://github.com/zmkfirmware/zmk) 编译配置。
 
 ## 烧录 (针对一般用户)
 
-1. 请确保已经在 HW-75 中烧入了 DFU bootloader。详见[这篇文章](https://github.com/peng-zhihui/HelloWord-Keyboard/discussions/77)；
-2. 从 [Releases](https://github.com/xingrz/zmk-config_xikii_hw-75/releases) 下载最新的固件；
-3. 按住键盘的 Fn 键插入 USB，打开 [WebDFU](https://devanlai.github.io/webdfu/dfu-util/) 选择固件进行烧录。
+本仓库支持下列版本的 PCB。烧录时请注意区分：
+
+| 版本 | 文件名 | 备注 |
+|-|-|-|
+| Ver1.1 | `xikii_hw75@1.1-zmk.bin` | 立创开源版，大部分开源团使用的版本 |
+| Ver1.2 | `xikii_hw75@1.2-zmk.bin` | Xikii 500 人试作团、哔哩哔哩会员购版 |
+
+操作步骤：
+
+1. 从 [Releases](https://github.com/xingrz/zmk-config_xikii_hw-75/releases/latest) 下载最新的固件。请注意区分 PCB 版本；
+2. 参考[这篇文章的步骤](https://www.zfrontier.com/app/flow/xKYXEy6AqWra)完成准备工作，并烧入固件。
 
 ## 快速定制
 
@@ -49,10 +57,17 @@ west build -s zmk/app -b xikii_hw75 -- -DZMK_CONFIG=$PWD/config
 west flash
 ```
 
+默认会构建最新 PCB 版本的配置。如果你需要构建不同版本，可以使用下面的命令：
+
+```sh
+west build -p -s zmk/app -b xikii_hw75@1.1 -- -DZMK_CONFIG=$PWD/config -DKEYMAP_FILE=$PWD/config/xikii_hw75.keymap
+```
+
 ## 相关链接
 
 * [使用开源的 DAPLink 调试器及 pyOCD 烧录程序](https://github.com/peng-zhihui/HelloWord-Keyboard/discussions/76)
 * [一个只有 4KB 的 DFU bootloader](https://github.com/peng-zhihui/HelloWord-Keyboard/discussions/77)
+* [peng-zhihui/HelloWord-Keyboard](https://github.com/peng-zhihui/HelloWord-Keyboard)
 * [ZMK Firmware](https://zmk.dev/)
 
 ## 协议
