@@ -1,0 +1,7 @@
+identifier: hw75_dynamic
+name: HelloWord HW-75 Dynamic
+type: mcu
+arch: arm
+toolchain:
+  - zephyr
+  - gnuarmemb

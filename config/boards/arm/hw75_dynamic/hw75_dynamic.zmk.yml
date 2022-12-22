@@ -1,0 +1,12 @@
+file_format: "1"
+id: hw75_dynamic
+name: HelloWord HW-75 Dynamic
+type: board
+arch: arm
+features:
+  - keys
+  - underglow
+  - encoder
+outputs:
+  - usb
+url: https://github.com/peng-zhihui/HelloWord-Keyboard

@@ -1,0 +1,103 @@
+/*
+ * Copyright (c) 2022 The ZMK Contributors
+ * SPDX-License-Identifier: MIT
+ */
+
+/dts-v1/;
+#include <st/f4/stm32f405Xg.dtsi>
+#include <st/f4/stm32f405rgtx-pinctrl.dtsi>
+#include <dt-bindings/led/led.h>
+#include <dt-bindings/zmk/matrix_transform.h>
+
+/ {
+	model = "HelloWord HW-75 Dynamic";
+	compatible = "st,stm32f405";
+
+	chosen {
+		zephyr,code-partition = &code_partition;
+		zephyr,sram = &sram0;
+		zephyr,flash = &flash0;
+		zephyr,ccm = &ccm0;
+		zephyr,console = &cdc_acm_uart0;
+		zmk,kscan = &kscan;
+		zmk,underglow = &led_strip;
+	};
+
+	kscan: kscan {
+		compatible = "zmk,kscan-gpio-direct";
+		label = "KSCAN";
+		input-gpios =
+			<&gpioc 8 GPIO_ACTIVE_LOW>,
+			<&gpioc 9 GPIO_ACTIVE_LOW>;
+	};
+};
+
+&clk_hse {
+	clock-frequency = <DT_FREQ_M(8)>;
+	status = "okay";
+};
+
+&pll {
+	div-m = <4>;
+	mul-n = <168>;
+	div-p = <2>;
+	div-q = <7>;
+	clocks = <&clk_hse>;
+	status = "okay";
+};
+
+&rcc {
+	clocks = <&pll>;
+	clock-frequency = <DT_FREQ_M(168)>;
+	ahb-prescaler = <1>;
+	apb1-prescaler = <4>;
+	apb2-prescaler = <2>;
+};
+
+&usbotg_fs {
+	pinctrl-0 = <&usb_otg_fs_dm_pa11 &usb_otg_fs_dp_pa12>;
+	pinctrl-names = "default";
+	status = "okay";
+
+	cdc_acm_uart0: cdc_acm_uart0 {
+		compatible = "zephyr,cdc-acm-uart";
+		label = "CDC_ACM_0";
+	};
+};
+
+&spi3 {
+	pinctrl-0 = <&spi3_mosi_pc12>;
+	pinctrl-names = "default";
+	status = "okay";
+
+	led_strip: ws2812@0 {
+		compatible = "worldsemi,ws2812-spi";
+		label = "WS2812";
+
+		reg = <0>;
+		spi-max-frequency = <4000000>;
+
+		chain-length = <4>;
+		spi-one-frame = <0x70>;
+		spi-zero-frame = <0x40>;
+		color-mapping = <LED_COLOR_ID_GREEN LED_COLOR_ID_RED LED_COLOR_ID_BLUE>;
+	};
+};
+
+&flash0 {
+	partitions {
+		compatible = "fixed-partitions";
+		#address-cells = <1>;
+		#size-cells = <1>;
+
+		code_partition: partition@0 {
+			label = "code_partition";
+			reg = <DT_SIZE_K(0) DT_SIZE_K(1020)>;
+		};
+
+		storage_partition: partition@ff000 {
+			label = "storage";
+			reg = <DT_SIZE_K(1020) DT_SIZE_K(4)>;
+		};
+	};
+};

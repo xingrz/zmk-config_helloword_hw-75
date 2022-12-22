@@ -1,0 +1,16 @@
+/*
+ * Copyright (c) 2022 The ZMK Contributors
+ * SPDX-License-Identifier: MIT
+ */
+
+#include <behaviors.dtsi>
+#include <dt-bindings/zmk/rgb.h>
+
+/ {
+	keymap {
+		compatible = "zmk,keymap";
+		base {
+			bindings = <&rgb_ug RGB_TOG &rgb_ug RGB_EFF>;
+		};
+	};
+};
