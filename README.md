@@ -13,7 +13,7 @@ zmk-config for HelloWord HW-75 (瀚文 75)
 
 | 版本 | 文件名 | 备注 |
 |-|-|-|
-| Ver1.1 | `hw75@1.1-zmk.bin` | 立创开源版，大部分开源团使用的版本 |
+| Ver1.1 | `hw75@1.1-zmk.bin` | [立创开源](https://oshwhub.com/pengzhihui/b11afae464c54a3e8d0f77e1f92dc7b7)版，大部分开源团使用的版本 |
 | Ver1.2 | `hw75@1.2-zmk.bin` | Xikii 500 人试作团、哔哩哔哩会员购版 |
 
 操作步骤：
