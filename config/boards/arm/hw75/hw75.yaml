@@ -1,5 +1,5 @@
-identifier: xikii_hw75
-name: Xikii HW-75
+identifier: hw75
+name: HelloWord HW-75
 type: mcu
 arch: arm
 toolchain:

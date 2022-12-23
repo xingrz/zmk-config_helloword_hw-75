@@ -1,9 +1,9 @@
-zmk-config for Xikii HW-75 (瀚文 75)
+zmk-config for HelloWord HW-75 (瀚文 75)
 ========
 
 ![HW-75](https://github.com/peng-zhihui/HelloWord-Keyboard/raw/main/5.Docs/2.Images/hw1.jpg)
 
-[瀚文 75 (HW-75)](https://github.com/peng-zhihui/HelloWord-Keyboard) 是一款由稚晖君 ([@peng-zhihui](https://github.com/peng-zhihui)) 设计、Xikii Industy 生产的模块化机械键盘。
+[瀚文 75 (HW-75)](https://github.com/peng-zhihui/HelloWord-Keyboard) 是一款由稚晖君 ([@peng-zhihui](https://github.com/peng-zhihui)) 设计并开源的模块化机械键盘。
 
 本仓库是针对 HW-75 的 [ZMK](https://github.com/zmkfirmware/zmk) 编译配置。
 
@@ -13,12 +13,12 @@ zmk-config for Xikii HW-75 (瀚文 75)
 
 | 版本 | 文件名 | 备注 |
 |-|-|-|
-| Ver1.1 | `xikii_hw75@1.1-zmk.bin` | 立创开源版，大部分开源团使用的版本 |
-| Ver1.2 | `xikii_hw75@1.2-zmk.bin` | Xikii 500 人试作团、哔哩哔哩会员购版 |
+| Ver1.1 | `hw75@1.1-zmk.bin` | 立创开源版，大部分开源团使用的版本 |
+| Ver1.2 | `hw75@1.2-zmk.bin` | Xikii 500 人试作团、哔哩哔哩会员购版 |
 
 操作步骤：
 
-1. 从 [Releases](https://github.com/xingrz/zmk-config_xikii_hw-75/releases/latest) 下载最新的固件。请注意区分 PCB 版本；
+1. 从 [Releases](https://github.com/xingrz/zmk-config_helloword_hw-75/releases/latest) 下载最新的固件。请注意区分 PCB 版本；
 2. 参考[这篇文章的步骤](https://www.zfrontier.com/app/flow/xKYXEy6AqWra)完成准备工作，并烧入固件。
 
 ## 快速定制
@@ -29,7 +29,7 @@ zmk-config for Xikii HW-75 (瀚文 75)
 
 ![keymap](keymap.png)
 
-本固件默认为针对 Mac 用户的按键布局 (并且屏蔽了触摸条)。如果你需要在 Windows 上使用，可以将本仓库 Fork 到自己账号下之后使用 [ZMK Keymap Editor](https://nickcoutsos.github.io/keymap-editor/) 修改，或手动编辑 [`xikii_hw75.keymap`](config/xikii_hw75.keymap) 文件。然后等待云端编译出新的固件。
+本固件默认为针对 Mac 用户的按键布局 (并且屏蔽了触摸条)。如果你需要在 Windows 上使用，可以将本仓库 Fork 到自己账号下之后使用 [ZMK Keymap Editor](https://nickcoutsos.github.io/keymap-editor/) 修改，或手动编辑 [`hw75.keymap`](config/hw75.keymap) 文件。然后等待云端编译出新的固件。
 
 ### 灯效
 
@@ -53,14 +53,14 @@ export GNUARMEMB_TOOLCHAIN_PATH=/path/to/gcc-arm-none-eabi-10.3-2021.10
 west init -l config
 west update
 west zephyr-export
-west build -s zmk/app -b xikii_hw75 -- -DZMK_CONFIG=$PWD/config
+west build -s zmk/app -b hw75 -- -DZMK_CONFIG=$PWD/config
 west flash
 ```
 
 默认会构建最新 PCB 版本的配置。如果你需要构建不同版本，可以使用下面的命令：
 
 ```sh
-west build -p -s zmk/app -b xikii_hw75@1.1 -- -DZMK_CONFIG=$PWD/config -DKEYMAP_FILE=$PWD/config/xikii_hw75.keymap
+west build -p -s zmk/app -b hw75@1.1 -- -DZMK_CONFIG=$PWD/config -DKEYMAP_FILE=$PWD/config/hw75.keymap
 ```
 
 ## 相关链接

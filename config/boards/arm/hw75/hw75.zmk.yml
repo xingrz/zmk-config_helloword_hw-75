@@ -1,6 +1,6 @@
 file_format: "1"
-id: xikii_hw75
-name: Xikii HW-75
+id: hw75
+name: HelloWord HW-75
 type: board
 arch: arm
 features:

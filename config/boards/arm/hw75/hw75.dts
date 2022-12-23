@@ -10,7 +10,7 @@
 #include <dt-bindings/zmk/matrix_transform.h>
 
 / {
-	model = "Xikii HW-75";
+	model = "HelloWord HW-75";
 	compatible = "st,stm32f103";
 
 	chosen {
