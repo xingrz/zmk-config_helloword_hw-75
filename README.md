@@ -72,4 +72,4 @@ west build -p -s zmk/app -b hw75@1.1 -- -DZMK_CONFIG=$PWD/config -DKEYMAP_FILE=$
 
 ## 协议
 
-[Apache License 2.0](LICENSE)
+[MIT License](LICENSE)
