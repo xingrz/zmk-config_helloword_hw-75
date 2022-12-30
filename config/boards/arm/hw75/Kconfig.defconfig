@@ -14,6 +14,19 @@ config ZMK_KEYBOARD_NAME
 config ZMK_USB
 	default y
 
+choice ZMK_HID_REPORT_TYPE
+	default ZMK_HID_REPORT_TYPE_NKRO
+endchoice
+
+config ZMK_RGB_UNDERGLOW
+	default y
+	select WS2812_STRIP
+	select LED_STRIP
+	select SPI
+
+config ZMK_RGB_UNDERGLOW_EXT_POWER
+	default n
+
 rsource "drivers/Kconfig"
 
 endif # BOARD_HW75
