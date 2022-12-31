@@ -19,6 +19,7 @@
 		zephyr,flash = &flash0;
 		zephyr,ccm = &ccm0;
 		zephyr,console = &cdc_acm_uart0;
+		zephyr,display = &oled;
 		zmk,kscan = &kscan;
 		zmk,underglow = &led_strip;
 	};
@@ -81,6 +82,32 @@
 		spi-one-frame = <0x70>;
 		spi-zero-frame = <0x40>;
 		color-mapping = <LED_COLOR_ID_GREEN LED_COLOR_ID_RED LED_COLOR_ID_BLUE>;
+	};
+};
+
+&i2c1 {
+	pinctrl-0 = <&i2c1_scl_pb6 &i2c1_sda_pb7>;
+	pinctrl-names = "default";
+	status = "okay";
+
+	clock-frequency = <100000>;
+
+	oled: ssd1306@3c {
+		compatible = "solomon,ssd1306fb";
+		label = "SSD1306";
+
+		reg = <0x3C>;
+
+		width = <128>;
+		height = <32>;
+
+		segment-offset = <2>;
+		page-offset = <0>;
+		display-offset = <16>;
+		multiplex-ratio = <31>;
+		segment-remap;
+		com-invdir;
+		prechargep = <0xf1>;
 	};
 };
 
