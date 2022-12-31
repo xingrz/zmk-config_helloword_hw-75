@@ -14,6 +14,13 @@ config ZMK_KEYBOARD_NAME
 config ZMK_USB
 	default y
 
+config ZMK_RTT_LOGGING
+	bool "Enable RTT logging to help debug"
+	select LOG
+	select USE_SEGGER_RTT
+	select CONSOLE
+	select RTT_CONSOLE
+
 config ZMK_RGB_UNDERGLOW
 	default y
 	select WS2812_STRIP
