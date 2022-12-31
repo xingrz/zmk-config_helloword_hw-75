@@ -126,6 +126,36 @@
 	};
 };
 
+&spi2 {
+	pinctrl-0 = <&spi2_mosi_pc3 &spi2_sck_pb10>;
+	pinctrl-names = "default";
+	status = "okay";
+
+	cs-gpios = <&gpioa 4 GPIO_ACTIVE_LOW>;
+
+	ssd16xx: ssd16xx@0 {
+		compatible = "solomon,ssd16xxfb";
+		label = "SSD16XX";
+
+		reg = <0>;
+		spi-max-frequency = <4000000>;
+
+		width = <296>;
+		height = <128>;
+
+		reset-gpios = <&gpioc 2 GPIO_ACTIVE_LOW>;
+		dc-gpios = <&gpioc 0 GPIO_ACTIVE_LOW>;
+		busy-gpios = <&gpioc 1 GPIO_ACTIVE_HIGH>;
+
+		pp-width-bits = <8>;
+		pp-height-bits = <16>;
+		gdv = [16];
+		sdv = [0a];
+		vcom = <0xa8>;
+		border-waveform = <0x33>;
+	};
+};
+
 &spi3 {
 	pinctrl-0 = <&spi3_mosi_pc12>;
 	pinctrl-names = "default";
