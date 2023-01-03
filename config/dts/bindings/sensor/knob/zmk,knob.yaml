@@ -1,0 +1,28 @@
+# Copyright (c) 2022-2023 XiNGRZ
+# SPDX-License-Identifier: MIT
+
+description: Sensor driver for FOC-emulated rotary encoder
+
+compatible: "zmk,knob"
+
+properties:
+  label:
+    type: string
+    required: true
+
+  encoder:
+    type: phandle
+    required: true
+    description: The encoder device
+
+  tick-interval-us:
+    type: int
+    required: false
+    default: 10000
+    description: Delay between each tick
+
+  ppr:
+    type: int
+    required: false
+    default: 24
+    description: Number of pulses per full revolution

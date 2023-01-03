@@ -1,0 +1,9 @@
+# Copyright (c) 2022-2023 XiNGRZ
+# SPDX-License-Identifier: MIT
+
+DT_COMPAT_AMS_AS5047 := ams,as5047
+
+config KNOB_ENCODER_AS5047
+	bool "14-bit on-axis magnetic rotary position sensor with 11-bit decimal and binary incremental pulse count"
+	default $(dt_compat_enabled,$(DT_COMPAT_AMS_AS5047))
+	select SPI

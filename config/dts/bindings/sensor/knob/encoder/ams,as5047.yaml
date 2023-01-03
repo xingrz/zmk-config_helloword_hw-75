@@ -1,0 +1,25 @@
+# Copyright (c) 2022-2023 XiNGRZ
+# SPDX-License-Identifier: MIT
+
+description: 14-bit on-axis magnetic rotary position sensor with 11-bit decimal and binary incremental pulse count
+
+compatible: "ams,as5047"
+
+include: spi-device.yaml
+
+properties:
+  label:
+    type: string
+    required: true
+
+  cs-delay-us:
+    type: int
+    required: false
+    default: 350
+    description: Delay after pulling down and before releasing CS pin.
+
+  init-delay-us:
+    type: int
+    required: false
+    default: 0
+    description: Delay before ready.

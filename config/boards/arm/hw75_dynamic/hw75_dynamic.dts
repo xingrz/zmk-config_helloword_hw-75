@@ -31,6 +31,18 @@
 			<&gpioc 8 GPIO_ACTIVE_LOW>,
 			<&gpioc 9 GPIO_ACTIVE_LOW>;
 	};
+
+	sensors {
+		compatible = "zmk,keymap-sensors";
+		sensors = <&knob>;
+	};
+
+	knob: knob {
+		compatible = "zmk,knob";
+		label = "KNOB";
+		encoder = <&as5047>;
+		tick-interval-us = <1000>;
+	};
 };
 
 &clk_hse {
@@ -63,6 +75,25 @@
 	cdc_acm_uart0: cdc_acm_uart0 {
 		compatible = "zephyr,cdc-acm-uart";
 		label = "CDC_ACM_0";
+	};
+};
+
+&spi1 {
+	pinctrl-0 = <&spi1_miso_pb4 &spi1_mosi_pb5 &spi1_sck_pb3>;
+	pinctrl-names = "default";
+	status = "okay";
+
+	cs-gpios = <&gpiod 2 GPIO_ACTIVE_LOW>;
+
+	as5047: as5047@0 {
+		compatible = "ams,as5047";
+		label = "AS5047";
+
+		reg = <0>;
+		spi-max-frequency = <1000000>;
+
+		cs-delay-us = <350>;
+		init-delay-us = <10000>;
 	};
 };
 

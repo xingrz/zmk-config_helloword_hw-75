@@ -2,3 +2,4 @@
 # SPDX-License-Identifier: MIT
 
 add_subdirectory_ifdef(CONFIG_BOARD_HW75_DYNAMIC app)
+add_subdirectory_ifdef(CONFIG_BOARD_HW75_DYNAMIC drivers)
