@@ -92,12 +92,12 @@
 
 		code_partition: partition@0 {
 			label = "code_partition";
-			reg = <DT_SIZE_K(0) DT_SIZE_K(1020)>;
+			reg = <0x00000000 DT_SIZE_K(256)>;
 		};
 
-		storage_partition: partition@ff000 {
+		storage_partition: partition@e0000 {
 			label = "storage";
-			reg = <DT_SIZE_K(1020) DT_SIZE_K(4)>;
+			reg = <0x000e0000 DT_SIZE_K(128)>;
 		};
 	};
 };
