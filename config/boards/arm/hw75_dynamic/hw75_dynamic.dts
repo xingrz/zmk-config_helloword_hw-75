@@ -134,10 +134,8 @@
 
 		segment-offset = <2>;
 		page-offset = <0>;
-		display-offset = <16>;
+		display-offset = <48>;
 		multiplex-ratio = <31>;
-		segment-remap;
-		com-invdir;
 		prechargep = <0xf1>;
 	};
 };

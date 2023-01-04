@@ -11,19 +11,19 @@
 	keymap {
 		compatible = "zmk,keymap";
 		layer_0 {
-			label = "VOLUME";
+			label = "VOL";
 			bindings = <&rgb_ug RGB_EFF &to 1>;
 			sensor-bindings = <&inc_dec_kp C_VOL_DN C_VOL_UP>;
 		};
 
 		layer_1 {
-			label = "SCREEN";
+			label = "BRI";
 			bindings = <&rgb_ug RGB_EFF &to 2>;
 			sensor-bindings = <&inc_dec_kp C_BRI_DEC C_BRI_INC>;
 		};
 
 		layer_2 {
-			label = "SCROLL";
+			label = "SCR";
 			bindings = <&rgb_ug RGB_EFF &to 0>;
 			sensor-bindings = <&inc_dec_kp DOWN UP>;
 		};
