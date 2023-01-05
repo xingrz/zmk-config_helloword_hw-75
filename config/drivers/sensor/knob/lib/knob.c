@@ -29,6 +29,7 @@ struct knob_data {
 };
 
 struct knob_config {
+	const struct device *inverter;
 	const struct device *encoder;
 	uint32_t tick_interval_us;
 	float radian_per_pulse;
@@ -122,6 +123,11 @@ int knob_init(const struct device *dev)
 
 	data->dev = dev;
 
+	if (!device_is_ready(config->inverter)) {
+		LOG_ERR("%s: Inverter device is not ready: %s", dev->name, config->inverter->name);
+		return -ENODEV;
+	}
+
 	if (!device_is_ready(config->encoder)) {
 		LOG_ERR("%s: Encoder device is not ready: %s", dev->name, config->encoder->name);
 		return -ENODEV;
@@ -139,6 +145,7 @@ int knob_init(const struct device *dev)
 #define KNOB_INST(n)                                                                               \
 	struct knob_data knob_data_##n;                                                            \
 	const struct knob_config knob_config_##n = {                                               \
+		.inverter = DEVICE_DT_GET(DT_INST_PHANDLE(n, inverter)),                           \
 		.encoder = DEVICE_DT_GET(DT_INST_PHANDLE(n, encoder)),                             \
 		.tick_interval_us = DT_INST_PROP_OR(n, tick_interval_us, 10000),                   \
 		.radian_per_pulse = PI2 / (float)DT_INST_PROP_OR(n, ppr, 24),                      \

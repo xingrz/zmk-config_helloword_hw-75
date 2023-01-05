@@ -10,6 +10,11 @@ properties:
     type: string
     required: true
 
+  inverter:
+    type: phandle
+    required: true
+    description: The inverter device
+
   encoder:
     type: phandle
     required: true

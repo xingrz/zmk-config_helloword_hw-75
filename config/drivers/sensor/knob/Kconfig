@@ -23,6 +23,7 @@ config KNOB_DRIVER_INIT_PRIORITY
 	int
 	default 80
 
+rsource "inverter/Kconfig"
 rsource "encoder/Kconfig"
 
 endif # KNOB

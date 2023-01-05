@@ -48,6 +48,7 @@
 	knob: knob {
 		compatible = "zmk,knob";
 		label = "KNOB";
+		inverter = <&inverter>;
 		encoder = <&as5047>;
 		tick-interval-us = <1000>;
 	};
@@ -146,6 +147,31 @@
 		multiplex-ratio = <31>;
 		com-invdir;
 		prechargep = <0xf1>;
+	};
+};
+
+&timers1 {
+	status = "okay";
+
+	pwm {
+		pinctrl-0 = <
+			&tim1_ch1_pa8
+			&tim1_ch2_pa9
+			&tim1_ch3_pa10
+			&tim1_ch1n_pb13
+			&tim1_ch2n_pb0
+			&tim1_ch3n_pb1
+		>;
+		pinctrl-names = "default";
+		status = "okay";
+	};
+
+	inverter: inverter {
+		compatible = "zmk,inverter-stm32";
+		label = "INVERTER";
+		enable-gpios = <&gpiob 8 GPIO_ACTIVE_HIGH>;
+		pwm-period = <4199>;
+		pwm-channels = <1 2 3>;
 	};
 };
 

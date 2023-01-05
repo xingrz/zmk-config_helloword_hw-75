@@ -1,0 +1,26 @@
+# Copyright (c) 2022-2023 XiNGRZ
+# SPDX-License-Identifier: MIT
+
+description: STM32 TIM based output driver for generic 3-phase bridge driver
+
+compatible: "zmk,inverter-stm32"
+
+include: base.yaml
+
+properties:
+  label:
+    type: string
+    required: true
+
+  enable-gpios:
+    type: phandle-array
+
+  pwm-period:
+    type: int
+    required: true
+    description: PWM peroid in cycles
+
+  pwm-channels:
+    type: array
+    required: true
+    description: PWM channels for phase A, B and C
