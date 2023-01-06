@@ -1,0 +1,29 @@
+on: [push, pull_request, workflow_dispatch]
+
+jobs:
+  build:
+    uses: zmkfirmware/zmk/.github/workflows/build-user-config.yml@main
+    with:
+      build_matrix_path: build_dynamic.yaml
+      fallback_binary: hex
+
+  release:
+    if: ${{ startsWith(github.ref, 'refs/tags/') }}
+    needs: build
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Download artifacts
+        uses: actions/download-artifact@v3
+        with:
+          name: firmware
+          path: firmware
+
+      - name: Publish release
+        uses: svenstaro/upload-release-action@v2
+        with:
+          file: firmware/*.bin
+          file_glob: true
+          tag: ${{ github.ref }}
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
