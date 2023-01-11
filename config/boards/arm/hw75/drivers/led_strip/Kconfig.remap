@@ -4,6 +4,6 @@
 DT_COMPAT_ZMK_LED_STRIP_REMAP := zmk,led-strip-remap
 
 config LED_STRIP_REMAP
-	bool "A virtual LED strip driver for reordering LEDs"
+	bool "A virtual LED strip driver for reordering LEDs, with extended APIs to override status of individual LED"
 	default $(dt_compat_enabled,$(DT_COMPAT_ZMK_LED_STRIP_REMAP))
 	depends on LED_STRIP

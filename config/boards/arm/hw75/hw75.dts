@@ -57,6 +57,11 @@
 			/* status (top/mid/bottom) */
 			 84  83  82
 		>;
+
+		status {
+			label = "STATUS";
+			led-indexes = <84 83 82>;
+		};
 	};
 };
 

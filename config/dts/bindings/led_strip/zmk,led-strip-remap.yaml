@@ -2,7 +2,8 @@
 # SPDX-License-Identifier: MIT
 
 description: |
-  A virtual LED strip driver for reordering LEDs.
+  A virtual LED strip driver for reordering LEDs, with additional APIs for using
+  individual LEDs as custom indicators.
 
 compatible: "zmk,led-strip-remap"
 
@@ -21,3 +22,14 @@ properties:
     type: array
     required: true
     description: The re-ordered index of LEDs.
+
+child-binding:
+  description: Subset of LEDs to be use as indicators.
+  properties:
+    label:
+      type: string
+      required: true
+    led-indexes:
+      type: array
+      required: true
+      description: The indexes of the LEDs in the subset.
