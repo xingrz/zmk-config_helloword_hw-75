@@ -1,0 +1,23 @@
+# Copyright (c) 2022-2023 XiNGRZ
+# SPDX-License-Identifier: MIT
+
+description: |
+  A virtual LED strip driver for reordering LEDs.
+
+compatible: "zmk,led-strip-remap"
+
+properties:
+  label:
+    type: string
+    required: true
+  chain-length:
+    type: int
+    required: true
+    description: The number of LEDs in the strip.
+  led-strip:
+    type: phandle
+    required: true
+  map:
+    type: array
+    required: true
+    description: The re-ordered index of LEDs.

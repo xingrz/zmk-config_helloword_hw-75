@@ -1,0 +1,9 @@
+# Copyright (c) 2022-2023 XiNGRZ
+# SPDX-License-Identifier: MIT
+
+DT_COMPAT_ZMK_LED_STRIP_REMAP := zmk,led-strip-remap
+
+config LED_STRIP_REMAP
+	bool "A virtual LED strip driver for reordering LEDs"
+	default $(dt_compat_enabled,$(DT_COMPAT_ZMK_LED_STRIP_REMAP))
+	depends on LED_STRIP

@@ -2,3 +2,4 @@
 # SPDX-License-Identifier: MIT
 
 add_subdirectory(kscan)
+add_subdirectory(led_strip)
