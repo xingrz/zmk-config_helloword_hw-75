@@ -7,15 +7,15 @@ HW-75 Keyboard
 
 本配置支持下列版本的 PCB。烧录时请注意区分：
 
-| PCB 版本 | 文件名 | 备注 |
+| PCB 版本 | 文件前缀 | 备注 |
 |--------|--------------------|------|
-| Ver1.1 | `hw75@1.1-zmk.bin` | [立创开源](https://oshwhub.com/pengzhihui/b11afae464c54a3e8d0f77e1f92dc7b7)版，大部分开源团使用的版本 |
-| Ver1.2 | `hw75@1.2-zmk.bin` | Xikii 500 人试作团、哔哩哔哩会员购版 |
+| Ver1.1 | `hw75@1.1-zmk` | [立创开源](https://oshwhub.com/pengzhihui/b11afae464c54a3e8d0f77e1f92dc7b7)版，大部分开源团使用的版本 |
+| Ver1.2 | `hw75@1.2-zmk` | Xikii 500 人试做团、哔哩哔哩会员购版 |
 
 ## 烧录
 
 1. 从 [Releases](https://github.com/xingrz/zmk-config_helloword_hw-75/releases/latest) 下载最新的固件。请注意区分 PCB 版本；
-2. 参考[这篇文章的步骤](https://www.zfrontier.com/app/flow/xKYXEy6AqWra)完成准备工作，并烧入固件。
+2. 参考[固件更新说明](https://github.com/xingrz/zmk-config_helloword_hw-75/wiki/%E5%9B%BA%E4%BB%B6%E6%9B%B4%E6%96%B0-(%E9%94%AE%E7%9B%98))完成准备工作，并烧入固件。
 
 ## 快速定制
 

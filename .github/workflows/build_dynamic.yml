@@ -23,7 +23,7 @@ jobs:
       - name: Publish release
         uses: svenstaro/upload-release-action@v2
         with:
-          file: firmware/*.bin
+          file: firmware/*.hex
           file_glob: true
           tag: ${{ github.ref }}
           repo_token: ${{ secrets.GITHUB_TOKEN }}
