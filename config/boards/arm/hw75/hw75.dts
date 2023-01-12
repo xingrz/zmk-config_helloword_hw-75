@@ -116,17 +116,17 @@
 
 		bootloader_partition: partition@0 {
 			label = "bootloader";
-			reg = <DT_SIZE_K(0) DT_SIZE_K(4)>;
+			reg = <0x00000000 DT_SIZE_K(16)>;
 		};
 
-		code_partition: partition@1000 {
+		code_partition: partition@4000 {
 			label = "code_partition";
-			reg = <DT_SIZE_K(4) DT_SIZE_K(122)>;
+			reg = <0x00004000 DT_SIZE_K(110)>;
 		};
 
 		storage_partition: partition@1f800 {
 			label = "storage";
-			reg = <DT_SIZE_K(126) DT_SIZE_K(2)>;
+			reg = <0x0001f800 DT_SIZE_K(2)>;
 		};
 	};
 };
