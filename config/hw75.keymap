@@ -15,25 +15,25 @@
 		compatible = "zmk,keymap";
 		base {
 			bindings = <
-				&kp ESC             &kp C_BRI_DEC &kp C_BRI_INC &none   &none   &rgb_ug RGB_BRD &rgb_ug RGB_BRI &kp C_PREV  &kp C_PP  &kp C_NEXT  &kp C_MUTE  &kp C_VOL_DN  &kp C_VOL_UP    &kp K_LOCK
-				&kp GRAVE &kp N1    &kp N2        &kp N3        &kp N4  &kp N5  &kp N6          &kp N7          &kp N8      &kp N9    &kp N0      &kp MINUS   &kp EQUAL     &kp BSPC        &kp HOME
-				&kp TAB   &kp Q     &kp W         &kp E         &kp R   &kp T   &kp Y           &kp U           &kp I       &kp O     &kp P       &kp LBKT    &kp RBKT      &kp BSLH        &kp PG_UP
-				&kp CLCK  &kp A     &kp S         &kp D         &kp F   &kp G   &kp H           &kp J           &kp K       &kp L     &kp SEMI    &kp SQT                   &kp RET         &kp PG_DN
-				&kp LSHFT           &kp Z         &kp X         &kp C   &kp V   &kp B           &kp N           &kp M       &kp COMMA &kp DOT     &kp FSLH    &kp RSHFT     &kp UP          &kp END
-				&kp LCTRL &kp LALT  &kp LCMD                                    &kp SPACE                                   &kp RCMD  &mo FN      &kp RALT    &kp LEFT      &kp DOWN        &kp RIGHT
-				                                                &none   &none   &none   &none   &none   &none
+				&kp ESC             &kp F1    &kp F2  &kp F3  &kp F4  &kp F5    &kp F6  &kp F7  &kp F8    &kp F9    &kp F10   &kp F11   &kp F12   &kp PAUSE_BREAK
+				&kp GRAVE &kp N1    &kp N2    &kp N3  &kp N4  &kp N5  &kp N6    &kp N7  &kp N8  &kp N9    &kp N0    &kp MINUS &kp EQUAL &kp BSPC  &kp INSERT
+				&kp TAB   &kp Q     &kp W     &kp E   &kp R   &kp T   &kp Y     &kp U   &kp I   &kp O     &kp P     &kp LBKT  &kp RBKT  &kp BSLH  &kp DELETE
+				&kp CLCK  &kp A     &kp S     &kp D   &kp F   &kp G   &kp H     &kp J   &kp K   &kp L     &kp SEMI  &kp SQT             &kp RET   &kp PG_UP
+				&kp LSHFT           &kp Z     &kp X   &kp C   &kp V   &kp B     &kp N   &kp M   &kp COMMA &kp DOT   &kp FSLH  &kp RSHFT &kp UP    &kp PG_DN
+				&kp LCTRL &kp LGUI  &kp LALT                          &kp SPACE                 &kp RALT  &mo FN    &kp RCTRL &kp LEFT  &kp DOWN  &kp RIGHT
+				&none   &none   &none   &none   &none   &none
 			>;
 		};
 
 		fn {
 			bindings = <
-				&trans                          &kp F1          &kp F2          &kp F3          &kp F4          &kp F5  &kp F6  &kp F7  &kp F8  &kp F9  &kp F10 &kp F11 &kp F12 &trans
-				&trans          &trans          &trans          &trans          &trans          &trans          &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans
-				&rgb_ug RGB_TOG &rgb_ug RGB_EFF &rgb_ug RGB_BRI &rgb_ug RGB_HUI &rgb_ug RGB_SAI &rgb_ug RGB_SPI &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans
-				&trans          &rgb_ug RGB_EFR &rgb_ug RGB_BRD &rgb_ug RGB_HUD &rgb_ug RGB_SAD &rgb_ug RGB_SPD &trans  &trans  &trans  &trans  &trans  &trans          &trans  &trans
-				&trans                          &trans          &trans          &trans          &trans          &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans
-				&trans          &trans          &trans                                                          &trans                  &trans  &trans  &trans  &trans  &trans  &trans
-				                                                &trans  &trans  &trans  &trans  &trans  &trans
+				&trans                          &kp C_BRI_DEC   &kp C_BRI_INC   &none           &none           &none   &none   &kp C_PREV  &kp C_PP  &kp C_NEXT  &kp C_MUTE  &kp C_VOL_DN  &kp C_VOL_UP  &trans
+				&trans          &trans          &trans          &trans          &trans          &trans          &trans  &trans  &trans      &trans    &trans      &trans      &trans        &trans        &trans
+				&rgb_ug RGB_TOG &rgb_ug RGB_EFF &rgb_ug RGB_BRI &rgb_ug RGB_HUI &rgb_ug RGB_SAI &rgb_ug RGB_SPI &trans  &trans  &trans      &trans    &trans      &trans      &trans        &trans        &trans
+				&trans          &rgb_ug RGB_EFR &rgb_ug RGB_BRD &rgb_ug RGB_HUD &rgb_ug RGB_SAD &rgb_ug RGB_SPD &trans  &trans  &trans      &trans    &trans      &trans                    &trans        &trans
+				&trans                          &trans          &trans          &trans          &trans          &trans  &trans  &trans      &trans    &trans      &trans      &trans        &trans        &trans
+				&trans          &trans          &trans                                                          &trans                      &trans    &trans      &trans      &trans        &trans        &trans
+				&trans  &trans  &trans  &trans  &trans  &trans
 			>;
 		};
 	};
