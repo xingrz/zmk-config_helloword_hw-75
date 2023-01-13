@@ -2,4 +2,3 @@
 # SPDX-License-Identifier: MIT
 
 add_subdirectory_ifdef(CONFIG_BOARD_HW75 app)
-add_subdirectory_ifdef(CONFIG_BOARD_HW75 drivers)
