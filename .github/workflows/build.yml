@@ -1,8 +1,74 @@
-on: [push, pull_request, workflow_dispatch]
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
 
 jobs:
   build:
-    uses: zmkfirmware/zmk/.github/workflows/build-user-config.yml@main
+    runs-on: ubuntu-latest
+
+    container:
+      image: zmkfirmware/zmk-build-arm:stable
+
+    strategy:
+      matrix:
+        include:
+          - { board: hw75@1.1,        keymap: hw75.keymap           }
+          - { board: hw75@1.2,        keymap: hw75.keymap           }
+          - { board: hw75_dynamic,    keymap: hw75_dynamic.keymap   }
+
+    steps:
+      - name: Prepare variables
+        run: |
+          echo "zephyr_version=${ZEPHYR_VERSION}" >> $GITHUB_ENV
+
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Cache west modules
+        uses: actions/cache@v3.0.11
+        continue-on-error: true
+        env:
+          cache_name: cache-zephyr-${{ env.zephyr_version }}-modules
+        with:
+          path: |
+            modules/
+            zephyr/
+            zmk/
+          key: ${{ runner.os }}-build-${{ env.cache_name }}-${{ hashFiles('**/west.yml', '**/build.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-build-${{ env.cache_name }}-
+            ${{ runner.os }}-build-
+            ${{ runner.os }}-
+
+      - name: Prepare west
+        run: |
+          west init -l config
+          west update
+          west zephyr-export
+
+      - name: West build
+        run: |
+          west build -s zmk/app -b ${{ matrix.board }} -- \
+            -DZMK_CONFIG=${GITHUB_WORKSPACE}/config \
+            -DKEYMAP_FILE=${GITHUB_WORKSPACE}/config/${{ matrix.keymap }}
+
+      - name: Rename artifacts
+        run: |
+          mkdir build/artifacts
+          if [ -f build/zephyr/zmk.uf2 ]; then
+            cp build/zephyr/zmk.uf2 "build/artifacts/${{ matrix.board }}-zmk.uf2"
+          fi
+          if [ -f build/zephyr/zmk.hex ]; then
+            cp build/zephyr/zmk.hex "build/artifacts/${{ matrix.board }}-zmk.hex"
+          fi
+          cp build/zephyr/zmk.bin "build/artifacts/${{ matrix.board }}-zmk.bin"
+
+      - name: Archive
+        uses: actions/upload-artifact@v3
+        with:
+          name: firmware
+          path: build/artifacts
 
   release:
     if: ${{ startsWith(github.ref, 'refs/tags/') }}
@@ -20,7 +86,7 @@ jobs:
       - name: Publish release
         uses: svenstaro/upload-release-action@v2
         with:
-          file: firmware/*.uf2
+          file: firmware/*
           file_glob: true
           tag: ${{ github.ref }}
           repo_token: ${{ secrets.GITHUB_TOKEN }}

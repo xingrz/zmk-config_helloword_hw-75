@@ -1,5 +1,0 @@
-board:
-  - hw75_dynamic
-
-cmake-args:
-  - -DKEYMAP_FILE=${GITHUB_WORKSPACE}/config/hw75_dynamic.keymap

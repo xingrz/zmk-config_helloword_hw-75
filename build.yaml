@@ -1,6 +1,0 @@
-board:
-  - hw75@1.1
-  - hw75@1.2
-
-cmake-args:
-  - -DKEYMAP_FILE=${GITHUB_WORKSPACE}/config/hw75.keymap
