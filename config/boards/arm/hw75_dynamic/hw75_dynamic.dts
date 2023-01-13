@@ -24,6 +24,14 @@
 		zmk,underglow = &led_strip;
 	};
 
+	oled: display-sw-rotate {
+		compatible = "zmk,display-sw-rotate";
+		label = "OLED_ROTATED";
+		width = <32>;
+		height = <128>;
+		display = <&ssd1306>;
+	};
+
 	kscan: kscan {
 		compatible = "zmk,kscan-gpio-direct";
 		label = "KSCAN";
@@ -123,7 +131,7 @@
 
 	clock-frequency = <100000>;
 
-	oled: ssd1306@3c {
+	ssd1306: ssd1306@3c {
 		compatible = "solomon,ssd1306fb";
 		label = "SSD1306";
 
@@ -134,8 +142,9 @@
 
 		segment-offset = <2>;
 		page-offset = <0>;
-		display-offset = <48>;
+		display-offset = <16>;
 		multiplex-ratio = <31>;
+		com-invdir;
 		prechargep = <0xf1>;
 	};
 };

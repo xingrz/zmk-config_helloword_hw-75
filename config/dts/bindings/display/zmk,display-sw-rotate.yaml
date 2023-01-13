@@ -1,0 +1,17 @@
+# Copyright (c) 2022-2023 XiNGRZ
+# SPDX-License-Identifier: MIT
+
+description: A virtual display that rotates the frame by 90 degrees.
+
+compatible: "zmk,display-sw-rotate"
+
+include: display-controller.yaml
+
+properties:
+  label:
+    type: string
+    required: true
+
+  display:
+    type: phandle
+    required: true

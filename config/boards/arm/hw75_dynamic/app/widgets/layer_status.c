@@ -17,8 +17,8 @@ LOG_MODULE_DECLARE(zmk, CONFIG_ZMK_LOG_LEVEL);
 #include <zmk/endpoints.h>
 #include <zmk/keymap.h>
 
-#define SCREEN_W 128
-#define SCREEN_H 32
+#define SCREEN_W 32
+#define SCREEN_H 128
 #define ITEM_SIZE 32
 
 #define KEYMAP_NODE DT_INST(0, zmk_keymap)
@@ -87,7 +87,7 @@ int custom_widget_layer_status_init(struct custom_widget_layer_status *widget, l
 	lv_style_set_text_color(&st_item, LV_STATE_FOCUSED, LV_COLOR_WHITE);
 
 	lv_obj_t *list = widget->obj = lv_list_create(parent, NULL);
-	lv_list_set_layout(list, LV_LAYOUT_ROW_MID);
+	lv_list_set_layout(list, LV_LAYOUT_COLUMN_MID);
 	lv_obj_add_style(list, LV_OBJ_PART_MAIN, &st_list);
 	lv_obj_set_size(list, SCREEN_W, SCREEN_H);
 

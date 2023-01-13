@@ -1,0 +1,17 @@
+# Copyright (c) 2022-2023 XiNGRZ
+# SPDX-License-Identifier: MIT
+
+DT_COMPAT_ZMK_DISPLAY_SW_ROTATE := zmk,display-sw-rotate
+
+config DISPLAY_SW_ROTATE
+	bool "A virtual display that rotates the frame by 90 degrees"
+	default $(dt_compat_enabled,$(DT_COMPAT_ZMK_DISPLAY_SW_ROTATE))
+	depends on DISPLAY
+
+if DISPLAY_SW_ROTATE
+
+config DISPLAY_SW_ROTATE_BUFFER_LINES
+	int "Vertical lines of the buffer being allocated"
+	default 32
+
+endif # DISPLAY_SW_ROTATE
