@@ -1,6 +1,6 @@
 file_format: "1"
-id: hw75
-name: HelloWord HW-75
+id: hw75_keyboard
+name: HelloWord HW-75 Keyboard
 type: board
 arch: arm
 features:

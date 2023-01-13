@@ -13,9 +13,9 @@ jobs:
     strategy:
       matrix:
         include:
-          - { board: hw75@1.1,        keymap: hw75.keymap           }
-          - { board: hw75@1.2,        keymap: hw75.keymap           }
-          - { board: hw75_dynamic,    keymap: hw75_dynamic.keymap   }
+          - { board: hw75_keyboard@1.1, keymap: hw75_keyboard.keymap  }
+          - { board: hw75_keyboard@1.2, keymap: hw75_keyboard.keymap  }
+          - { board: hw75_dynamic,      keymap: hw75_dynamic.keymap   }
 
     steps:
       - name: Prepare variables

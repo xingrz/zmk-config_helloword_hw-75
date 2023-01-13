@@ -1,7 +1,0 @@
-identifier: hw75
-name: HelloWord HW-75
-type: mcu
-arch: arm
-toolchain:
-  - zephyr
-  - gnuarmemb

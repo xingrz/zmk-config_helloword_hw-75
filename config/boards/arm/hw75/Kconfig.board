@@ -1,8 +1,0 @@
-# HW-75 board configuration
-
-# Copyright (c) 2022 The ZMK Contributors
-# SPDX-License-Identifier: MIT
-
-config BOARD_HW75
-	bool "HelloWord HW-75"
-	depends on SOC_STM32F103XB

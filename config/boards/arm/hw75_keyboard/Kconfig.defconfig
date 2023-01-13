@@ -1,15 +1,15 @@
 # HW-75 board configuration
 
-# Copyright (c) 2022 The ZMK Contributors
+# Copyright (c) 2022-2023 XiNGRZ
 # SPDX-License-Identifier: MIT
 
-if BOARD_HW75
+if BOARD_HW75_KEYBOARD
 
 config BOARD
-	default "hw75"
+	default "hw75_keyboard"
 
 config ZMK_KEYBOARD_NAME
-	default "HelloWord HW-75"
+	default "HelloWord HW-75 Keyboard"
 
 config ZMK_USB
 	default y
@@ -43,4 +43,4 @@ config BUILD_OUTPUT_UF2_USE_FLASH_OFFSET
 
 endif # BUILD_OUTPUT_UF2
 
-endif # BOARD_HW75
+endif # BOARD_HW75_KEYBOARD

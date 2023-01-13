@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 The ZMK Contributors
+ * Copyright (c) 2022-2023 XiNGRZ
  * SPDX-License-Identifier: MIT
  */
 
@@ -10,7 +10,7 @@
 #include <dt-bindings/zmk/matrix_transform.h>
 
 / {
-	model = "HelloWord HW-75";
+	model = "HelloWord HW-75 Keyboard";
 	compatible = "st,stm32f103";
 
 	chosen {

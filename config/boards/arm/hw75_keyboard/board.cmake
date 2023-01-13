@@ -1,4 +1,4 @@
-# Copyright (c) 2022 The ZMK Contributors
+# Copyright (c) 2022-2023 XiNGRZ
 # SPDX-License-Identifier: MIT
 
 board_runner_args(pyocd "--target=stm32f103c8")

@@ -9,8 +9,8 @@ zmk-config for HelloWord HW-75 (瀚文 75)
 
 HW-75 由键盘主体 (Keyboard) 与扩展模块 (Dynamic) 组成。详细说明请见：
 
-* [Keyboard](config/boards/arm/hw75/)
-* [Dynamic](config/boards/arm/hw75_dynamic/)
+* [HW-75 Keyboard](config/boards/arm/hw75_keyboard/)
+* [HW-75 Dynamic](config/boards/arm/hw75_dynamic/)
 
 ## 相关链接
 
