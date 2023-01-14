@@ -23,7 +23,7 @@ properties:
   tick-interval-us:
     type: int
     required: false
-    default: 10000
+    default: 200
     description: Delay between each tick
 
   ppr:

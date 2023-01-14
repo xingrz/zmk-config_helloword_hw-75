@@ -4,6 +4,8 @@
 config KNOB
 	bool "Sensor driver for FOC-emulated rotary encoder"
 	select SENSOR
+	select CMSIS_DSP
+	select CMSIS_DSP_FASTMATH
 
 if KNOB
 

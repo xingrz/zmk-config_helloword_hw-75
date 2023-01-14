@@ -3,8 +3,10 @@
 
 if(CONFIG_KNOB)
 
-zephyr_library_named(helloword__drivers__knob)
-zephyr_library_include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
+zephyr_library_named(knob)
+
+target_include_directories(knob PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
+target_include_directories(knob PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/lib/include)
 
 add_subdirectory(lib)
 add_subdirectory(inverter)

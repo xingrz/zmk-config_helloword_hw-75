@@ -50,7 +50,6 @@
 		label = "KNOB";
 		inverter = <&inverter>;
 		encoder = <&as5047>;
-		tick-interval-us = <1000>;
 	};
 };
 
