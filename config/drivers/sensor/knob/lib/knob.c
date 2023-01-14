@@ -190,7 +190,7 @@ void knob_set_mode(const struct device *dev, enum knob_mode mode)
 void knob_set_enable(const struct device *dev, bool enable)
 {
 	struct knob_data *data = dev->data;
-	motor_set_enable(&data->motor, enable);
+	motor_set_enable(&data->motor, enable && data->mode != KNOB_DISABLE);
 }
 
 void knob_set_encoder_report(const struct device *dev, bool report)
@@ -325,15 +325,9 @@ int knob_init(const struct device *dev)
 	pid_set(&data->motor.pid_velocity, 0.1f, 0.0f, 0.0f);
 	pid_set(&data->motor.pid_angle, 80.0f, 0.0f, 0.7f);
 
-#if 1
 	if (!knob_calibrate_auto(dev)) {
 		return -EIO;
 	}
-
-	knob_set_enable(dev, true);
-	knob_set_encoder_report(dev, true);
-	knob_set_mode(dev, KNOB_ENCODER);
-#endif
 
 	k_thread_create(&data->thread, data->thread_stack, CONFIG_KNOB_THREAD_STACK_SIZE,
 			(k_thread_entry_t)knob_thread, (void *)dev, 0, NULL,
@@ -347,7 +341,7 @@ int knob_init(const struct device *dev)
 		.mode = KNOB_DISABLE,                                                              \
 		.position_min = 3.3f,                                                              \
 		.position_max = 5.1f,                                                              \
-		.encoder_report = true,                                                            \
+		.encoder_report = false,                                                           \
 		.encoder_ppr = DT_INST_PROP_OR(n, ppr, 24),                                        \
 	};                                                                                         \
                                                                                                    \
