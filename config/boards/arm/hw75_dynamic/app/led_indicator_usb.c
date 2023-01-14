@@ -19,8 +19,8 @@ LOG_MODULE_DECLARE(zmk, CONFIG_ZMK_LOG_LEVEL);
 
 static const struct device *led_strip;
 
-static struct led_rgb color_idle = { .r = 0xFF, .g = 0x00, .b = 0x00 };
-static struct led_rgb color_connected = { .r = 0x00, .g = 0xFF, .b = 0x00 };
+static struct led_rgb color_idle = { .r = 0x22, .g = 0x00, .b = 0x00 };
+static struct led_rgb color_connected = { .r = 0x00, .g = 0x22, .b = 0x00 };
 
 static int led_indicator_usb_init(const struct device *dev)
 {

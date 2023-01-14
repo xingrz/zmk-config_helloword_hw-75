@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: MIT
 
 zephyr_library_sources(ssd1306_delay.c)
+zephyr_library_sources(led_indicator_usb.c)
 
 zephyr_library_include_directories(${ZEPHYR_LVGL_MODULE_DIR})
 zephyr_library_include_directories(${ZEPHYR_BASE}/lib/gui/lvgl)

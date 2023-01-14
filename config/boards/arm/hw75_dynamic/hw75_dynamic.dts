@@ -40,6 +40,21 @@
 			<&gpioc 9 GPIO_ACTIVE_LOW>;
 	};
 
+
+	led_strip: led-strip-remap {
+		compatible = "zmk,led-strip-remap";
+		label = "LED_STRIP";
+
+		chain-length = <4>;
+		led-strip = <&ws2812>;
+		map = <0 3 2 1>;
+
+		status {
+			label = "STATUS";
+			led-indexes = <3 2 1>;
+		};
+	};
+
 	sensors {
 		compatible = "zmk,keymap-sensors";
 		sensors = <&knob>;
@@ -110,7 +125,7 @@
 	pinctrl-names = "default";
 	status = "okay";
 
-	led_strip: ws2812@0 {
+	ws2812: ws2812@0 {
 		compatible = "worldsemi,ws2812-spi";
 		label = "WS2812";
 
