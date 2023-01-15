@@ -1,0 +1,13 @@
+# Copyright (c) 2022-2023 XiNGRZ
+# SPDX-License-Identifier: MIT
+
+config HW75_HID_MOUSE
+	bool "USB HID mouse simulation"
+	depends on USB_DEVICE_HID
+
+if HW75_HID_MOUSE
+
+config HW75_HID_MOUSE_DEVICE_NAME
+	string "Name of USB HID device to be used for mouse simulation"
+
+endif # HW75_HID_MOUSE
