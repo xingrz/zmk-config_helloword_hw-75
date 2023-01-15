@@ -36,7 +36,7 @@ struct knob_data {
 	float position_max;
 
 	bool encoder_report;
-	int encoder_ppr;
+	float encoder_rpp;
 
 	float last_angle;
 	float last_velocity;
@@ -98,13 +98,30 @@ static void knob_tick(const struct device *dev)
 		data->last_velocity = v;
 	} break;
 	case KNOB_ENCODER: {
-		float p = knob_get_position(dev);
-		if (p - data->last_angle > PI / (float)data->encoder_ppr) {
-			mc->target += PI2 / (float)data->encoder_ppr;
-			data->last_angle = mc->target = data->last_angle;
-		} else if (p - data->last_angle < -PI / (float)data->encoder_ppr) {
-			mc->target -= PI2 / (float)data->encoder_ppr;
-			data->last_angle = mc->target;
+		float dp = knob_get_position(dev) - data->last_angle;
+		float rpp = data->encoder_rpp;
+		float rpp_4 = rpp / 4.0f;
+		float rpp_2 = rpp / 2.0f;
+		if (dp == 0) {
+			mc->target = data->last_angle;
+		} else if (dp > 0) {
+			if (dp < rpp_4) {
+				mc->target = data->last_angle - dp;
+			} else {
+				mc->target = data->last_angle + rpp_2 - (rpp_2 - dp) * 3.0f;
+			}
+			if (dp >= rpp_2) {
+				data->last_angle += rpp;
+			}
+		} else if (dp < 0) {
+			if (dp > -rpp_4) {
+				mc->target = data->last_angle - dp;
+			} else {
+				mc->target = data->last_angle - rpp_2 + (rpp_2 + dp) * 3.0f;
+			}
+			if (dp <= -rpp_2) {
+				data->last_angle -= rpp;
+			}
 		}
 	} break;
 	case KNOB_DAMPED: {
@@ -159,12 +176,12 @@ void knob_set_mode(const struct device *dev, enum knob_mode mode)
 	} break;
 	case KNOB_ENCODER: {
 		motor_set_enable(config->motor, true);
-		motor_set_torque_limit(config->motor, 0.2f);
+		motor_set_torque_limit(config->motor, 0.3f);
 		mc->mode = ANGLE;
-		motor_set_velocity_pid(config->motor, 0.1f, 0.0f, 0.0f);
+		motor_set_velocity_pid(config->motor, 0.02f, 0.0f, 0.0f);
 		motor_set_angle_pid(config->motor, 100.0f, 0.0f, 3.5f);
-		mc->target = 4.2f;
-		data->last_angle = 4.2f;
+		mc->target = 0.0f;
+		data->last_angle = 0.0f;
 	} break;
 	case KNOB_SPRING: {
 		motor_set_enable(config->motor, true);
@@ -227,7 +244,7 @@ int knob_get_encoder_position(const struct device *dev)
 {
 	struct knob_data *data = dev->data;
 	const struct knob_config *config = dev->config;
-	return lroundf(knob_get_position(dev) / (PI2 / (float)data->encoder_ppr)) *
+	return lroundf(knob_get_position(dev) / data->encoder_rpp) *
 	       motor_get_direction(config->motor);
 }
 
@@ -302,7 +319,7 @@ int knob_init(const struct device *dev)
 		.position_min = 3.3f,                                                              \
 		.position_max = 5.1f,                                                              \
 		.encoder_report = false,                                                           \
-		.encoder_ppr = DT_INST_PROP_OR(n, ppr, 24),                                        \
+		.encoder_rpp = PI2 / (float)DT_INST_PROP(n, ppr),                                  \
 	};                                                                                         \
                                                                                                    \
 	const struct knob_config knob_config_##n = {                                               \
