@@ -41,11 +41,6 @@ float knob_get_velocity(const struct device *dev);
 
 int knob_get_encoder_position(const struct device *dev);
 
-void knob_calibrate_set(const struct device *dev, float zero_offset, int direction);
-void knob_calibrate_get(const struct device *dev, float *zero_offset, int *direction);
-
-bool knob_calibrate_auto(const struct device *dev);
-
 #ifdef __cplusplus
 }
 #endif

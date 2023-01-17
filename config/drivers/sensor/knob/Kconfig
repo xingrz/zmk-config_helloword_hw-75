@@ -21,9 +21,13 @@ config KNOB_THREAD_STACK_SIZE
 	help
 	  Stack size of thread used by the driver to poll frames.
 
-config KNOB_DRIVER_INIT_PRIORITY
+config KNOB_MOTOR_INIT_PRIORITY
 	int
 	default 80
+
+config KNOB_DRIVER_INIT_PRIORITY
+	int
+	default 70
 
 rsource "inverter/Kconfig"
 rsource "encoder/Kconfig"

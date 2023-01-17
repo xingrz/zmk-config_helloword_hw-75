@@ -10,15 +10,10 @@ properties:
     type: string
     required: true
 
-  inverter:
+  motor:
     type: phandle
     required: true
-    description: The inverter device
-
-  encoder:
-    type: phandle
-    required: true
-    description: The encoder device
+    description: The motor device
 
   tick-interval-us:
     type: int

@@ -6,19 +6,18 @@
 #define DT_DRV_COMPAT zmk_knob
 
 #include <device.h>
-#include <drivers/sensor.h>
 #include <kernel.h>
-#include <logging/log.h>
+#include <drivers/sensor.h>
 
 #include <knob/math.h>
-#include <knob/motor.h>
 #include <knob/encoder_state.h>
+#include <knob/drivers/motor.h>
 #include <knob/drivers/knob.h>
 
+#include <logging/log.h>
 LOG_MODULE_REGISTER(knob, CONFIG_ZMK_LOG_LEVEL);
 
 struct knob_data {
-	const struct device *dev;
 	int32_t delta;
 
 	int last_pos;
@@ -29,7 +28,7 @@ struct knob_data {
 	K_THREAD_STACK_MEMBER(thread_stack, CONFIG_KNOB_THREAD_STACK_SIZE);
 	struct k_thread thread;
 
-	struct motor motor;
+	struct motor_control *mc;
 
 	enum knob_mode mode;
 
@@ -44,8 +43,7 @@ struct knob_data {
 };
 
 struct knob_config {
-	const struct device *inverter;
-	const struct device *encoder;
+	const struct device *motor;
 	uint32_t tick_interval_us;
 };
 
@@ -83,27 +81,30 @@ static int knob_channel_get(const struct device *dev, enum sensor_channel chan,
 static void knob_tick(const struct device *dev)
 {
 	struct knob_data *data = dev->data;
+	const struct knob_config *config = dev->config;
+
+	struct motor_control *mc = data->mc;
 
 	switch (data->mode) {
 	case KNOB_INERTIA: {
 		float v = knob_get_velocity(dev);
 		if (v > 1 || v < -1) {
 			if (fabsf(v - data->last_velocity) > 0.3) {
-				data->motor.target = v;
+				mc->target = v;
 			}
 		} else {
-			data->motor.target = 0.0f;
+			mc->target = 0.0f;
 		}
 		data->last_velocity = v;
 	} break;
 	case KNOB_ENCODER: {
 		float p = knob_get_position(dev);
 		if (p - data->last_angle > PI / (float)data->encoder_ppr) {
-			data->motor.target += PI2 / (float)data->encoder_ppr;
-			data->last_angle = data->motor.target;
+			mc->target += PI2 / (float)data->encoder_ppr;
+			data->last_angle = mc->target = data->last_angle;
 		} else if (p - data->last_angle < -PI / (float)data->encoder_ppr) {
-			data->motor.target -= PI2 / (float)data->encoder_ppr;
-			data->last_angle = data->motor.target;
+			mc->target -= PI2 / (float)data->encoder_ppr;
+			data->last_angle = mc->target;
 		}
 	} break;
 	case KNOB_DAMPED: {
@@ -113,14 +114,14 @@ static void knob_tick(const struct device *dev)
 
 		float p = knob_get_position(dev);
 		if (p > data->position_max) {
-			data->motor.control_mode = ANGLE;
-			data->motor.target = data->position_max;
+			mc->mode = ANGLE;
+			mc->target = data->position_max;
 		} else if (p < data->position_min) {
-			data->motor.control_mode = ANGLE;
-			data->motor.target = data->position_min;
+			mc->mode = ANGLE;
+			mc->target = data->position_min;
 		} else {
-			data->motor.control_mode = VELOCITY;
-			data->motor.target = 0;
+			mc->mode = VELOCITY;
+			mc->target = 0.0f;
 		}
 	} break;
 	case KNOB_DISABLE:
@@ -129,12 +130,15 @@ static void knob_tick(const struct device *dev)
 		break;
 	}
 
-	motor_tick(&data->motor);
+	motor_tick(config->motor);
 }
 
 void knob_set_mode(const struct device *dev, enum knob_mode mode)
 {
 	struct knob_data *data = dev->data;
+	const struct knob_config *config = dev->config;
+
+	struct motor_control *mc = data->mc;
 
 	data->mode = mode;
 
@@ -143,46 +147,46 @@ void knob_set_mode(const struct device *dev, enum knob_mode mode)
 
 	switch (mode) {
 	case KNOB_DISABLE:
-		motor_set_enable(&data->motor, false);
+		motor_set_enable(config->motor, false);
 		break;
 	case KNOB_INERTIA: {
-		motor_set_enable(&data->motor, true);
-		motor_set_torque_limit(&data->motor, 0.5f);
-		data->motor.control_mode = VELOCITY;
-		pid_set(&data->motor.pid_velocity, 0.1f, 0.0f, 0.0f);
-		pid_set(&data->motor.pid_angle, 20.0f, 0.0f, 0.7f);
-		data->motor.target = 0.0f;
+		motor_set_enable(config->motor, true);
+		motor_set_torque_limit(config->motor, 0.5f);
+		mc->mode = VELOCITY;
+		motor_set_velocity_pid(config->motor, 0.1f, 0.0f, 0.0f);
+		motor_set_angle_pid(config->motor, 20.0f, 0.0f, 0.7f);
+		mc->target = 0.0f;
 	} break;
 	case KNOB_ENCODER: {
-		motor_set_enable(&data->motor, true);
-		motor_set_torque_limit(&data->motor, 0.2f);
-		data->motor.control_mode = ANGLE;
-		pid_set(&data->motor.pid_velocity, 0.1f, 0.0f, 0.0f);
-		pid_set(&data->motor.pid_angle, 100.0f, 0.0f, 3.5f);
-		data->motor.target = 4.2f;
+		motor_set_enable(config->motor, true);
+		motor_set_torque_limit(config->motor, 0.2f);
+		mc->mode = ANGLE;
+		motor_set_velocity_pid(config->motor, 0.1f, 0.0f, 0.0f);
+		motor_set_angle_pid(config->motor, 100.0f, 0.0f, 3.5f);
+		mc->target = 4.2f;
 		data->last_angle = 4.2f;
 	} break;
 	case KNOB_SPRING: {
-		motor_set_enable(&data->motor, true);
-		motor_set_torque_limit(&data->motor, 1.5f);
-		data->motor.control_mode = ANGLE;
-		pid_set(&data->motor.pid_velocity, 0.1f, 0.0f, 0.0f);
-		pid_set(&data->motor.pid_angle, 100.0f, 0.0f, 3.5f);
-		data->motor.target = 4.2f;
+		motor_set_enable(config->motor, true);
+		motor_set_torque_limit(config->motor, 1.5f);
+		mc->mode = ANGLE;
+		motor_set_velocity_pid(config->motor, 0.1f, 0.0f, 0.0f);
+		motor_set_angle_pid(config->motor, 100.0f, 0.0f, 3.5f);
+		mc->target = 4.2f;
 	} break;
 	case KNOB_DAMPED: {
-		motor_set_enable(&data->motor, true);
-		motor_set_torque_limit(&data->motor, 1.5f);
-		data->motor.control_mode = VELOCITY;
-		pid_set(&data->motor.pid_velocity, 0.1f, 0.0f, 0.0f);
-		data->motor.target = 0.0f;
+		motor_set_enable(config->motor, true);
+		motor_set_torque_limit(config->motor, 1.5f);
+		mc->mode = VELOCITY;
+		motor_set_velocity_pid(config->motor, 0.1f, 0.0f, 0.0f);
+		mc->target = 0.0f;
 	} break;
 	case KNOB_SPIN: {
-		motor_set_enable(&data->motor, true);
-		motor_set_torque_limit(&data->motor, 1.5f);
-		data->motor.control_mode = VELOCITY;
-		pid_set(&data->motor.pid_velocity, 0.3f, 0.0f, 0.0f);
-		data->motor.target = 20.0f;
+		motor_set_enable(config->motor, true);
+		motor_set_torque_limit(config->motor, 1.5f);
+		mc->mode = VELOCITY;
+		motor_set_velocity_pid(config->motor, 0.3f, 0.0f, 0.0f);
+		mc->target = 20.0f;
 	} break;
 	}
 }
@@ -190,7 +194,8 @@ void knob_set_mode(const struct device *dev, enum knob_mode mode)
 void knob_set_enable(const struct device *dev, bool enable)
 {
 	struct knob_data *data = dev->data;
-	motor_set_enable(&data->motor, enable && data->mode != KNOB_DISABLE);
+	const struct knob_config *config = dev->config;
+	motor_set_enable(config->motor, enable && data->mode != KNOB_DISABLE);
 }
 
 void knob_set_encoder_report(const struct device *dev, bool report)
@@ -208,51 +213,22 @@ void knob_set_position_limit(const struct device *dev, float min, float max)
 
 float knob_get_position(const struct device *dev)
 {
-	struct knob_data *data = dev->data;
-	return motor_get_estimate_angle(&data->motor);
+	const struct knob_config *config = dev->config;
+	return motor_get_estimate_angle(config->motor);
 }
 
 float knob_get_velocity(const struct device *dev)
 {
-	struct knob_data *data = dev->data;
-	return motor_get_estimate_velocity(&data->motor);
+	const struct knob_config *config = dev->config;
+	return motor_get_estimate_velocity(config->motor);
 }
 
 int knob_get_encoder_position(const struct device *dev)
 {
 	struct knob_data *data = dev->data;
+	const struct knob_config *config = dev->config;
 	return lroundf(knob_get_position(dev) / (PI2 / (float)data->encoder_ppr)) *
-	       data->motor.encoder_dir;
-}
-
-void knob_calibrate_set(const struct device *dev, float zero_offset, int direction)
-{
-	struct knob_data *data = dev->data;
-	data->motor.zero_offset = zero_offset;
-	data->motor.encoder_dir = (enum encoder_direction)direction;
-}
-
-void knob_calibrate_get(const struct device *dev, float *zero_offset, int *direction)
-{
-	struct knob_data *data = dev->data;
-	*zero_offset = data->motor.zero_offset;
-	*direction = data->motor.encoder_dir;
-}
-
-bool knob_calibrate_auto(const struct device *dev)
-{
-	struct knob_data *data = dev->data;
-
-	if (motor_calibrate_auto(&data->motor)) {
-		LOG_INF("Motor calibrated, zero: %f (%f deg), direction: %d",
-			data->motor.zero_offset, rad_to_deg(data->motor.zero_offset),
-			data->motor.encoder_dir);
-		return true;
-	} else {
-		LOG_ERR("Motor calibration failed");
-		motor_set_enable(&data->motor, false);
-		return false;
-	}
+	       motor_get_direction(config->motor);
 }
 
 static inline void knob_fires(const struct device *dev, int32_t delta)
@@ -306,28 +282,12 @@ int knob_init(const struct device *dev)
 	struct knob_data *data = dev->data;
 	const struct knob_config *config = dev->config;
 
-	data->dev = dev;
-
-	if (!device_is_ready(config->inverter)) {
-		LOG_ERR("%s: Inverter device is not ready: %s", dev->name, config->inverter->name);
+	if (!device_is_ready(config->motor)) {
+		LOG_ERR("%s: Motor device is not ready: %s", dev->name, config->motor->name);
 		return -ENODEV;
 	}
 
-	if (!device_is_ready(config->encoder)) {
-		LOG_ERR("%s: Encoder device is not ready: %s", dev->name, config->encoder->name);
-		return -ENODEV;
-	}
-
-	motor_init(&data->motor, config->encoder, config->inverter, 7);
-	data->motor.control_mode = TORQUE;
-	data->motor.voltage_limit = 1.5f;
-	data->motor.velocity_limit = 100.0f;
-	pid_set(&data->motor.pid_velocity, 0.1f, 0.0f, 0.0f);
-	pid_set(&data->motor.pid_angle, 80.0f, 0.0f, 0.7f);
-
-	if (!knob_calibrate_auto(dev)) {
-		return -EIO;
-	}
+	data->mc = motor_get_control(config->motor);
 
 	k_thread_create(&data->thread, data->thread_stack, CONFIG_KNOB_THREAD_STACK_SIZE,
 			(k_thread_entry_t)knob_thread, (void *)dev, 0, NULL,
@@ -346,8 +306,7 @@ int knob_init(const struct device *dev)
 	};                                                                                         \
                                                                                                    \
 	const struct knob_config knob_config_##n = {                                               \
-		.inverter = DEVICE_DT_GET(DT_INST_PHANDLE(n, inverter)),                           \
-		.encoder = DEVICE_DT_GET(DT_INST_PHANDLE(n, encoder)),                             \
+		.motor = DEVICE_DT_GET(DT_INST_PHANDLE(n, motor)),                                 \
 		.tick_interval_us = DT_INST_PROP_OR(n, tick_interval_us, 200),                     \
 	};                                                                                         \
                                                                                                    \

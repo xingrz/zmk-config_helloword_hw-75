@@ -1,0 +1,26 @@
+# Copyright (c) 2022-2023 XiNGRZ
+# SPDX-License-Identifier: MIT
+
+description: Driver for FOC motor
+
+compatible: "zmk,motor"
+
+properties:
+  label:
+    type: string
+    required: true
+
+  inverter:
+    type: phandle
+    required: true
+    description: The inverter device
+
+  encoder:
+    type: phandle
+    required: true
+    description: The encoder device
+
+  pole-pairs:
+    type: int
+    required: false
+    default: 7

@@ -8,12 +8,6 @@
 #include <device.h>
 #include <stdint.h>
 
-enum encoder_direction {
-	CW = 1,
-	CCW = -1,
-	UNKNOWN = 0,
-};
-
 struct encoder_state {
 	float angle_last;
 	uint32_t angle_time;
