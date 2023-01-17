@@ -187,7 +187,7 @@ void knob_set_mode(const struct device *dev, enum knob_mode mode)
 		motor_set_enable(config->motor, true);
 		motor_set_torque_limit(config->motor, 1.5f);
 		mc->mode = ANGLE;
-		motor_set_velocity_pid(config->motor, 0.1f, 0.0f, 0.0f);
+		motor_set_velocity_pid(config->motor, 0.05f, 0.0f, 0.0f);
 		motor_set_angle_pid(config->motor, 100.0f, 0.0f, 3.5f);
 		mc->target = 4.2f;
 	} break;
@@ -195,7 +195,7 @@ void knob_set_mode(const struct device *dev, enum knob_mode mode)
 		motor_set_enable(config->motor, true);
 		motor_set_torque_limit(config->motor, 1.5f);
 		mc->mode = VELOCITY;
-		motor_set_velocity_pid(config->motor, 0.1f, 0.0f, 0.0f);
+		motor_set_velocity_pid(config->motor, 0.05f, 0.0f, 0.0f);
 		mc->target = 0.0f;
 	} break;
 	case KNOB_SPIN: {
