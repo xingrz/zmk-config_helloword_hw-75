@@ -88,14 +88,33 @@ static void knob_tick(const struct device *dev)
 	switch (data->mode) {
 	case KNOB_INERTIA: {
 		float v = knob_get_velocity(dev);
-		if (v > 1 || v < -1) {
-			if (fabsf(v - data->last_velocity) > 0.3) {
-				mc->target = v;
-			}
-		} else {
+		float a = v - data->last_velocity;
+		if (v == 0.0f) {
 			mc->target = 0.0f;
+		} else if (v > 0.0f) {
+			if (a > 1.0f) {
+				mc->target = v;
+			} else if (a < -2.0f) {
+				mc->target += a;
+				if (mc->target < 1.0f) {
+					mc->target = 0.0f;
+				}
+			} else {
+				mc->target -= 0.001f;
+			}
+		} else if (v < 0.0f) {
+			if (a < -1.0f) {
+				mc->target = v;
+			} else if (a > 2.0f) {
+				mc->target += a;
+				if (mc->target > -1.0f) {
+					mc->target = 0.0f;
+				}
+			} else {
+				mc->target += 0.001f;
+			}
 		}
-		data->last_velocity = v;
+		data->last_velocity = mc->target;
 	} break;
 	case KNOB_ENCODER: {
 		float dp = knob_get_position(dev) - data->last_angle;
@@ -168,9 +187,9 @@ void knob_set_mode(const struct device *dev, enum knob_mode mode)
 		break;
 	case KNOB_INERTIA: {
 		motor_set_enable(config->motor, true);
-		motor_set_torque_limit(config->motor, 0.5f);
+		motor_set_torque_limit(config->motor, 1.5f);
 		mc->mode = VELOCITY;
-		motor_set_velocity_pid(config->motor, 0.1f, 0.0f, 0.0f);
+		motor_set_velocity_pid(config->motor, 0.3f, 0.0f, 0.0f);
 		motor_set_angle_pid(config->motor, 20.0f, 0.0f, 0.7f);
 		mc->target = 0.0f;
 	} break;
