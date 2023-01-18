@@ -22,3 +22,7 @@ zephyr_library_include_directories(${ZMK_CONFIG}/boards/arm/hw75_dynamic/app)
 
 zephyr_library_sources(handler_rgb.c)
 zephyr_library_include_directories(${CMAKE_SOURCE_DIR}/include)
+
+# handler - eink
+zephyr_library_sources(handler_eink.c)
+zephyr_library_include_directories(${ZMK_CONFIG}/drivers/display/include)

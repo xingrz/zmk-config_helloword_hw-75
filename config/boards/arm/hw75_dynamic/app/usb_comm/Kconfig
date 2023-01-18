@@ -16,6 +16,10 @@ config HW75_USB_COMM_MAX_RX_PACKET_SIZE
 	int
 	default 8192
 
+config HW75_USB_COMM_BYTES_FIELD_SIZE
+	int
+	default 8192
+
 module = HW75_USB_COMM
 module-str = usb_comm
 source "subsys/logging/Kconfig.template.log_config"

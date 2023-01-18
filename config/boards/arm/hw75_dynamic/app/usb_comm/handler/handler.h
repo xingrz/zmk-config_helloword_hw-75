@@ -15,3 +15,6 @@ bool handle_knob_set_config(const KnobConfig *req, KnobConfig *res);
 
 bool handle_rgb_control(const RgbControl *control, RgbState *state);
 bool handle_rgb_get_state(RgbState *state);
+
+bool handle_eink_set_image(const EinkImage *req, const void *bits, uint32_t bits_len,
+			   EinkImage *res);

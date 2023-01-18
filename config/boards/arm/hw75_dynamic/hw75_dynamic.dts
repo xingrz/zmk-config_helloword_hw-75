@@ -32,6 +32,15 @@
 		display = <&ssd1306>;
 	};
 
+	eink: eink-sw-rotate {
+		compatible = "zmk,display-sw-rotate";
+		label = "EINK";
+		width = <128>;
+		height = <296>;
+		display = <&ssd16xx>;
+		buffer-lines = <128>;
+	};
+
 	kscan: kscan {
 		compatible = "zmk,kscan-gpio-direct";
 		label = "KSCAN";

@@ -23,6 +23,32 @@ static uint8_t usb_ep_in, usb_ep_out;
 static uint8_t usb_rx_buf[CONFIG_HW75_USB_COMM_MAX_RX_PACKET_SIZE];
 static uint8_t usb_tx_buf[CONFIG_HW75_USB_COMM_MAX_TX_PACKET_SIZE];
 
+static uint8_t bytes_field[CONFIG_HW75_USB_COMM_BYTES_FIELD_SIZE];
+static uint32_t bytes_field_len = 0;
+
+static bool read_bytes_field(pb_istream_t *stream, const pb_field_t *field, void **arg)
+{
+	uint32_t len = **((uint32_t **)arg);
+
+	if (len > sizeof(bytes_field)) {
+		LOG_ERR("Buffer overflows decoding %d bytes", len);
+		return false;
+	}
+
+	if (len > stream->bytes_left) {
+		LOG_ERR("Not enough bytes to decode, request: %d, left: %d", len,
+			stream->bytes_left);
+		return false;
+	}
+
+	if (!pb_read(stream, bytes_field, len)) {
+		return false;
+	}
+
+	bytes_field_len = len;
+	return true;
+}
+
 static void usb_comm_read(void);
 
 static void usb_comm_proto_write_cb(uint8_t ep, int size, void *priv);
@@ -38,21 +64,34 @@ void usb_comm_ready(uint8_t ep_in, uint8_t ep_out)
 static void usb_comm_proto_write_cb(uint8_t ep, int size, void *priv)
 {
 	LOG_DBG("ep %x, size %u", ep, size);
-	LOG_HEXDUMP_DBG(usb_tx_buf, size, "tx");
+	LOG_HEXDUMP_DBG(usb_tx_buf, MIN(size, 64), "tx");
 }
 
 #define D2H_PAYLOAD_OR_NOP(result, tag) (result ? tag : MessageD2H_nop_tag)
 
+static bool h2d_callback(pb_istream_t *stream, const pb_field_t *field, void **arg)
+{
+	if (field->tag == MessageH2D_eink_image_tag) {
+		EinkImage *eink_image = field->pData;
+		LOG_DBG("incoming eink, len: %d", eink_image->bits_length);
+		eink_image->bits.funcs.decode = read_bytes_field;
+		eink_image->bits.arg = &eink_image->bits_length;
+	}
+	return true;
+}
+
 static void usb_comm_proto_read_cb(uint8_t ep, int size, void *priv)
 {
 	LOG_DBG("ep %x, size %u", ep, size);
-	LOG_HEXDUMP_DBG(usb_rx_buf, size, "rx");
+	LOG_HEXDUMP_DBG(usb_rx_buf, MIN(size, 64), "rx");
 
 	pb_istream_t h2d_stream = pb_istream_from_buffer(usb_rx_buf, size);
 	pb_ostream_t d2h_stream = pb_ostream_from_buffer(usb_tx_buf, sizeof(usb_tx_buf));
 
 	MessageH2D h2d = MessageH2D_init_zero;
 	MessageD2H d2h = MessageD2H_init_zero;
+
+	h2d.cb_payload.funcs.decode = h2d_callback;
 
 	if (!pb_decode_delimited(&h2d_stream, MessageH2D_fields, &h2d)) {
 		LOG_ERR("Failed decoding h2d message: %s", h2d_stream.errmsg);
@@ -90,6 +129,12 @@ static void usb_comm_proto_read_cb(uint8_t ep, int size, void *priv)
 	case Action_RGB_GET_STATE:
 		d2h.which_payload = D2H_PAYLOAD_OR_NOP(handle_rgb_get_state(&d2h.payload.rgb_state),
 						       MessageD2H_rgb_state_tag);
+		break;
+	case Action_EINK_SET_IMAGE:
+		d2h.which_payload = D2H_PAYLOAD_OR_NOP(
+			handle_eink_set_image(&h2d.payload.eink_image, &bytes_field,
+					      bytes_field_len, &d2h.payload.eink_image),
+			MessageD2H_eink_image_tag);
 		break;
 	default:
 		d2h.which_payload = MessageD2H_nop_tag;
