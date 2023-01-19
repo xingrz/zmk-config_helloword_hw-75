@@ -26,7 +26,16 @@ pyocd load --pack=Keil.STM32F4xx_DFP.2.16.0.pack --target stm32f405rg hw75_dynam
 
 ## 二次开发
 
+### 环境准备
+
 参考 [ZMK 的上手文档](https://zmk.dev/docs/development/setup#prerequisites)。
+
+```sh
+sudo apt-get update
+sudo apt-get install -y python3-pip protobuf-compiler
+```
+
+### 编译
 
 ```sh
 export ZEPHYR_TOOLCHAIN_VARIANT=gnuarmemb
@@ -35,6 +44,8 @@ export GNUARMEMB_TOOLCHAIN_PATH=/path/to/gcc-arm-none-eabi-10.3-2021.10
 west init -l config
 west update
 west zephyr-export
+pip install -r zephyr/scripts/requirements.txt
+
 west build -s zmk/app -b hw75_dynamic -- -DZMK_CONFIG=$PWD/config
 west flash
 ```

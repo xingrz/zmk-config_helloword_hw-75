@@ -69,4 +69,6 @@ config SSD1306_REVERSE_MODE
 
 endif # SSD1306
 
+rsource "app/Kconfig"
+
 endif # BOARD_HW75_DYNAMIC

@@ -13,3 +13,5 @@ zephyr_library_sources_ifdef(CONFIG_ZMK_DISPLAY_STATUS_SCREEN_CUSTOM widgets/ico
 
 zephyr_library_include_directories_ifdef(CONFIG_KNOB ${ZMK_CONFIG}/drivers/sensor/knob/include)
 zephyr_library_sources_ifdef(CONFIG_KNOB knob_app.c)
+
+add_subdirectory_ifdef(CONFIG_HW75_USB_COMM usb_comm)

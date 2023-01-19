@@ -1,0 +1,41 @@
+/*
+ * Copyright (c) 2022-2023 XiNGRZ
+ * SPDX-License-Identifier: MIT
+ */
+
+syntax = "proto2";
+
+enum Action {
+	NOP = 0;
+	VERSION = 1;
+}
+
+message MessageH2D
+{
+	required Action action = 1;
+	oneof payload
+	{
+		Nop nop = 2;
+	}
+}
+
+message MessageD2H
+{
+	required Action action = 1;
+	oneof payload
+	{
+		Nop nop = 2;
+		Version version = 3;
+	}
+}
+
+message Nop
+{
+}
+
+message Version
+{
+	required string zephyr_version = 1;
+	required string zmk_version = 2;
+	required string app_version = 3;
+}

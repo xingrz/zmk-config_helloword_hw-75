@@ -25,6 +25,11 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
+      - name: Set up build tools
+        run: |
+          apt-get update
+          apt-get install -y python3-pip protobuf-compiler
+
       - name: Cache west modules
         uses: actions/cache@v3.0.11
         continue-on-error: true
@@ -46,12 +51,16 @@ jobs:
           west init -l config
           west update
           west zephyr-export
+          pip install -r zephyr/scripts/requirements.txt
+          git config --global --add safe.directory $PWD
 
       - name: West build
         run: |
           west build -s zmk/app -b ${{ matrix.board }} -- \
             -DZMK_CONFIG=${GITHUB_WORKSPACE}/config \
             -DKEYMAP_FILE=${GITHUB_WORKSPACE}/config/${{ matrix.keymap }}
+        env:
+          PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION: python
 
       - name: Rename artifacts
         run: |
