@@ -16,8 +16,12 @@ LOG_MODULE_DECLARE(zmk, CONFIG_ZMK_LOG_LEVEL);
 #include <zmk/event_manager.h>
 #include <zmk/events/activity_state_changed.h>
 
+#include "knob_app.h"
+
 static const struct device *knob;
 static const struct device *motor;
+
+static bool motor_demo = false;
 
 static int knob_app_init(const struct device *dev)
 {
@@ -47,23 +51,42 @@ static int knob_app_init(const struct device *dev)
 	return 0;
 }
 
+static void knob_app_update_motor_state(void)
+{
+	if (motor_is_calibrated(motor) && !motor_demo) {
+		knob_set_enable(knob, zmk_activity_get_state() == ZMK_ACTIVITY_ACTIVE);
+	}
+}
+
 static int knob_app_event_listener(const zmk_event_t *eh)
 {
-	bool active;
-
 	if (!knob) {
 		return -ENODEV;
 	}
 
 	if (as_zmk_activity_state_changed(eh)) {
-		if (motor_is_calibrated(motor)) {
-			active = zmk_activity_get_state() == ZMK_ACTIVITY_ACTIVE;
-			knob_set_enable(knob, active);
-		}
+		knob_app_update_motor_state();
 		return 0;
 	}
 
 	return -ENOTSUP;
+}
+
+bool knob_app_get_demo(void)
+{
+	return motor_demo;
+}
+
+void knob_app_set_demo(bool demo)
+{
+	motor_demo = demo;
+	if (demo) {
+		knob_set_encoder_report(knob, false);
+	} else {
+		knob_set_mode(knob, KNOB_ENCODER);
+		knob_set_encoder_report(knob, true);
+	}
+	knob_app_update_motor_state();
 }
 
 ZMK_LISTENER(knob_app, knob_app_event_listener);

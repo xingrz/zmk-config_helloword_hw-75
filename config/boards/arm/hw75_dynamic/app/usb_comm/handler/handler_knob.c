@@ -10,6 +10,8 @@
 #include <knob/drivers/knob.h>
 #include <knob/drivers/motor.h>
 
+#include <knob_app.h>
+
 static const struct device *knob;
 static const struct device *motor;
 
@@ -40,7 +42,7 @@ bool handle_knob_get_config(KnobConfig *res)
 		return false;
 	}
 
-	res->demo = !knob_get_encoder_report(knob);
+	res->demo = knob_app_get_demo();
 	res->mode = (KnobConfig_Mode)knob_get_mode(knob);
 
 	if (res->mode == KnobConfig_Mode_DAMPED) {
@@ -62,15 +64,14 @@ bool handle_knob_set_config(const KnobConfig *req, KnobConfig *res)
 	}
 
 	if (req->demo) {
-		knob_set_encoder_report(knob, false);
+		knob_app_set_demo(true);
 		knob_set_mode(knob, (enum knob_mode)req->mode);
 		if (req->mode == KnobConfig_Mode_DAMPED && req->has_damped_min &&
 		    req->has_damped_max) {
 			knob_set_position_limit(knob, req->damped_min, req->damped_max);
 		}
 	} else {
-		knob_set_mode(knob, KNOB_ENCODER);
-		knob_set_encoder_report(knob, true);
+		knob_app_set_demo(false);
 	}
 
 	return handle_knob_get_config(res);
