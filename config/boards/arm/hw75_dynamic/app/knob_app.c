@@ -26,19 +26,15 @@ static int knob_app_init(const struct device *dev)
 	ARG_UNUSED(dev);
 
 	knob = device_get_binding("KNOB");
-	if (knob) {
-		LOG_INF("Found Knob device");
-	} else {
+	if (!knob) {
 		LOG_ERR("Knob device not found");
-		return -EIO;
+		return -ENODEV;
 	}
 
 	motor = device_get_binding("MOTOR");
-	if (motor) {
-		LOG_INF("Found motor device");
-	} else {
+	if (!motor) {
 		LOG_ERR("Motor device not found");
-		return -EIO;
+		return -ENODEV;
 	}
 
 	int ret = motor_calibrate_auto(motor);

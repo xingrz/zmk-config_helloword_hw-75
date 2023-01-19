@@ -27,11 +27,9 @@ static int led_indicator_usb_init(const struct device *dev)
 	ARG_UNUSED(dev);
 
 	led_strip = device_get_binding(STRIP_LABEL);
-	if (led_strip) {
-		LOG_INF("Found LED strip device %s", STRIP_LABEL);
-	} else {
+	if (!led_strip) {
 		LOG_ERR("LED strip device %s not found", STRIP_LABEL);
-		return -EINVAL;
+		return -ENODEV;
 	}
 
 	return led_strip_remap_clear(led_strip, "STATUS");
