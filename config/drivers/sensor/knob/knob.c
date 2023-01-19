@@ -227,6 +227,12 @@ void knob_set_mode(const struct device *dev, enum knob_mode mode)
 	}
 }
 
+enum knob_mode knob_get_mode(const struct device *dev)
+{
+	struct knob_data *data = dev->data;
+	return data->mode;
+}
+
 void knob_set_enable(const struct device *dev, bool enable)
 {
 	struct knob_data *data = dev->data;
@@ -240,11 +246,24 @@ void knob_set_encoder_report(const struct device *dev, bool report)
 	data->encoder_report = report;
 }
 
+bool knob_get_encoder_report(const struct device *dev)
+{
+	struct knob_data *data = dev->data;
+	return data->encoder_report;
+}
+
 void knob_set_position_limit(const struct device *dev, float min, float max)
 {
 	struct knob_data *data = dev->data;
 	data->position_min = min;
 	data->position_max = max;
+}
+
+void knob_get_position_limit(const struct device *dev, float *min, float *max)
+{
+	struct knob_data *data = dev->data;
+	*min = data->position_min;
+	*max = data->position_max;
 }
 
 float knob_get_position(const struct device *dev)

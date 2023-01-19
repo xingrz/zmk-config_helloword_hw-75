@@ -8,6 +8,9 @@ syntax = "proto2";
 enum Action {
 	NOP = 0;
 	VERSION = 1;
+	MOTOR_GET_STATE = 2;
+	KNOB_GET_CONFIG = 3;
+	KNOB_SET_CONFIG = 4;
 }
 
 message MessageH2D
@@ -16,6 +19,7 @@ message MessageH2D
 	oneof payload
 	{
 		Nop nop = 2;
+		KnobConfig knob_config = 3;
 	}
 }
 
@@ -26,6 +30,8 @@ message MessageD2H
 	{
 		Nop nop = 2;
 		Version version = 3;
+		MotorState motor_state = 4;
+		KnobConfig knob_config = 5;
 	}
 }
 
@@ -38,4 +44,38 @@ message Version
 	required string zephyr_version = 1;
 	required string zmk_version = 2;
 	required string app_version = 3;
+}
+
+message MotorState
+{
+	required uint32 timestamp = 1;
+	required ControlMode control_mode = 2;
+	required float current_angle = 3;
+	required float current_velocity = 4;
+	required float target_angle = 5;
+	required float target_velocity = 6;
+	required float target_voltage = 7;
+
+	enum ControlMode {
+		TORQUE = 0;
+		VELOCITY = 1;
+		ANGLE = 2;
+	}
+}
+
+message KnobConfig
+{
+	required bool demo = 1;
+	required Mode mode = 2;
+	optional float damped_min = 3;
+	optional float damped_max = 4;
+
+	enum Mode {
+		DISABLE = 0;
+		INERTIA = 1;
+		ENCODER = 2;
+		SPRING = 3;
+		DAMPED = 4;
+		SPIN = 5;
+	}
 }

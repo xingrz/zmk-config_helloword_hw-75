@@ -8,6 +8,7 @@
 #include <device.h>
 #include <kernel.h>
 
+#include <knob/time.h>
 #include <knob/math.h>
 #include <knob/lpf.h>
 #include <knob/pid.h>
@@ -347,6 +348,18 @@ enum motor_direction motor_get_direction(const struct device *dev)
 {
 	struct motor_data *data = dev->data;
 	return data->direction;
+}
+
+void motor_inspect(const struct device *dev, struct motor_state *state)
+{
+	struct motor_data *data = dev->data;
+	state->timestamp = time_us();
+	state->control_mode = data->control.mode;
+	state->current_angle = data->est_angle;
+	state->current_velocity = data->est_velocity;
+	state->target_angle = data->set_point_angle;
+	state->target_velocity = data->set_point_velocity;
+	state->target_voltage = data->set_point_voltage;
 }
 
 static int motor_init(const struct device *dev)

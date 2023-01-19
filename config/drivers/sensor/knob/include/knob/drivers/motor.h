@@ -63,6 +63,18 @@ struct motor_control *motor_get_control(const struct device *dev);
 
 enum motor_direction motor_get_direction(const struct device *dev);
 
+struct motor_state {
+	uint32_t timestamp;
+	enum motor_control_mode control_mode;
+	float current_angle;
+	float current_velocity;
+	float target_angle;
+	float target_velocity;
+	float target_voltage;
+};
+
+void motor_inspect(const struct device *dev, struct motor_state *state);
+
 #ifdef __cplusplus
 }
 #endif
