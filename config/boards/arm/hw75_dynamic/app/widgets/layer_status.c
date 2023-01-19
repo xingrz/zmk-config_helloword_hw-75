@@ -32,6 +32,8 @@ static const char *layer_names[KEYMAP_LAYERS_NUM] = { DT_FOREACH_CHILD(KEYMAP_NO
 
 static lv_obj_t *layer_items[KEYMAP_LAYERS_NUM] = {};
 
+LV_FONT_DECLARE(icons_19);
+
 static lv_style_t st_list;
 static lv_style_t st_item;
 
@@ -85,6 +87,7 @@ int custom_widget_layer_status_init(struct custom_widget_layer_status *widget, l
 	lv_style_set_text_color(&st_item, LV_STATE_DEFAULT, LV_COLOR_BLACK);
 	lv_style_set_bg_color(&st_item, LV_STATE_FOCUSED, LV_COLOR_BLACK);
 	lv_style_set_text_color(&st_item, LV_STATE_FOCUSED, LV_COLOR_WHITE);
+	lv_style_set_text_font(&st_item, LV_STATE_DEFAULT, &icons_19);
 
 	lv_obj_t *list = widget->obj = lv_list_create(parent, NULL);
 	lv_list_set_layout(list, LV_LAYOUT_COLUMN_MID);
