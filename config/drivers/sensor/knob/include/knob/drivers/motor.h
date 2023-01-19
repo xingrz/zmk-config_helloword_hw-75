@@ -59,6 +59,8 @@ float motor_get_estimate_velocity(const struct device *dev);
 
 float motor_get_electrical_angle(const struct device *dev);
 
+void motor_reset_rotation_count(const struct device *dev);
+
 struct motor_control *motor_get_control(const struct device *dev);
 
 enum motor_direction motor_get_direction(const struct device *dev);

@@ -338,6 +338,13 @@ float motor_get_electrical_angle(const struct device *dev)
 			data->zero_offset);
 }
 
+void motor_reset_rotation_count(const struct device *dev)
+{
+	struct motor_data *data = dev->data;
+	data->encoder_state.rotation_count = 0;
+	data->encoder_state.rotation_count_last = 0;
+}
+
 struct motor_control *motor_get_control(const struct device *dev)
 {
 	struct motor_data *data = dev->data;

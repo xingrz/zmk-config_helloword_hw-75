@@ -181,6 +181,8 @@ void knob_set_mode(const struct device *dev, enum knob_mode mode)
 	data->last_angle = knob_get_position(dev);
 	data->last_velocity = knob_get_velocity(dev);
 
+	motor_reset_rotation_count(config->motor);
+
 	switch (mode) {
 	case KNOB_DISABLE:
 		motor_set_enable(config->motor, false);
