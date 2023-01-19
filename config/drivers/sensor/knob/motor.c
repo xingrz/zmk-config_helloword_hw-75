@@ -152,6 +152,12 @@ int motor_calibrate_auto(const struct device *dev)
 	return 0;
 }
 
+bool motor_is_calibrated(const struct device *dev)
+{
+	struct motor_data *data = dev->data;
+	return data->direction != UNKNOWN;
+}
+
 void motor_tick(const struct device *dev)
 {
 	motor_close_loop_control_tick(dev);
@@ -368,7 +374,7 @@ static int motor_init(const struct device *dev)
 
 	encoder_init(&data->encoder_state, config->encoder);
 
-	return motor_calibrate_auto(dev);
+	return 0;
 }
 
 #define MOTOR_INIT(n)                                                                              \

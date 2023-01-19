@@ -41,6 +41,8 @@ int motor_calibrate_set(const struct device *dev, float zero_offset,
 
 int motor_calibrate_auto(const struct device *dev);
 
+bool motor_is_calibrated(const struct device *dev);
+
 void motor_tick(const struct device *dev);
 
 void motor_set_enable(const struct device *dev, bool enable);

@@ -10,6 +10,7 @@
 LOG_MODULE_DECLARE(zmk, CONFIG_ZMK_LOG_LEVEL);
 
 #include <knob/drivers/knob.h>
+#include <knob/drivers/motor.h>
 
 #include <zmk/activity.h>
 #include <zmk/usb.h>
@@ -18,6 +19,7 @@ LOG_MODULE_DECLARE(zmk, CONFIG_ZMK_LOG_LEVEL);
 #include <zmk/events/usb_conn_state_changed.h>
 
 static const struct device *knob;
+static const struct device *motor;
 
 static int knob_app_init(const struct device *dev)
 {
@@ -28,7 +30,21 @@ static int knob_app_init(const struct device *dev)
 		LOG_INF("Found Knob device");
 	} else {
 		LOG_ERR("Knob device not found");
-		return -EINVAL;
+		return -EIO;
+	}
+
+	motor = device_get_binding("MOTOR");
+	if (motor) {
+		LOG_INF("Found motor device");
+	} else {
+		LOG_ERR("Motor device not found");
+		return -EIO;
+	}
+
+	int ret = motor_calibrate_auto(motor);
+	if (ret != 0) {
+		LOG_ERR("Motor is not calibrated");
+		return -EIO;
 	}
 
 	knob_set_mode(knob, KNOB_ENCODER);
@@ -46,9 +62,11 @@ static int knob_app_event_listener(const zmk_event_t *eh)
 	}
 
 	if (as_zmk_activity_state_changed(eh) || as_zmk_usb_conn_state_changed(eh)) {
-		active = zmk_activity_get_state() == ZMK_ACTIVITY_ACTIVE;
-		hid_ready = zmk_usb_is_hid_ready();
-		knob_set_enable(knob, active && hid_ready);
+		if (motor_is_calibrated(motor)) {
+			active = zmk_activity_get_state() == ZMK_ACTIVITY_ACTIVE;
+			hid_ready = zmk_usb_is_hid_ready();
+			knob_set_enable(knob, active && hid_ready);
+		}
 		return 0;
 	}
 
