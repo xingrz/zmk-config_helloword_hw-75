@@ -1,0 +1,11 @@
+# SSD16XX display controller configuration options
+
+# Copyright (c) 2018 Phytec Messtechnik GmbH
+# SPDX-License-Identifier: Apache-2.0
+
+config HW75_SSD16XX
+	bool "SSD16XX compatible display controller driver"
+	depends on SPI
+	depends on !SSD16XX
+	help
+	  Enable driver for SSD16XX compatible controller.
