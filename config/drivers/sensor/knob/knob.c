@@ -40,6 +40,7 @@ struct knob_data {
 
 	float last_angle;
 	float last_velocity;
+	float max_velocity;
 };
 
 struct knob_config {
@@ -91,24 +92,29 @@ static void knob_tick(const struct device *dev)
 		float a = v - data->last_velocity;
 		if (v == 0.0f) {
 			mc->target = 0.0f;
+			data->max_velocity = 0.0f;
 		} else if (v > 0.0f) {
-			if (a > 1.0f) {
+			if (a > 1.0f || v > data->max_velocity) {
 				mc->target = v;
+				data->max_velocity = v;
 			} else if (a < -2.0f) {
 				mc->target += a;
 				if (mc->target < 1.0f) {
 					mc->target = 0.0f;
+					data->max_velocity = 0.0f;
 				}
 			} else {
 				mc->target -= 0.001f;
 			}
 		} else if (v < 0.0f) {
-			if (a < -1.0f) {
+			if (a < -1.0f || v < data->max_velocity) {
 				mc->target = v;
+				data->max_velocity = v;
 			} else if (a > 2.0f) {
 				mc->target += a;
 				if (mc->target > -1.0f) {
 					mc->target = 0.0f;
+					data->max_velocity = 0.0f;
 				}
 			} else {
 				mc->target += 0.001f;
@@ -180,6 +186,7 @@ void knob_set_mode(const struct device *dev, enum knob_mode mode)
 
 	data->last_angle = knob_get_position(dev);
 	data->last_velocity = knob_get_velocity(dev);
+	data->max_velocity = 0.0f;
 
 	motor_reset_rotation_count(config->motor);
 
