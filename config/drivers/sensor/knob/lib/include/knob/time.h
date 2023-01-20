@@ -10,5 +10,5 @@
 
 static inline uint32_t time_us()
 {
-	return k_cyc_to_us_floor32(k_cycle_get_32());
+	return k_ticks_to_us_floor32(k_uptime_ticks());
 }
