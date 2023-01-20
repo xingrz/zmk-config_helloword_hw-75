@@ -7,5 +7,13 @@ config HW75_SSD16XX
 	bool "SSD16XX compatible display controller driver"
 	depends on SPI
 	depends on !SSD16XX
+	select HW75_SSD16XX_NO_BLANK_ON_INIT
 	help
 	  Enable driver for SSD16XX compatible controller.
+
+if HW75_SSD16XX
+
+config HW75_SSD16XX_NO_BLANK_ON_INIT
+	bool "Do not blank display on init"
+
+endif # HW75_SSD16XX

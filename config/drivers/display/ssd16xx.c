@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2018-2020 PHYTEC Messtechnik GmbH
+ * Copyright (c) 2022-2023 XiNGRZ
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -529,6 +530,38 @@ static int ssd16xx_load_ws_default(const struct device *dev)
 	return 0;
 }
 
+#ifdef CONFIG_HW75_SSD16XX_NO_BLANK_ON_INIT
+int ssd16xx_clear(const struct device *dev)
+{
+	int err;
+	struct ssd16xx_data *driver = dev->data;
+
+	if (ssd16xx_load_ws_initial(dev)) {
+		return -EIO;
+	}
+
+	err = ssd16xx_clear_cntlr_mem(dev, SSD16XX_CMD_WRITE_RAM, true);
+	if (err < 0) {
+		return err;
+	}
+
+	ssd16xx_busy_wait(driver);
+
+	err = ssd16xx_clear_cntlr_mem(dev, SSD16XX_CMD_WRITE_RED_RAM, false);
+	if (err < 0) {
+		return err;
+	}
+
+	ssd16xx_busy_wait(driver);
+
+	if (ssd16xx_load_ws_default(dev)) {
+		return -EIO;
+	}
+
+	return ssd16xx_clear_cntlr_mem(dev, SSD16XX_CMD_WRITE_RAM, true);
+}
+#endif
+
 static int ssd16xx_controller_init(const struct device *dev)
 {
 	int err;
@@ -608,6 +641,7 @@ static int ssd16xx_controller_init(const struct device *dev)
 			      SSD16XX_CTRL2_DISABLE_ANALOG |
 			      SSD16XX_CTRL2_DISABLE_CLK);
 
+#ifndef CONFIG_HW75_SSD16XX_NO_BLANK_ON_INIT
 	if (ssd16xx_load_ws_initial(dev)) {
 		return -EIO;
 	}
@@ -632,6 +666,9 @@ static int ssd16xx_controller_init(const struct device *dev)
 	}
 
 	return ssd16xx_clear_cntlr_mem(dev, SSD16XX_CMD_WRITE_RAM, true);
+#else
+	return 0;
+#endif
 }
 
 static int ssd16xx_init(const struct device *dev)
