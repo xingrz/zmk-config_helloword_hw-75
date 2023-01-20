@@ -62,7 +62,9 @@ static inline float norm_rad(float radian)
 /**
  * @brief Radian to degree
  */
-static inline float rad_to_deg(float rad)
-{
-	return 360.0f * (rad / PI2);
-}
+#define rad_to_deg(rad) (360.0f * (rad / PI2))
+
+/**
+ * @brief Degree to radian
+ */
+#define deg_to_rad(deg) (deg / 360.0f * PI2)

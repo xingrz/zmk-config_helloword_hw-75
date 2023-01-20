@@ -210,7 +210,7 @@ void knob_set_mode(const struct device *dev, enum knob_mode mode)
 		mc->mode = ANGLE;
 		motor_set_velocity_pid(config->motor, 0.05f, 0.0f, 0.0f);
 		motor_set_angle_pid(config->motor, 100.0f, 0.0f, 3.5f);
-		mc->target = 4.2f;
+		mc->target = deg_to_rad(240);
 	} break;
 	case KNOB_DAMPED: {
 		motor_set_enable(config->motor, true);
@@ -357,8 +357,8 @@ int knob_init(const struct device *dev)
 #define KNOB_INST(n)                                                                               \
 	struct knob_data knob_data_##n = {                                                         \
 		.mode = KNOB_DISABLE,                                                              \
-		.position_min = 3.3f,                                                              \
-		.position_max = 5.1f,                                                              \
+		.position_min = deg_to_rad(190),                                                   \
+		.position_max = deg_to_rad(290),                                                   \
 		.encoder_report = false,                                                           \
 		.encoder_rpp = PI2 / (float)DT_INST_PROP(n, ppr),                                  \
 	};                                                                                         \
