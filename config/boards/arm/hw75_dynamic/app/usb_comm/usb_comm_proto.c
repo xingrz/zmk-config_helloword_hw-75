@@ -82,6 +82,15 @@ static void usb_comm_proto_read_cb(uint8_t ep, int size, void *priv)
 			handle_knob_set_config(&h2d.payload.knob_config, &d2h.payload.knob_config),
 			MessageD2H_knob_config_tag);
 		break;
+	case Action_RGB_CONTROL:
+		d2h.which_payload = D2H_PAYLOAD_OR_NOP(handle_rgb_control(&h2d.payload.rgb_control,
+									  &d2h.payload.rgb_state),
+						       MessageD2H_rgb_state_tag);
+		break;
+	case Action_RGB_GET_STATE:
+		d2h.which_payload = D2H_PAYLOAD_OR_NOP(handle_rgb_get_state(&d2h.payload.rgb_state),
+						       MessageD2H_rgb_state_tag);
+		break;
 	default:
 		d2h.which_payload = MessageD2H_nop_tag;
 		break;

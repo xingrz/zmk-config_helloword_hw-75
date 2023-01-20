@@ -17,3 +17,8 @@ zephyr_library_compile_definitions(
 zephyr_library_sources(handler_knob.c)
 zephyr_library_include_directories(${ZMK_CONFIG}/drivers/sensor/knob/include)
 zephyr_library_include_directories(${ZMK_CONFIG}/boards/arm/hw75_dynamic/app)
+
+# handler - rgb
+
+zephyr_library_sources(handler_rgb.c)
+zephyr_library_include_directories(${CMAKE_SOURCE_DIR}/include)

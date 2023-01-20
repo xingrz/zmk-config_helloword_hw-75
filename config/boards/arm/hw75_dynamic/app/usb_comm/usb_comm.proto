@@ -11,6 +11,8 @@ enum Action {
 	MOTOR_GET_STATE = 2;
 	KNOB_GET_CONFIG = 3;
 	KNOB_SET_CONFIG = 4;
+	RGB_CONTROL = 5;
+	RGB_GET_STATE = 6;
 }
 
 message MessageH2D
@@ -20,6 +22,7 @@ message MessageH2D
 	{
 		Nop nop = 2;
 		KnobConfig knob_config = 3;
+		RgbControl rgb_control = 4;
 	}
 }
 
@@ -32,6 +35,7 @@ message MessageD2H
 		Version version = 3;
 		MotorState motor_state = 4;
 		KnobConfig knob_config = 5;
+		RgbState rgb_state = 6;
 	}
 }
 
@@ -79,4 +83,29 @@ message KnobConfig
 		SPIN = 5;
 		RATCHET = 6;
 	}
+}
+
+message RgbControl
+{
+	required Command command = 1;
+
+	enum Command {
+		RGB_ON = 1;
+		RGB_OFF = 2;
+		RGB_HUI = 3;
+		RGB_HUD = 4;
+		RGB_SAI = 5;
+		RGB_SAD = 6;
+		RGB_BRI = 7;
+		RGB_BRD = 8;
+		RGB_SPI = 9;
+		RGB_SPD = 10;
+		RGB_EFF = 11;
+		RGB_EFR = 12;
+	}
+}
+
+message RgbState
+{
+	required bool on = 1;
 }
