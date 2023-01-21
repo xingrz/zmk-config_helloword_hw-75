@@ -166,6 +166,17 @@ static void knob_tick(const struct device *dev)
 			mc->target = 0.0f;
 		}
 	} break;
+	case KNOB_RATCHET: {
+		float dp = knob_get_position(dev) - data->last_angle;
+		float rpp = PI2 / 12;
+		if (dp < 0) {
+			mc->target = data->last_angle;
+		} else if (dp < rpp) {
+			mc->target = data->last_angle + dp - dp * 0.5f;
+		} else {
+			data->last_angle += rpp;
+		}
+	} break;
 	case KNOB_DISABLE:
 	case KNOB_SPRING:
 	case KNOB_SPIN:
@@ -233,6 +244,15 @@ void knob_set_mode(const struct device *dev, enum knob_mode mode)
 		mc->mode = VELOCITY;
 		motor_set_velocity_pid(config->motor, 0.3f, 0.0f, 0.0f);
 		mc->target = 20.0f;
+	} break;
+	case KNOB_RATCHET: {
+		motor_set_enable(config->motor, true);
+		motor_set_torque_limit(config->motor, 2.5f);
+		mc->mode = ANGLE;
+		motor_set_velocity_pid(config->motor, 0.05f, 0.0f, 0.0f);
+		motor_set_angle_pid(config->motor, 100.0f, 0.0f, 3.5f);
+		mc->target = 0.0f;
+		data->last_angle = 0.0f;
 	} break;
 	}
 }

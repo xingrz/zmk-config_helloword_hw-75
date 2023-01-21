@@ -25,6 +25,7 @@ enum knob_mode {
 	KNOB_SPRING,
 	KNOB_DAMPED,
 	KNOB_SPIN,
+	KNOB_RATCHET,
 };
 
 void knob_set_mode(const struct device *dev, enum knob_mode mode);
