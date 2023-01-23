@@ -59,14 +59,24 @@ static int sw_rotate_write(const struct device *dev, const uint16_t x, const uin
 		.pitch = desc->height,
 	};
 
-	for (uint16_t sy = 0; sy < desc->height; sy++) {
-		for (uint16_t sx = 0; sx < desc->width / BITS_PER_ITEM; sx++) {
-			data->buffer[sy + desc->height * sx] =
-				((const uint8_t *)buf)[desc->width / BITS_PER_ITEM * sy + sx];
+	const uint8_t *s = (const uint8_t *)buf;
+	const uint16_t sw = desc->width / BITS_PER_ITEM;
+	const uint16_t sh = desc->height;
+
+	uint8_t *d = data->buffer;
+	uint16_t dx, dy;
+
+	for (uint16_t sy = 0; sy < sh; sy++) {
+		for (uint16_t sx = 0; sx < sw; sx++) {
+			dx = sy;
+			dy = sx;
+			d[dx + sh * dy] = s[sw * sy + sx];
 		}
 	}
 
-	return display_write(config->dst, y, x, &desc_rot, data->buffer);
+	const uint16_t dst_x = y;
+	const uint16_t dst_y = x;
+	return display_write(config->dst, dst_x, dst_y, &desc_rot, data->buffer);
 }
 
 static int sw_rotate_read(const struct device *dev, const uint16_t x, const uint16_t y,
