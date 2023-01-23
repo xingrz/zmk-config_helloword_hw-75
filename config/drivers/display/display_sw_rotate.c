@@ -68,13 +68,13 @@ static int sw_rotate_write(const struct device *dev, const uint16_t x, const uin
 
 	for (uint16_t sy = 0; sy < sh; sy++) {
 		for (uint16_t sx = 0; sx < sw; sx++) {
-			dx = sy;
+			dx = (desc->height - 1) - sy;
 			dy = sx;
 			d[dx + sh * dy] = s[sw * sy + sx];
 		}
 	}
 
-	const uint16_t dst_x = y;
+	const uint16_t dst_x = config->dst_width - y - desc->height;
 	const uint16_t dst_y = x;
 	return display_write(config->dst, dst_x, dst_y, &desc_rot, data->buffer);
 }

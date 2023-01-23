@@ -195,6 +195,7 @@
 		page-offset = <0>;
 		display-offset = <16>;
 		multiplex-ratio = <31>;
+		segment-remap;
 		com-invdir;
 		prechargep = <0xf1>;
 	};
