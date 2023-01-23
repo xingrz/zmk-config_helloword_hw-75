@@ -16,6 +16,8 @@ LOG_MODULE_DECLARE(zmk, CONFIG_ZMK_LOG_LEVEL);
 #include <pb_encode.h>
 #include <pb_decode.h>
 
+#include "indicator_app.h"
+
 #define EINK_NODE DT_NODELABEL(eink)
 #define EINK_WIDTH DT_PROP(EINK_NODE, width)
 #define EINK_HEIGHT DT_PROP(EINK_NODE, height)
@@ -45,8 +47,10 @@ bool handle_eink_set_image(const EinkImage *req, const void *bits, uint32_t bits
 	LOG_DBG("Start updating E-Ink");
 
 	if (!ssd16xx_inited) {
+		indicator_set_bits(INDICATOR_EINK_UPDATING);
 		ssd16xx_clear(ssd16xx);
 		ssd16xx_inited = true;
+		indicator_clear_bits(INDICATOR_EINK_UPDATING);
 	}
 
 	display_write(eink, 0, 0, &desc, bits);

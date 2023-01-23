@@ -17,6 +17,7 @@ LOG_MODULE_DECLARE(zmk, CONFIG_ZMK_LOG_LEVEL);
 #include <zmk/events/activity_state_changed.h>
 
 #include "knob_app.h"
+#include "indicator_app.h"
 
 static const struct device *knob;
 static const struct device *motor;
@@ -39,6 +40,8 @@ static int knob_app_init(const struct device *dev)
 		return -ENODEV;
 	}
 
+	indicator_set_bits(INDICATOR_KNOB_CALIBRATING);
+
 	int ret = motor_calibrate_auto(motor);
 	if (ret != 0) {
 		LOG_ERR("Motor is not calibrated");
@@ -47,6 +50,8 @@ static int knob_app_init(const struct device *dev)
 
 	knob_set_mode(knob, KNOB_ENCODER);
 	knob_set_encoder_report(knob, true);
+
+	indicator_clear_bits(INDICATOR_KNOB_CALIBRATING);
 
 	return 0;
 }
