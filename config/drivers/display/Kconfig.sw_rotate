@@ -10,8 +10,4 @@ config DISPLAY_SW_ROTATE
 
 if DISPLAY_SW_ROTATE
 
-config DISPLAY_SW_ROTATE_BUFFER_LINES
-	int "Vertical lines of the buffer being allocated"
-	default 32
-
 endif # DISPLAY_SW_ROTATE

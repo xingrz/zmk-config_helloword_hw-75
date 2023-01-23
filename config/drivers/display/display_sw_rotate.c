@@ -162,7 +162,7 @@ static const struct display_driver_api sw_rotate_api = {
 };
 
 #define SW_ROTATE_BUFFER_SIZE(n)                                                                   \
-	(DT_INST_PROP(n, height) * CONFIG_DISPLAY_SW_ROTATE_BUFFER_LINES / BITS_PER_ITEM)
+	(DT_INST_PROP(n, height) * DT_INST_PROP_OR(n, buffer_lines, 32) / BITS_PER_ITEM)
 
 #define SW_ROTATE_INIT(n)                                                                          \
 	static uint8_t sw_rotate_buffer_##n[SW_ROTATE_BUFFER_SIZE(n)] = {};                        \

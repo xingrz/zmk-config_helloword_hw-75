@@ -15,3 +15,7 @@ properties:
   display:
     type: phandle
     required: true
+
+  buffer-lines:
+    type: int
+    default: 32
