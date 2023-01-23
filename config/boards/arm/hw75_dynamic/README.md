@@ -20,9 +20,8 @@ HW-75 Dynamic
 
 ## 烧录
 
-```sh
-pyocd load --pack=Keil.STM32F4xx_DFP.2.16.0.pack --target stm32f405rg hw75_dynamic-zmk.hex
-```
+1. 从 [Releases](https://github.com/xingrz/zmk-config_helloword_hw-75/releases/latest) 下载最新的固件；
+2. 参考[固件更新说明](https://github.com/xingrz/zmk-config_helloword_hw-75/wiki/%E5%9B%BA%E4%BB%B6%E6%9B%B4%E6%96%B0-(%E6%89%A9%E5%B1%95))烧入固件。
 
 ## 二次开发
 
