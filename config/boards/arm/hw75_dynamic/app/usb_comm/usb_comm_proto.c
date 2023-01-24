@@ -7,7 +7,7 @@
 #include <device.h>
 
 #include <logging/log.h>
-LOG_MODULE_REGISTER(usb_comm, CONFIG_HW75_USB_COMM_LOG_LEVEL);
+LOG_MODULE_DECLARE(usb_comm, CONFIG_HW75_USB_COMM_LOG_LEVEL);
 
 #include <usb/usb_device.h>
 
