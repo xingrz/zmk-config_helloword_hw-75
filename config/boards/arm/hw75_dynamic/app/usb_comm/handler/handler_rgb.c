@@ -8,9 +8,12 @@
 
 #include <zmk/rgb_underglow.h>
 
-bool handle_rgb_control(const RgbControl *control, RgbState *state)
+bool handle_rgb_control(const MessageH2D *h2d, MessageD2H *d2h, const void *bytes,
+			uint32_t bytes_len)
 {
-	switch (control->command) {
+	const RgbControl *req = &h2d->payload.rgb_control;
+
+	switch (req->command) {
 	case RgbControl_Command_RGB_ON:
 		zmk_rgb_underglow_on();
 		break;
@@ -49,17 +52,20 @@ bool handle_rgb_control(const RgbControl *control, RgbState *state)
 		break;
 	}
 
-	return handle_rgb_get_state(state);
+	return handle_rgb_get_state(h2d, d2h, NULL, 0);
 }
 
-bool handle_rgb_get_state(RgbState *state)
+bool handle_rgb_get_state(const MessageH2D *h2d, MessageD2H *d2h, const void *bytes,
+			  uint32_t bytes_len)
 {
+	RgbState *res = &d2h->payload.rgb_state;
+
 	bool on;
 	if (zmk_rgb_underglow_get_state(&on) != 0) {
 		return false;
 	}
 
-	state->on = on;
+	res->on = on;
 
 	return true;
 }

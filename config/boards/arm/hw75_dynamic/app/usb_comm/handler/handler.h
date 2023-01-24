@@ -7,14 +7,22 @@
 
 #include "usb_comm.pb.h"
 
-bool handle_version(Version *res);
+typedef bool (*usb_comm_handler_t)(const MessageH2D *h2d, MessageD2H *d2h, const void *bytes,
+				   uint32_t bytes_len);
 
-bool handle_motor_get_state(MotorState *res);
-bool handle_knob_get_config(KnobConfig *res);
-bool handle_knob_set_config(const KnobConfig *req, KnobConfig *res);
+bool handle_version(const MessageH2D *h2d, MessageD2H *d2h, const void *bytes, uint32_t bytes_len);
 
-bool handle_rgb_control(const RgbControl *control, RgbState *state);
-bool handle_rgb_get_state(RgbState *state);
+bool handle_motor_get_state(const MessageH2D *h2d, MessageD2H *d2h, const void *bytes,
+			    uint32_t bytes_len);
+bool handle_knob_get_config(const MessageH2D *h2d, MessageD2H *d2h, const void *bytes,
+			    uint32_t bytes_len);
+bool handle_knob_set_config(const MessageH2D *h2d, MessageD2H *d2h, const void *bytes,
+			    uint32_t bytes_len);
 
-bool handle_eink_set_image(const EinkImage *req, const void *bits, uint32_t bits_len,
-			   EinkImage *res);
+bool handle_rgb_control(const MessageH2D *h2d, MessageD2H *d2h, const void *bytes,
+			uint32_t bytes_len);
+bool handle_rgb_get_state(const MessageH2D *h2d, MessageD2H *d2h, const void *bytes,
+			  uint32_t bytes_len);
+
+bool handle_eink_set_image(const MessageH2D *h2d, MessageD2H *d2h, const void *bytes,
+			   uint32_t bytes_len);

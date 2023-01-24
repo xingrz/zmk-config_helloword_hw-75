@@ -17,8 +17,11 @@ static const struct device *motor;
 
 static struct motor_state state = {};
 
-bool handle_motor_get_state(MotorState *res)
+bool handle_motor_get_state(const MessageH2D *h2d, MessageD2H *d2h, const void *bytes,
+			    uint32_t bytes_len)
 {
+	MotorState *res = &d2h->payload.motor_state;
+
 	if (!motor) {
 		return false;
 	}
@@ -36,8 +39,11 @@ bool handle_motor_get_state(MotorState *res)
 	return true;
 }
 
-bool handle_knob_get_config(KnobConfig *res)
+bool handle_knob_get_config(const MessageH2D *h2d, MessageD2H *d2h, const void *bytes,
+			    uint32_t bytes_len)
 {
+	KnobConfig *res = &d2h->payload.knob_config;
+
 	if (!knob) {
 		return false;
 	}
@@ -57,8 +63,11 @@ bool handle_knob_get_config(KnobConfig *res)
 	return true;
 }
 
-bool handle_knob_set_config(const KnobConfig *req, KnobConfig *res)
+bool handle_knob_set_config(const MessageH2D *h2d, MessageD2H *d2h, const void *bytes,
+			    uint32_t bytes_len)
 {
+	const KnobConfig *req = &h2d->payload.knob_config;
+
 	if (!knob) {
 		return false;
 	}
@@ -74,7 +83,7 @@ bool handle_knob_set_config(const KnobConfig *req, KnobConfig *res)
 		knob_app_set_demo(false);
 	}
 
-	return handle_knob_get_config(res);
+	return handle_knob_get_config(h2d, d2h, NULL, 0);
 }
 
 static int handler_knob_init(const struct device *dev)

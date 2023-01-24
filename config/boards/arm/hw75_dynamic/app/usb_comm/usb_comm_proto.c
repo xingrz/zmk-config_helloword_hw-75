@@ -26,6 +26,20 @@ static uint8_t usb_tx_buf[CONFIG_HW75_USB_COMM_MAX_TX_MESSAGE_SIZE];
 static uint8_t bytes_field[CONFIG_HW75_USB_COMM_MAX_BYTES_FIELD_SIZE];
 static uint32_t bytes_field_len = 0;
 
+static struct {
+	Action action;
+	pb_size_t which_payload;
+	usb_comm_handler_t handler;
+} handlers[] = {
+	{ Action_VERSION, MessageD2H_version_tag, handle_version },
+	{ Action_MOTOR_GET_STATE, MessageD2H_motor_state_tag, handle_motor_get_state },
+	{ Action_KNOB_GET_CONFIG, MessageD2H_knob_config_tag, handle_knob_get_config },
+	{ Action_KNOB_SET_CONFIG, MessageD2H_knob_config_tag, handle_knob_set_config },
+	{ Action_RGB_CONTROL, MessageD2H_rgb_state_tag, handle_rgb_control },
+	{ Action_RGB_GET_STATE, MessageD2H_rgb_state_tag, handle_rgb_get_state },
+	{ Action_EINK_SET_IMAGE, MessageD2H_eink_image_tag, handle_eink_set_image },
+};
+
 static bool read_bytes_field(pb_istream_t *stream, const pb_field_t *field, void **arg)
 {
 	uint32_t len = **((uint32_t **)arg);
@@ -100,45 +114,15 @@ static void usb_comm_proto_read_cb(uint8_t ep, int size, void *priv)
 
 	LOG_DBG("req action: %d", h2d.action);
 	d2h.action = h2d.action;
+	d2h.which_payload = MessageD2H_nop_tag;
 
-	switch (h2d.action) {
-	case Action_VERSION:
-		d2h.which_payload = D2H_PAYLOAD_OR_NOP(handle_version(&d2h.payload.version),
-						       MessageD2H_version_tag);
-		break;
-	case Action_MOTOR_GET_STATE:
-		d2h.which_payload =
-			D2H_PAYLOAD_OR_NOP(handle_motor_get_state(&d2h.payload.motor_state),
-					   MessageD2H_motor_state_tag);
-		break;
-	case Action_KNOB_GET_CONFIG:
-		d2h.which_payload =
-			D2H_PAYLOAD_OR_NOP(handle_knob_get_config(&d2h.payload.knob_config),
-					   MessageD2H_knob_config_tag);
-		break;
-	case Action_KNOB_SET_CONFIG:
-		d2h.which_payload = D2H_PAYLOAD_OR_NOP(
-			handle_knob_set_config(&h2d.payload.knob_config, &d2h.payload.knob_config),
-			MessageD2H_knob_config_tag);
-		break;
-	case Action_RGB_CONTROL:
-		d2h.which_payload = D2H_PAYLOAD_OR_NOP(handle_rgb_control(&h2d.payload.rgb_control,
-									  &d2h.payload.rgb_state),
-						       MessageD2H_rgb_state_tag);
-		break;
-	case Action_RGB_GET_STATE:
-		d2h.which_payload = D2H_PAYLOAD_OR_NOP(handle_rgb_get_state(&d2h.payload.rgb_state),
-						       MessageD2H_rgb_state_tag);
-		break;
-	case Action_EINK_SET_IMAGE:
-		d2h.which_payload = D2H_PAYLOAD_OR_NOP(
-			handle_eink_set_image(&h2d.payload.eink_image, &bytes_field,
-					      bytes_field_len, &d2h.payload.eink_image),
-			MessageD2H_eink_image_tag);
-		break;
-	default:
-		d2h.which_payload = MessageD2H_nop_tag;
-		break;
+	for (size_t i = 0; i < ARRAY_SIZE(handlers); i++) {
+		if (handlers[i].action == h2d.action) {
+			if (handlers[i].handler(&h2d, &d2h, bytes_field, bytes_field_len)) {
+				d2h.which_payload = handlers[i].which_payload;
+			}
+			break;
+		}
 	}
 
 	size_t d2h_size;

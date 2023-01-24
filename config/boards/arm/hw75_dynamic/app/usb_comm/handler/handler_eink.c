@@ -27,9 +27,12 @@ static const struct device *eink;
 static const struct device *ssd16xx;
 static bool ssd16xx_inited = false;
 
-bool handle_eink_set_image(const EinkImage *req, const void *bits, uint32_t bits_len,
-			   EinkImage *res)
+bool handle_eink_set_image(const MessageH2D *h2d, MessageD2H *d2h, const void *bytes,
+			   uint32_t bytes_len)
 {
+	const EinkImage *req = &h2d->payload.eink_image;
+	EinkImage *res = &d2h->payload.eink_image;
+
 	if (!eink || !ssd16xx) {
 		LOG_ERR("E-Ink device not found, ignoring update request");
 		return true;
@@ -38,7 +41,7 @@ bool handle_eink_set_image(const EinkImage *req, const void *bits, uint32_t bits
 	res->id = req->id;
 
 	struct display_buffer_descriptor desc = {
-		.buf_size = bits_len,
+		.buf_size = bytes_len,
 		.width = EINK_WIDTH,
 		.height = EINK_HEIGHT,
 		.pitch = EINK_WIDTH,
@@ -53,7 +56,7 @@ bool handle_eink_set_image(const EinkImage *req, const void *bits, uint32_t bits
 		indicator_clear_bits(INDICATOR_EINK_UPDATING);
 	}
 
-	display_write(eink, 0, 0, &desc, bits);
+	display_write(eink, 0, 0, &desc, bytes);
 
 	LOG_DBG("E-Ink update finished");
 	return true;

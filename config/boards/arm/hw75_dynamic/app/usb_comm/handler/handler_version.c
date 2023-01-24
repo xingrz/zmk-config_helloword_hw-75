@@ -35,8 +35,9 @@ static bool write_string(pb_ostream_t *stream, const pb_field_t *field, void *co
 	return pb_encode_string(stream, (uint8_t *)str, strlen(str));
 }
 
-bool handle_version(Version *res)
+bool handle_version(const MessageH2D *h2d, MessageD2H *d2h, const void *bytes, uint32_t bytes_len)
 {
+	Version *res = &d2h->payload.version;
 	res->zephyr_version.funcs.encode = write_string;
 	res->zephyr_version.arg = (void *)zephyr_version;
 	res->zmk_version.funcs.encode = write_string;
