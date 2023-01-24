@@ -15,7 +15,7 @@ zephyr_library_include_directories(${CMAKE_CURRENT_BINARY_DIR})
 zephyr_library_sources(${PROTO_SRCS} ${PROTO_HDRS})
 
 zephyr_library_sources(usb_comm.c)
-zephyr_library_sources(usb_comm_webusb.c)
+zephyr_library_sources(usb_comm_bos.c)
 zephyr_library_sources(usb_comm_proto.c)
 
 add_subdirectory(handler)

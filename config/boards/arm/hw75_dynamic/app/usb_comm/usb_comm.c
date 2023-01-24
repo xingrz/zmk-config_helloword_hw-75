@@ -12,7 +12,7 @@ LOG_MODULE_REGISTER(usb_comm, CONFIG_HW75_USB_COMM_LOG_LEVEL);
 #include <usb/usb_device.h>
 #include <usb_descriptor.h>
 
-#include "usb_comm_webusb.h"
+#include "usb_comm_bos.h"
 #include "usb_comm_proto.h"
 
 #define USB_IN_EP_IDX 0

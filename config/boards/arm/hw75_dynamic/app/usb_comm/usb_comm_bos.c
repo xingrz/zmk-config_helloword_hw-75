@@ -12,7 +12,7 @@ LOG_MODULE_DECLARE(usb_comm, CONFIG_HW75_USB_COMM_LOG_LEVEL);
 #include <usb/usb_device.h>
 #include <usb/bos.h>
 
-#include "usb_comm_webusb.h"
+#include "usb_comm_bos.h"
 
 #define WBVAL(x) (x & 0xFF), ((x >> 8) & 0xFF)
 
@@ -113,45 +113,6 @@ USB_DEVICE_BOS_DESC_DEFINE_CAP struct usb_bos_msosv2_desc {
 	},
 };
 
-#define WEBUSB_VENDOR_CODE 0x02
-#define WEBUSB_REQUEST_GET_URL 0x02
-
-static const uint8_t webusb_origin_url[] = {
-	/* URL Descriptor */
-	0x0f, // bLength
-	0x03, // bDescriptorType (url)
-	0x01, 'h', 'w', '.', 'x', 'i', 'n', 'g', 'r', 'z', '.', 'm', 'e'
-};
-
-USB_DEVICE_BOS_DESC_DEFINE_CAP struct usb_bos_webusb_desc {
-	struct usb_bos_platform_descriptor platform;
-	struct usb_bos_capability_webusb cap;
-} __packed bos_cap_webusb = {
-	.platform = {
-		.bLength = sizeof(struct usb_bos_platform_descriptor)
-			+ sizeof(struct usb_bos_capability_webusb),
-		.bDescriptorType = USB_DESC_DEVICE_CAPABILITY,
-		.bDevCapabilityType = USB_BOS_CAPABILITY_PLATFORM,
-		.bReserved = 0,
-		/**
-		 * WebUSB Platform Capability UUID
-		 * 3408b638-09a9-47a0-8bfd-a0768815b665
-		 */
-		.PlatformCapabilityUUID = {
-			0x38, 0xB6, 0x08, 0x34,
-			0xA9, 0x09,
-			0xA0, 0x47,
-			0x8B, 0xFD,
-			0xA0, 0x76, 0x88, 0x15, 0xB6, 0x65,
-		},
-	},
-	.cap = {
-		.bcdVersion = sys_cpu_to_le16(0x0100),
-		.bVendorCode = WEBUSB_VENDOR_CODE,
-		.iLandingPage = 1,
-	}
-};
-
 int usb_comm_custom_handler(struct usb_setup_packet *setup, int32_t *len, uint8_t **data)
 {
 	return -EINVAL;
@@ -163,15 +124,8 @@ int usb_comm_vendor_handler(struct usb_setup_packet *setup, int32_t *len, uint8_
 		return -ENOTSUP;
 	}
 
-	if (setup->bRequest == WEBUSB_VENDOR_CODE && setup->wIndex == WEBUSB_REQUEST_GET_URL) {
-		*data = (uint8_t *)(&webusb_origin_url);
-		*len = sizeof(webusb_origin_url);
-
-		LOG_DBG("Get webusb_origin_url");
-
-		return 0;
-	} else if (setup->bRequest == WINUSB_VENDOR_CODE &&
-		   setup->wIndex == WINUSB_REQUEST_GET_DESCRIPTOR_SET) {
+	if (setup->bRequest == WINUSB_VENDOR_CODE &&
+	    setup->wIndex == WINUSB_REQUEST_GET_DESCRIPTOR_SET) {
 		*data = (uint8_t *)(&msos2_descriptor);
 		*len = sizeof(msos2_descriptor);
 
@@ -183,14 +137,13 @@ int usb_comm_vendor_handler(struct usb_setup_packet *setup, int32_t *len, uint8_
 	return -ENOTSUP;
 }
 
-static int usb_comm_init(const struct device *dev)
+static int usb_comm_bos_init(const struct device *dev)
 {
 	ARG_UNUSED(dev);
 
 	usb_bos_register_cap((void *)&bos_cap_msosv2);
-	usb_bos_register_cap((void *)&bos_cap_webusb);
 
 	return 0;
 }
 
-SYS_INIT(usb_comm_init, APPLICATION, CONFIG_ZMK_USB_INIT_PRIORITY);
+SYS_INIT(usb_comm_bos_init, APPLICATION, CONFIG_ZMK_USB_INIT_PRIORITY);
