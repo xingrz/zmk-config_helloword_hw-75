@@ -20,10 +20,10 @@ LOG_MODULE_DECLARE(usb_comm, CONFIG_HW75_USB_COMM_LOG_LEVEL);
 #include "handler/handler.h"
 
 static uint8_t usb_ep_in, usb_ep_out;
-static uint8_t usb_rx_buf[CONFIG_HW75_USB_COMM_MAX_RX_PACKET_SIZE];
-static uint8_t usb_tx_buf[CONFIG_HW75_USB_COMM_MAX_TX_PACKET_SIZE];
+static uint8_t usb_rx_buf[CONFIG_HW75_USB_COMM_MAX_RX_MESSAGE_SIZE];
+static uint8_t usb_tx_buf[CONFIG_HW75_USB_COMM_MAX_TX_MESSAGE_SIZE];
 
-static uint8_t bytes_field[CONFIG_HW75_USB_COMM_BYTES_FIELD_SIZE];
+static uint8_t bytes_field[CONFIG_HW75_USB_COMM_MAX_BYTES_FIELD_SIZE];
 static uint32_t bytes_field_len = 0;
 
 static bool read_bytes_field(pb_istream_t *stream, const pb_field_t *field, void **arg)
@@ -144,7 +144,7 @@ static void usb_comm_proto_read_cb(uint8_t ep, int size, void *priv)
 	size_t d2h_size;
 	pb_get_encoded_size(&d2h_size, MessageD2H_fields, &d2h);
 	if (d2h_size > sizeof(usb_tx_buf)) {
-		LOG_ERR("The size of response for action %d is %d, exceeds max packet size %d",
+		LOG_ERR("The size of response for action %d is %d, exceeds max tx buf size %d",
 			h2d.action, d2h_size, sizeof(usb_tx_buf));
 	}
 
