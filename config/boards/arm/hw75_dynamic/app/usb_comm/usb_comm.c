@@ -12,6 +12,7 @@ LOG_MODULE_REGISTER(usb_comm, CONFIG_HW75_USB_COMM_LOG_LEVEL);
 #include <usb/usb_device.h>
 #include <usb_descriptor.h>
 
+#include "usb_comm_webusb.h"
 #include "usb_comm_proto.h"
 
 #define USB_IN_EP_IDX 0
@@ -74,36 +75,13 @@ static void usb_comm_status_cb(struct usb_cfg_data *cfg, enum usb_dc_status_code
 	}
 }
 
-static int usb_comm_vendor_handler(struct usb_setup_packet *setup, int32_t *len, uint8_t **data)
-{
-	LOG_DBG("Class request: bRequest 0x%x bmRequestType 0x%x len %d", setup->bRequest,
-		setup->bmRequestType, *len);
-
-	if (setup->RequestType.recipient != USB_REQTYPE_RECIPIENT_DEVICE) {
-		return -ENOTSUP;
-	}
-
-	if (usb_reqtype_is_to_device(setup)) {
-		LOG_DBG("Host-to-Device, data %p", *data);
-		LOG_HEXDUMP_DBG(*data, setup->wLength, "H2D");
-		return 0;
-	}
-
-	if ((usb_reqtype_is_to_host(setup))) {
-		LOG_DBG("Device-to-Host, wLength %d, data %p", setup->wLength, *data);
-		return 0;
-	}
-
-	return -ENOTSUP;
-}
-
 USBD_DEFINE_CFG_DATA(usb_config) = {
 	.usb_device_description = NULL,
 	.interface_descriptor = &usb_comm_desc.if0,
 	.cb_usb_status = usb_comm_status_cb,
 	.interface = {
 		.class_handler = NULL,
-		.custom_handler = NULL,
+		.custom_handler = usb_comm_custom_handler,
 		.vendor_handler = usb_comm_vendor_handler,
 	},
 	.num_endpoints = ARRAY_SIZE(usb_comm_ep_data),

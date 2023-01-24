@@ -4,6 +4,7 @@
 config HW75_USB_COMM
 	bool
 	depends on USB_DEVICE_DRIVER
+	select USB_DEVICE_BOS
 	default y
 
 if HW75_USB_COMM
