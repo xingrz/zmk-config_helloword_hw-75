@@ -17,9 +17,11 @@ LOG_MODULE_DECLARE(zmk, CONFIG_ZMK_LOG_LEVEL);
 #include <zmk/endpoints.h>
 #include <zmk/keymap.h>
 
-#define SCREEN_W 32
-#define SCREEN_H 128
-#define ITEM_SIZE 32
+#define DISPLAY_NODE DT_CHOSEN(zephyr_display)
+
+#define SCREEN_W DT_PROP(DISPLAY_NODE, width)
+#define SCREEN_H DT_PROP(DISPLAY_NODE, height)
+#define ITEM_SIZE MIN(SCREEN_W, SCREEN_H)
 
 #define KEYMAP_NODE DT_INST(0, zmk_keymap)
 
@@ -30,6 +32,7 @@ LOG_MODULE_DECLARE(zmk, CONFIG_ZMK_LOG_LEVEL);
 
 static const char *layer_names[KEYMAP_LAYERS_NUM] = { DT_FOREACH_CHILD(KEYMAP_NODE, LAYER_LABEL) };
 
+static lv_obj_t *layer_list;
 static lv_obj_t *layer_items[KEYMAP_LAYERS_NUM] = {};
 
 LV_FONT_DECLARE(icons_19);
@@ -37,25 +40,19 @@ LV_FONT_DECLARE(icons_19);
 static lv_style_t st_list;
 static lv_style_t st_item;
 
-static sys_slist_t widgets = SYS_SLIST_STATIC_INIT(&widgets);
-
 struct layer_status_state {
 	uint8_t index;
 };
 
-static void update_layer_status(struct custom_widget_layer_status *widget,
-				struct layer_status_state state)
+static void update_layer_status(struct layer_status_state *state)
 {
-	lv_list_focus_btn(widget->obj, layer_items[state.index]);
-	lv_list_focus(layer_items[state.index], LV_ANIM_ON);
+	lv_list_focus_btn(layer_list, layer_items[state->index]);
+	lv_list_focus(layer_items[state->index], LV_ANIM_ON);
 }
 
 static void layer_status_update_cb(struct layer_status_state state)
 {
-	struct custom_widget_layer_status *widget;
-	SYS_SLIST_FOR_EACH_CONTAINER (&widgets, widget, node) {
-		update_layer_status(widget, state);
-	}
+	update_layer_status(&state);
 }
 
 static struct layer_status_state layer_status_get_state(const zmk_event_t *eh)
@@ -64,12 +61,12 @@ static struct layer_status_state layer_status_get_state(const zmk_event_t *eh)
 	return (struct layer_status_state){ .index = index };
 }
 
-ZMK_DISPLAY_WIDGET_LISTENER(custom_layer_status, struct layer_status_state, layer_status_update_cb,
-			    layer_status_get_state)
+ZMK_DISPLAY_WIDGET_LISTENER(layer_status_subscribtion, struct layer_status_state,
+			    layer_status_update_cb, layer_status_get_state)
 
-ZMK_SUBSCRIPTION(custom_layer_status, zmk_layer_state_changed);
+ZMK_SUBSCRIPTION(layer_status_subscribtion, zmk_layer_state_changed);
 
-int custom_widget_layer_status_init(struct custom_widget_layer_status *widget, lv_obj_t *parent)
+int layer_status_init(lv_obj_t *parent)
 {
 	lv_style_init(&st_list);
 	lv_style_set_radius(&st_list, LV_STATE_DEFAULT, 0);
@@ -89,12 +86,11 @@ int custom_widget_layer_status_init(struct custom_widget_layer_status *widget, l
 	lv_style_set_text_color(&st_item, LV_STATE_FOCUSED, LV_COLOR_WHITE);
 	lv_style_set_text_font(&st_item, LV_STATE_DEFAULT, &icons_19);
 
-	lv_obj_t *list = widget->obj = lv_list_create(parent, NULL);
+	lv_obj_t *list = layer_list = lv_list_create(parent, NULL);
 	lv_list_set_layout(list, LV_LAYOUT_COLUMN_MID);
 	lv_obj_add_style(list, LV_OBJ_PART_MAIN, &st_list);
 	lv_obj_set_size(list, SCREEN_W, SCREEN_H);
 
-	LOG_ERR("layers: %d", KEYMAP_LAYERS_NUM);
 	for (int i = 0; i < KEYMAP_LAYERS_NUM; i++) {
 		lv_obj_t *btn = layer_items[i] = lv_list_add_btn(list, NULL, layer_names[i]);
 		lv_obj_add_style(btn, LV_BTN_PART_MAIN, &st_item);
@@ -104,13 +100,7 @@ int custom_widget_layer_status_init(struct custom_widget_layer_status *widget, l
 		lv_label_set_align(label, LV_LABEL_ALIGN_CENTER);
 	}
 
-	sys_slist_append(&widgets, &widget->node);
+	layer_status_subscribtion_init();
 
-	custom_layer_status_init();
 	return 0;
-}
-
-lv_obj_t *custom_widget_layer_status_obj(struct custom_widget_layer_status *widget)
-{
-	return widget->obj;
 }

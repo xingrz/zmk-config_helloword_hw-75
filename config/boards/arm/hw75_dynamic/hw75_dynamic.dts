@@ -49,7 +49,6 @@
 			<&gpioc 9 GPIO_ACTIVE_LOW>;
 	};
 
-
 	led_strip: led-strip-remap {
 		compatible = "zmk,led-strip-remap";
 		label = "LED_STRIP";
