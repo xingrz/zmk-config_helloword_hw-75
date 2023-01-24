@@ -8,7 +8,7 @@
 #include <logging/log.h>
 LOG_MODULE_DECLARE(zmk, CONFIG_ZMK_LOG_LEVEL);
 
-#include "widgets/layer_status.h"
+#include "layer_status.h"
 
 static struct custom_widget_layer_status layer_status_widget;
 
