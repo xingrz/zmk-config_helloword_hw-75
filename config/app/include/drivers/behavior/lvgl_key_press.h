@@ -7,4 +7,4 @@
 
 #include <lvgl.h>
 
-int layer_status_init(lv_obj_t *parent, lv_group_t *group);
+lv_indev_t *behavior_lvgl_get_indev(void);

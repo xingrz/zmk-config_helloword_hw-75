@@ -1,0 +1,8 @@
+# Copyright (c) 2022-2023 XiNGRZ
+# SPDX-License-Identifier: MIT
+
+description: Key press/release behavior bridging to LVGL
+
+compatible: "zmk,behavior-lvgl-key-press"
+
+include: one_param.yaml

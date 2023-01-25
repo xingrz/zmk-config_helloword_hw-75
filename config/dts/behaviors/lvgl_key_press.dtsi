@@ -1,0 +1,14 @@
+/*
+ * Copyright (c) 2022-2023 XiNGRZ
+ * SPDX-License-Identifier: MIT
+ */
+
+/ {
+	behaviors {
+		/omit-if-no-ref/ lvkp: behavior_lvgl_key_press {
+			compatible = "zmk,behavior-lvgl-key-press";
+			label = "LV_KEY_PRESS";
+			#binding-cells = <1>;
+		};
+	};
+};

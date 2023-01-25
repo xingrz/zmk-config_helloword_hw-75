@@ -4,9 +4,11 @@
  */
 
 #include <behaviors.dtsi>
+#include <behaviors/lvgl_key_press.dtsi>
 #include <behaviors/sensor_rotate_mouse_wheel.dtsi>
 #include <dt-bindings/zmk/keys.h>
 #include <dt-bindings/zmk/rgb.h>
+#include <dt-bindings/zmk/lvgl.h>
 #include <dt-bindings/zmk/mouse.h>
 
 #define UI_SYMBOL_VOLUME  "\xEF\x80\xA8"
@@ -18,19 +20,19 @@
 		compatible = "zmk,keymap";
 		layer_0 {
 			label = UI_SYMBOL_VOLUME;
-			bindings = <&rgb_ug RGB_EFF &to 1>;
+			bindings = <&lvkp LV_KEY_PREV &lvkp LV_KEY_NEXT>;
 			sensor-bindings = <&inc_dec_kp C_VOL_DN C_VOL_UP>;
 		};
 
 		layer_1 {
 			label = UI_SYMBOL_BRIGHTNESS;
-			bindings = <&rgb_ug RGB_EFF &to 2>;
+			bindings = <&trans &trans>;
 			sensor-bindings = <&inc_dec_kp C_BRI_DEC C_BRI_INC>;
 		};
 
 		layer_2 {
 			label = UI_SYMBOL_SCROLL;
-			bindings = <&rgb_ug RGB_EFF &to 0>;
+			bindings = <&trans &trans>;
 			sensor-bindings = <&mw MW_UP(1) MW_DN(1)>;
 		};
 	};

@@ -12,10 +12,9 @@
 LOG_MODULE_DECLARE(zmk, CONFIG_ZMK_LOG_LEVEL);
 
 #include <zmk/display.h>
-#include <zmk/events/layer_state_changed.h>
-#include <zmk/event_manager.h>
-#include <zmk/endpoints.h>
 #include <zmk/keymap.h>
+#include <zmk/event_manager.h>
+#include <zmk/events/layer_state_changed.h>
 
 #define DISPLAY_NODE DT_CHOSEN(zephyr_display)
 
@@ -66,7 +65,17 @@ ZMK_DISPLAY_WIDGET_LISTENER(layer_status_subscribtion, struct layer_status_state
 
 ZMK_SUBSCRIPTION(layer_status_subscribtion, zmk_layer_state_changed);
 
-int layer_status_init(lv_obj_t *parent)
+static void layer_button_selected(lv_obj_t *obj, lv_event_t event)
+{
+	if (event == LV_EVENT_FOCUSED) {
+		int layer_id = (int)lv_obj_get_user_data(obj);
+		if (layer_id != zmk_keymap_highest_layer_active()) {
+			zmk_keymap_layer_to((uint8_t)layer_id);
+		}
+	}
+}
+
+int layer_status_init(lv_obj_t *parent, lv_group_t *group)
 {
 	lv_style_init(&st_list);
 	lv_style_set_radius(&st_list, LV_STATE_DEFAULT, 0);
@@ -96,8 +105,13 @@ int layer_status_init(lv_obj_t *parent)
 		lv_obj_add_style(btn, LV_BTN_PART_MAIN, &st_item);
 		lv_btn_set_fit(btn, LV_FIT_NONE);
 		lv_obj_set_size(btn, ITEM_SIZE, ITEM_SIZE);
+		lv_obj_set_user_data(btn, (void *)i);
+		lv_obj_set_event_cb(btn, layer_button_selected);
+
 		lv_obj_t *label = lv_list_get_btn_label(btn);
 		lv_label_set_align(label, LV_LABEL_ALIGN_CENTER);
+
+		lv_group_add_obj(group, btn);
 	}
 
 	layer_status_subscribtion_init();
