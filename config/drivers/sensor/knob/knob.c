@@ -273,6 +273,9 @@ void knob_set_enable(const struct device *dev, bool enable)
 void knob_set_encoder_report(const struct device *dev, bool report)
 {
 	struct knob_data *data = dev->data;
+	if (report) {
+		data->last_pos = knob_get_encoder_position(dev);
+	}
 	data->encoder_report = report;
 }
 
