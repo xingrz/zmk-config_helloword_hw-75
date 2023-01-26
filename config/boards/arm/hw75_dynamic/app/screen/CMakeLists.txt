@@ -6,6 +6,7 @@ zephyr_library()
 zephyr_library_include_directories(${ZEPHYR_LVGL_MODULE_DIR})
 zephyr_library_include_directories(${ZEPHYR_BASE}/lib/gui/lvgl)
 zephyr_library_include_directories(${APPLICATION_SOURCE_DIR}/include)
+zephyr_library_include_directories(${BOARD_DIR}/app/include)
 
 include(${ZMK_CONFIG}/cmake/ui_strings.cmake)
 
@@ -23,6 +24,7 @@ generate_ui_strings(strings.csv
 zephyr_library_sources(${ICONS_SRC} ${STRINGS_SRC})
 zephyr_library_include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
+zephyr_library_sources(knob_status.c)
 zephyr_library_sources(layer_status.c)
 zephyr_library_sources(status_screen.c)
 
