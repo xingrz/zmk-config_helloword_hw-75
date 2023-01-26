@@ -1,0 +1,24 @@
+# Copyright (c) 2022-2023 XiNGRZ
+# SPDX-License-Identifier: MIT
+
+config HW75_USB_COMM
+	default y
+	select HW75_USB_COMM_FEATURE_RGB
+	select HW75_USB_COMM_FEATURE_EINK
+	select HW75_USB_COMM_FEATURE_KNOB
+
+if HW75_USB_COMM
+
+config HW75_USB_COMM_MAX_TX_MESSAGE_SIZE
+	int
+	default 4096
+
+config HW75_USB_COMM_MAX_RX_MESSAGE_SIZE
+	int
+	default 8192
+
+config HW75_USB_COMM_MAX_BYTES_FIELD_SIZE
+	int
+	default 8192
+
+endif # HW75_USB_COMM

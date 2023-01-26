@@ -1,0 +1,11 @@
+# Copyright (c) 2022-2023 XiNGRZ
+# SPDX-License-Identifier: MIT
+
+config ZMK_DISPLAY_STATUS_SCREEN_CUSTOM
+	select LVGL_USE_LABEL
+	select LVGL_USE_BTN
+	select LVGL_USE_CONT
+	select LVGL_USE_LIST
+	select LVGL_USE_PAGE
+	select LVGL_USE_GROUP
+	select LVGL_USE_ANIMATION

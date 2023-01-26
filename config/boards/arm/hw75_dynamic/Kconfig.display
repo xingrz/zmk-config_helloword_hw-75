@@ -1,0 +1,35 @@
+# Copyright (c) 2022 The ZMK Contributors
+# SPDX-License-Identifier: MIT
+
+config ZMK_DISPLAY
+	select SSD1306
+	select I2C
+
+if ZMK_DISPLAY
+
+choice ZMK_DISPLAY_WORK_QUEUE
+	default ZMK_DISPLAY_WORK_QUEUE_DEDICATED
+endchoice
+
+config LVGL_VDB_SIZE
+	default 100
+
+config LVGL_BITS_PER_PIXEL
+	default 1
+
+choice LVGL_COLOR_DEPTH
+	default LVGL_COLOR_DEPTH_16
+endchoice
+
+endif # ZMK_DISPLAY
+
+if SSD1306
+
+choice SSD1306_CONTROLLER_TYPE
+	default SSD1306_SH1106_COMPATIBLE
+endchoice
+
+config SSD1306_REVERSE_MODE
+	default y
+
+endif # SSD1306

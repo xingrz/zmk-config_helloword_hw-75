@@ -14,98 +14,11 @@ config ZMK_KEYBOARD_NAME
 config ZMK_USB
 	default y
 
-config ZMK_RTT_LOGGING
-	bool "Enable RTT logging to help debug"
-	select LOG
-	select USE_SEGGER_RTT
-	select CONSOLE
-	select RTT_CONSOLE
-
-config ZMK_RGB_UNDERGLOW
-	default y
-	select WS2812_STRIP
-	select LED_STRIP
-	select SPI
-
-config ZMK_DISPLAY
-	select SSD1306
-	select I2C
-
-config BUILD_OUTPUT_UF2
-	default y
-
-config HW75_USB_COMM
-	default y
-	select HW75_USB_COMM_FEATURE_RGB
-	select HW75_USB_COMM_FEATURE_EINK
-	select HW75_USB_COMM_FEATURE_KNOB
-
-if ZMK_DISPLAY
-
-choice ZMK_DISPLAY_WORK_QUEUE
-	default ZMK_DISPLAY_WORK_QUEUE_DEDICATED
-endchoice
-
-config ZMK_DISPLAY_STATUS_SCREEN_CUSTOM
-	select LVGL_USE_LABEL
-	select LVGL_USE_BTN
-	select LVGL_USE_CONT
-	select LVGL_USE_LIST
-	select LVGL_USE_PAGE
-	select LVGL_USE_GROUP
-	select LVGL_USE_ANIMATION
-
-config LVGL_VDB_SIZE
-	default 100
-
-config LVGL_BITS_PER_PIXEL
-	default 1
-
-choice LVGL_COLOR_DEPTH
-	default LVGL_COLOR_DEPTH_16
-endchoice
-
-endif # ZMK_DISPLAY
-
-if SSD1306
-
-choice SSD1306_CONTROLLER_TYPE
-	default SSD1306_SH1106_COMPATIBLE
-endchoice
-
-config SSD1306_REVERSE_MODE
-	default y
-
-endif # SSD1306
-
-if BUILD_OUTPUT_UF2
-
-config BUILD_OUTPUT_UF2_FAMILY_ID
-	default "0x57755a57"
-
-config BUILD_OUTPUT_UF2_USE_FLASH_BASE
-	default y
-
-config BUILD_OUTPUT_UF2_USE_FLASH_OFFSET
-	default y
-
-endif # BUILD_OUTPUT_UF2
-
-if HW75_USB_COMM
-
-config HW75_USB_COMM_MAX_TX_MESSAGE_SIZE
-	int
-	default 4096
-
-config HW75_USB_COMM_MAX_RX_MESSAGE_SIZE
-	int
-	default 8192
-
-config HW75_USB_COMM_MAX_BYTES_FIELD_SIZE
-	int
-	default 8192
-
-endif # HW75_USB_COMM
+rsource "Kconfig.display"
+rsource "Kconfig.rgb"
+rsource "Kconfig.rtt"
+rsource "Kconfig.uf2"
+rsource "Kconfig.usb"
 
 rsource "app/Kconfig"
 

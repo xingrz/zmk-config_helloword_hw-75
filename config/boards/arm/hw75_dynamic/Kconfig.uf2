@@ -1,0 +1,18 @@
+# Copyright (c) 2022-2023 XiNGRZ
+# SPDX-License-Identifier: MIT
+
+config BUILD_OUTPUT_UF2
+	default y
+
+if BUILD_OUTPUT_UF2
+
+config BUILD_OUTPUT_UF2_FAMILY_ID
+	default "0x57755a57"
+
+config BUILD_OUTPUT_UF2_USE_FLASH_BASE
+	default y
+
+config BUILD_OUTPUT_UF2_USE_FLASH_OFFSET
+	default y
+
+endif # BUILD_OUTPUT_UF2

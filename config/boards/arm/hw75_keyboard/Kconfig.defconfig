@@ -18,34 +18,9 @@ choice ZMK_HID_REPORT_TYPE
 	default ZMK_HID_REPORT_TYPE_NKRO
 endchoice
 
-config ZMK_RGB_UNDERGLOW
-	default y
-	select WS2812_STRIP
-	select LED_STRIP
-	select SPI
-
-config ZMK_RGB_UNDERGLOW_EXT_POWER
-	default n
-
-config BUILD_OUTPUT_UF2
-	default y
-
-config HW75_USB_COMM
-	default y
-	select HW75_USB_COMM_FEATURE_RGB
-
-if BUILD_OUTPUT_UF2
-
-config BUILD_OUTPUT_UF2_FAMILY_ID
-	default "0x5ee21072"
-
-config BUILD_OUTPUT_UF2_USE_FLASH_BASE
-	default y
-
-config BUILD_OUTPUT_UF2_USE_FLASH_OFFSET
-	default y
-
-endif # BUILD_OUTPUT_UF2
+rsource "Kconfig.rgb"
+rsource "Kconfig.uf2"
+rsource "Kconfig.usb"
 
 rsource "app/Kconfig"
 

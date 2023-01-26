@@ -1,0 +1,8 @@
+# Copyright (c) 2022-2023 XiNGRZ
+# SPDX-License-Identifier: MIT
+
+config ZMK_RGB_UNDERGLOW
+	default y
+	select WS2812_STRIP
+	select LED_STRIP
+	select SPI
