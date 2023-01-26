@@ -11,6 +11,9 @@ LOG_MODULE_DECLARE(zmk, CONFIG_ZMK_LOG_LEVEL);
 
 #include <drivers/led_strip_remap.h>
 
+#include <zmk/event_manager.h>
+#include <app/events/knob_state_changed.h>
+
 #include "indicator_app.h"
 
 #define STRIP_LABEL DT_LABEL(DT_CHOSEN(zmk_underglow))
@@ -50,5 +53,24 @@ void indicator_clear_bits(uint32_t bits)
 	state &= ~bits;
 	indicator_update();
 }
+
+static int indicator_app_event_listener(const zmk_event_t *eh)
+{
+	struct app_knob_state_changed *knob_ev;
+
+	if ((knob_ev = as_app_knob_state_changed(eh)) != NULL) {
+		if (knob_ev->calibration == KNOB_CALIBRATE_OK) {
+			indicator_clear_bits(INDICATOR_KNOB_CALIBRATING);
+		} else {
+			indicator_set_bits(INDICATOR_KNOB_CALIBRATING);
+		}
+		return 0;
+	}
+
+	return -ENOTSUP;
+}
+
+ZMK_LISTENER(indicator_app, indicator_app_event_listener);
+ZMK_SUBSCRIPTION(indicator_app, app_knob_state_changed);
 
 SYS_INIT(indicator_app_init, APPLICATION, CONFIG_APPLICATION_INIT_PRIORITY);
