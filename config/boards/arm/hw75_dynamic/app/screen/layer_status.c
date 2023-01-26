@@ -30,6 +30,7 @@ LOG_MODULE_DECLARE(zmk, CONFIG_ZMK_LOG_LEVEL);
 #define LAYER_LABEL(node) COND_CODE_0(DT_NODE_HAS_PROP(node, label), (NULL), (DT_LABEL(node))),
 
 LV_FONT_DECLARE(icons_19);
+LV_FONT_DECLARE(zfull_9);
 
 #define UI_SYMBOL_VOLUME "\xEF\x80\xA8"
 #define UI_SYMBOL_BRIGHTNESS "\xEF\x86\x85"
@@ -93,6 +94,7 @@ int layer_status_init(lv_obj_t *parent, lv_group_t *group)
 	lv_style_init(&st_name);
 	lv_style_set_pad_ver(&st_name, LV_STATE_DEFAULT, 4);
 	lv_style_set_pad_hor(&st_name, LV_STATE_DEFAULT, 0);
+	lv_style_set_text_font(&st_name, LV_STATE_DEFAULT, &zfull_9);
 
 	lv_style_init(&st_list);
 	lv_style_set_radius(&st_list, LV_STATE_DEFAULT, 0);
