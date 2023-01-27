@@ -120,6 +120,5 @@ message RgbState
 message EinkImage
 {
 	required uint32 id = 1;
-	optional uint32 bits_length = 2;
 	optional bytes bits = 3;
 }

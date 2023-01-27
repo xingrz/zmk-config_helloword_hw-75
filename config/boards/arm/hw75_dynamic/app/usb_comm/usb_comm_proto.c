@@ -42,24 +42,24 @@ static struct {
 
 static bool read_bytes_field(pb_istream_t *stream, const pb_field_t *field, void **arg)
 {
-	uint32_t len = **((uint32_t **)arg);
+	ARG_UNUSED(field);
+	ARG_UNUSED(arg);
 
-	if (len > sizeof(bytes_field)) {
-		LOG_ERR("Buffer overflows decoding %d bytes", len);
+	if (stream->bytes_left > sizeof(bytes_field)) {
+		LOG_ERR("Buffer overflows decoding %d bytes", stream->bytes_left);
 		return false;
 	}
 
-	if (len > stream->bytes_left) {
-		LOG_ERR("Not enough bytes to decode, request: %d, left: %d", len,
-			stream->bytes_left);
+	uint32_t bytes_len = stream->bytes_left;
+
+	if (!pb_read(stream, bytes_field, stream->bytes_left)) {
+		LOG_ERR("Failed decoding bytes: %s", stream->errmsg);
 		return false;
 	}
 
-	if (!pb_read(stream, bytes_field, len)) {
-		return false;
-	}
+	bytes_field_len = bytes_len;
+	LOG_DBG("Decoded %d bytes", bytes_field_len);
 
-	bytes_field_len = len;
 	return true;
 }
 
@@ -87,9 +87,7 @@ static bool h2d_callback(pb_istream_t *stream, const pb_field_t *field, void **a
 {
 	if (field->tag == MessageH2D_eink_image_tag) {
 		EinkImage *eink_image = field->pData;
-		LOG_DBG("incoming eink, len: %d", eink_image->bits_length);
 		eink_image->bits.funcs.decode = read_bytes_field;
-		eink_image->bits.arg = &eink_image->bits_length;
 	}
 	return true;
 }
