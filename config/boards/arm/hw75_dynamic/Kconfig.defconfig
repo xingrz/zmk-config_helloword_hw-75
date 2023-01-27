@@ -31,6 +31,9 @@ config ZMK_DISPLAY
 	select SSD1306
 	select I2C
 
+config BUILD_OUTPUT_UF2
+	default y
+
 if ZMK_DISPLAY
 
 choice ZMK_DISPLAY_WORK_QUEUE
@@ -68,6 +71,19 @@ config SSD1306_REVERSE_MODE
 	default y
 
 endif # SSD1306
+
+if BUILD_OUTPUT_UF2
+
+config BUILD_OUTPUT_UF2_FAMILY_ID
+	default "0x57755a57"
+
+config BUILD_OUTPUT_UF2_USE_FLASH_BASE
+	default y
+
+config BUILD_OUTPUT_UF2_USE_FLASH_OFFSET
+	default y
+
+endif # BUILD_OUTPUT_UF2
 
 rsource "app/Kconfig"
 
