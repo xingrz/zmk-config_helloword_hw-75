@@ -5,6 +5,8 @@
 
 syntax = "proto2";
 
+package usb.comm;
+
 import "nanopb.proto";
 
 enum Action {

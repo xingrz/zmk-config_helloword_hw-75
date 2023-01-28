@@ -8,46 +8,46 @@
 
 #include <zmk/rgb_underglow.h>
 
-bool handle_rgb_control(const MessageH2D *h2d, MessageD2H *d2h, const void *bytes,
+bool handle_rgb_control(const usb_comm_MessageH2D *h2d, usb_comm_MessageD2H *d2h, const void *bytes,
 			uint32_t bytes_len)
 {
-	const RgbControl *req = &h2d->payload.rgb_control;
+	const usb_comm_RgbControl *req = &h2d->payload.rgb_control;
 
 	switch (req->command) {
-	case RgbControl_Command_RGB_ON:
+	case usb_comm_RgbControl_Command_RGB_ON:
 		zmk_rgb_underglow_on();
 		break;
-	case RgbControl_Command_RGB_OFF:
+	case usb_comm_RgbControl_Command_RGB_OFF:
 		zmk_rgb_underglow_off();
 		break;
-	case RgbControl_Command_RGB_HUI:
+	case usb_comm_RgbControl_Command_RGB_HUI:
 		zmk_rgb_underglow_change_hue(1);
 		break;
-	case RgbControl_Command_RGB_HUD:
+	case usb_comm_RgbControl_Command_RGB_HUD:
 		zmk_rgb_underglow_change_hue(-1);
 		break;
-	case RgbControl_Command_RGB_SAI:
+	case usb_comm_RgbControl_Command_RGB_SAI:
 		zmk_rgb_underglow_change_sat(1);
 		break;
-	case RgbControl_Command_RGB_SAD:
+	case usb_comm_RgbControl_Command_RGB_SAD:
 		zmk_rgb_underglow_change_sat(-1);
 		break;
-	case RgbControl_Command_RGB_BRI:
+	case usb_comm_RgbControl_Command_RGB_BRI:
 		zmk_rgb_underglow_change_brt(1);
 		break;
-	case RgbControl_Command_RGB_BRD:
+	case usb_comm_RgbControl_Command_RGB_BRD:
 		zmk_rgb_underglow_change_brt(-1);
 		break;
-	case RgbControl_Command_RGB_SPI:
+	case usb_comm_RgbControl_Command_RGB_SPI:
 		zmk_rgb_underglow_change_spd(1);
 		break;
-	case RgbControl_Command_RGB_SPD:
+	case usb_comm_RgbControl_Command_RGB_SPD:
 		zmk_rgb_underglow_change_spd(-1);
 		break;
-	case RgbControl_Command_RGB_EFF:
+	case usb_comm_RgbControl_Command_RGB_EFF:
 		zmk_rgb_underglow_cycle_effect(1);
 		break;
-	case RgbControl_Command_RGB_EFR:
+	case usb_comm_RgbControl_Command_RGB_EFR:
 		zmk_rgb_underglow_cycle_effect(-1);
 		break;
 	}
@@ -55,10 +55,10 @@ bool handle_rgb_control(const MessageH2D *h2d, MessageD2H *d2h, const void *byte
 	return handle_rgb_get_state(h2d, d2h, NULL, 0);
 }
 
-bool handle_rgb_get_state(const MessageH2D *h2d, MessageD2H *d2h, const void *bytes,
-			  uint32_t bytes_len)
+bool handle_rgb_get_state(const usb_comm_MessageH2D *h2d, usb_comm_MessageD2H *d2h,
+			  const void *bytes, uint32_t bytes_len)
 {
-	RgbState *res = &d2h->payload.rgb_state;
+	usb_comm_RgbState *res = &d2h->payload.rgb_state;
 
 	bool on;
 	if (zmk_rgb_underglow_get_state(&on) != 0) {

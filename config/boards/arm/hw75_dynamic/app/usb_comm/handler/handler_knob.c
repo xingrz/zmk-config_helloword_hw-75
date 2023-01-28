@@ -17,10 +17,10 @@ static const struct device *motor;
 
 static struct motor_state state = {};
 
-bool handle_motor_get_state(const MessageH2D *h2d, MessageD2H *d2h, const void *bytes,
-			    uint32_t bytes_len)
+bool handle_motor_get_state(const usb_comm_MessageH2D *h2d, usb_comm_MessageD2H *d2h,
+			    const void *bytes, uint32_t bytes_len)
 {
-	MotorState *res = &d2h->payload.motor_state;
+	usb_comm_MotorState *res = &d2h->payload.motor_state;
 
 	if (!motor) {
 		return false;
@@ -29,7 +29,7 @@ bool handle_motor_get_state(const MessageH2D *h2d, MessageD2H *d2h, const void *
 	motor_inspect(motor, &state);
 
 	res->timestamp = state.timestamp;
-	res->control_mode = (MotorState_ControlMode)state.control_mode;
+	res->control_mode = (usb_comm_MotorState_ControlMode)state.control_mode;
 	res->current_angle = state.current_angle;
 	res->current_velocity = state.current_velocity;
 	res->target_angle = state.target_angle;
@@ -39,19 +39,19 @@ bool handle_motor_get_state(const MessageH2D *h2d, MessageD2H *d2h, const void *
 	return true;
 }
 
-bool handle_knob_get_config(const MessageH2D *h2d, MessageD2H *d2h, const void *bytes,
-			    uint32_t bytes_len)
+bool handle_knob_get_config(const usb_comm_MessageH2D *h2d, usb_comm_MessageD2H *d2h,
+			    const void *bytes, uint32_t bytes_len)
 {
-	KnobConfig *res = &d2h->payload.knob_config;
+	usb_comm_KnobConfig *res = &d2h->payload.knob_config;
 
 	if (!knob) {
 		return false;
 	}
 
 	res->demo = knob_app_get_demo();
-	res->mode = (KnobConfig_Mode)knob_get_mode(knob);
+	res->mode = (usb_comm_KnobConfig_Mode)knob_get_mode(knob);
 
-	if (res->mode == KnobConfig_Mode_DAMPED) {
+	if (res->mode == usb_comm_KnobConfig_Mode_DAMPED) {
 		knob_get_position_limit(knob, &res->damped_min, &res->damped_max);
 		res->has_damped_min = true;
 		res->has_damped_max = true;
@@ -63,10 +63,10 @@ bool handle_knob_get_config(const MessageH2D *h2d, MessageD2H *d2h, const void *
 	return true;
 }
 
-bool handle_knob_set_config(const MessageH2D *h2d, MessageD2H *d2h, const void *bytes,
-			    uint32_t bytes_len)
+bool handle_knob_set_config(const usb_comm_MessageH2D *h2d, usb_comm_MessageD2H *d2h,
+			    const void *bytes, uint32_t bytes_len)
 {
-	const KnobConfig *req = &h2d->payload.knob_config;
+	const usb_comm_KnobConfig *req = &h2d->payload.knob_config;
 
 	if (!knob) {
 		return false;
@@ -75,7 +75,7 @@ bool handle_knob_set_config(const MessageH2D *h2d, MessageD2H *d2h, const void *
 	if (req->demo) {
 		knob_app_set_demo(true);
 		knob_set_mode(knob, (enum knob_mode)req->mode);
-		if (req->mode == KnobConfig_Mode_DAMPED && req->has_damped_min &&
+		if (req->mode == usb_comm_KnobConfig_Mode_DAMPED && req->has_damped_min &&
 		    req->has_damped_max) {
 			knob_set_position_limit(knob, req->damped_min, req->damped_max);
 		}

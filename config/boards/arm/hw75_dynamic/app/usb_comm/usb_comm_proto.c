@@ -27,17 +27,21 @@ static uint8_t bytes_field[CONFIG_HW75_USB_COMM_MAX_BYTES_FIELD_SIZE];
 static uint32_t bytes_field_len = 0;
 
 static struct {
-	Action action;
+	usb_comm_Action action;
 	pb_size_t which_payload;
 	usb_comm_handler_t handler;
 } handlers[] = {
-	{ Action_VERSION, MessageD2H_version_tag, handle_version },
-	{ Action_MOTOR_GET_STATE, MessageD2H_motor_state_tag, handle_motor_get_state },
-	{ Action_KNOB_GET_CONFIG, MessageD2H_knob_config_tag, handle_knob_get_config },
-	{ Action_KNOB_SET_CONFIG, MessageD2H_knob_config_tag, handle_knob_set_config },
-	{ Action_RGB_CONTROL, MessageD2H_rgb_state_tag, handle_rgb_control },
-	{ Action_RGB_GET_STATE, MessageD2H_rgb_state_tag, handle_rgb_get_state },
-	{ Action_EINK_SET_IMAGE, MessageD2H_eink_image_tag, handle_eink_set_image },
+	{ usb_comm_Action_VERSION, usb_comm_MessageD2H_version_tag, handle_version },
+	{ usb_comm_Action_MOTOR_GET_STATE, usb_comm_MessageD2H_motor_state_tag,
+	  handle_motor_get_state },
+	{ usb_comm_Action_KNOB_GET_CONFIG, usb_comm_MessageD2H_knob_config_tag,
+	  handle_knob_get_config },
+	{ usb_comm_Action_KNOB_SET_CONFIG, usb_comm_MessageD2H_knob_config_tag,
+	  handle_knob_set_config },
+	{ usb_comm_Action_RGB_CONTROL, usb_comm_MessageD2H_rgb_state_tag, handle_rgb_control },
+	{ usb_comm_Action_RGB_GET_STATE, usb_comm_MessageD2H_rgb_state_tag, handle_rgb_get_state },
+	{ usb_comm_Action_EINK_SET_IMAGE, usb_comm_MessageD2H_eink_image_tag,
+	  handle_eink_set_image },
 };
 
 static bool read_bytes_field(pb_istream_t *stream, const pb_field_t *field, void **arg)
@@ -85,8 +89,8 @@ static void usb_comm_proto_write_cb(uint8_t ep, int size, void *priv)
 
 static bool h2d_callback(pb_istream_t *stream, const pb_field_t *field, void **arg)
 {
-	if (field->tag == MessageH2D_eink_image_tag) {
-		EinkImage *eink_image = field->pData;
+	if (field->tag == usb_comm_MessageH2D_eink_image_tag) {
+		usb_comm_EinkImage *eink_image = field->pData;
 		eink_image->bits.funcs.decode = read_bytes_field;
 	}
 	return true;
@@ -100,19 +104,19 @@ static void usb_comm_proto_read_cb(uint8_t ep, int size, void *priv)
 	pb_istream_t h2d_stream = pb_istream_from_buffer(usb_rx_buf, size);
 	pb_ostream_t d2h_stream = pb_ostream_from_buffer(usb_tx_buf, sizeof(usb_tx_buf));
 
-	MessageH2D h2d = MessageH2D_init_zero;
-	MessageD2H d2h = MessageD2H_init_zero;
+	usb_comm_MessageH2D h2d = usb_comm_MessageH2D_init_zero;
+	usb_comm_MessageD2H d2h = usb_comm_MessageD2H_init_zero;
 
 	h2d.cb_payload.funcs.decode = h2d_callback;
 
-	if (!pb_decode_delimited(&h2d_stream, MessageH2D_fields, &h2d)) {
+	if (!pb_decode_delimited(&h2d_stream, usb_comm_MessageH2D_fields, &h2d)) {
 		LOG_ERR("Failed decoding h2d message: %s", h2d_stream.errmsg);
 		goto next;
 	}
 
 	LOG_DBG("req action: %d", h2d.action);
 	d2h.action = h2d.action;
-	d2h.which_payload = MessageD2H_nop_tag;
+	d2h.which_payload = usb_comm_MessageD2H_nop_tag;
 
 	for (size_t i = 0; i < ARRAY_SIZE(handlers); i++) {
 		if (handlers[i].action == h2d.action) {
@@ -124,13 +128,13 @@ static void usb_comm_proto_read_cb(uint8_t ep, int size, void *priv)
 	}
 
 	size_t d2h_size;
-	pb_get_encoded_size(&d2h_size, MessageD2H_fields, &d2h);
+	pb_get_encoded_size(&d2h_size, usb_comm_MessageD2H_fields, &d2h);
 	if (d2h_size > sizeof(usb_tx_buf)) {
 		LOG_ERR("The size of response for action %d is %d, exceeds max tx buf size %d",
 			h2d.action, d2h_size, sizeof(usb_tx_buf));
 	}
 
-	if (!pb_encode_delimited(&d2h_stream, MessageD2H_fields, &d2h)) {
+	if (!pb_encode_delimited(&d2h_stream, usb_comm_MessageD2H_fields, &d2h)) {
 		LOG_ERR("Failed encoding d2h message: %s", d2h_stream.errmsg);
 		goto next;
 	}

@@ -27,11 +27,11 @@ static const struct device *eink;
 static const struct device *ssd16xx;
 static bool ssd16xx_inited = false;
 
-bool handle_eink_set_image(const MessageH2D *h2d, MessageD2H *d2h, const void *bytes,
-			   uint32_t bytes_len)
+bool handle_eink_set_image(const usb_comm_MessageH2D *h2d, usb_comm_MessageD2H *d2h,
+			   const void *bytes, uint32_t bytes_len)
 {
-	const EinkImage *req = &h2d->payload.eink_image;
-	EinkImage *res = &d2h->payload.eink_image;
+	const usb_comm_EinkImage *req = &h2d->payload.eink_image;
+	usb_comm_EinkImage *res = &d2h->payload.eink_image;
 
 	if (!eink || !ssd16xx) {
 		LOG_ERR("E-Ink device not found, ignoring update request");
