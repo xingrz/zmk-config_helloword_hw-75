@@ -1,0 +1,22 @@
+# Copyright (c) 2022-2023 XiNGRZ
+# SPDX-License-Identifier: MIT
+
+config HW75_UART_COMM
+	bool
+	select SERIAL
+	select CONSOLE
+	select UART_PIPE
+	select HW75_PROTO_UART_COMM
+	default y
+
+if HW75_UART_COMM
+
+config HW75_UART_COMM_MAX_TX_MESSAGE_SIZE
+	int
+	default 1024
+
+module = HW75_UART_COMM
+module-str = uart_comm
+source "subsys/logging/Kconfig.template.log_config"
+
+endif # HW75_UART_COMM

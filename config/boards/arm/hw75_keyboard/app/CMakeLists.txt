@@ -4,3 +4,5 @@
 zephyr_library_sources(led_indicator_usb.c)
 
 zephyr_library_include_directories(${CMAKE_SOURCE_DIR}/include)
+
+add_subdirectory_ifdef(CONFIG_HW75_UART_COMM uart_comm)

@@ -43,4 +43,6 @@ config BUILD_OUTPUT_UF2_USE_FLASH_OFFSET
 
 endif # BUILD_OUTPUT_UF2
 
+rsource "app/Kconfig"
+
 endif # BOARD_HW75_KEYBOARD

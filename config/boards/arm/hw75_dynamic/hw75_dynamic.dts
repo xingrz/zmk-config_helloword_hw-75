@@ -18,7 +18,6 @@
 		zephyr,sram = &sram0;
 		zephyr,flash = &flash0;
 		zephyr,ccm = &ccm0;
-		zephyr,console = &cdc_acm_uart0;
 		zephyr,display = &oled;
 		zmk,kscan = &kscan;
 		zmk,underglow = &led_strip;
@@ -74,11 +73,17 @@
 		motor = <&motor>;
 	};
 
-	motor: motor{
+	motor: motor {
 		compatible = "zmk,motor";
 		label = "MOTOR";
 		inverter = <&inverter>;
 		encoder = <&as5047>;
+	};
+
+	slip: slip {
+		compatible = "zmk,uart-slip";
+		label = "SLIP";
+		uart = <&usart2>;
 	};
 };
 
@@ -108,11 +113,6 @@
 	pinctrl-0 = <&usb_otg_fs_dm_pa11 &usb_otg_fs_dp_pa12>;
 	pinctrl-names = "default";
 	status = "okay";
-
-	cdc_acm_uart0: cdc_acm_uart0 {
-		compatible = "zephyr,cdc-acm-uart";
-		label = "CDC_ACM_0";
-	};
 };
 
 &spi1 {
@@ -207,6 +207,13 @@
 		com-invdir;
 		prechargep = <0xf1>;
 	};
+};
+
+&usart2 {
+	pinctrl-0 = <&usart2_tx_pa2 &usart2_rx_pa3>;
+	pinctrl-names = "default";
+	status = "okay";
+	current-speed = <115200>;
 };
 
 &timers1 {

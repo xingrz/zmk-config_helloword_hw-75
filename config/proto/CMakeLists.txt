@@ -15,6 +15,10 @@ if(CONFIG_HW75_PROTO_USB_COMM)
     list(APPEND PROTO_DEFS usb_comm.proto)
 endif()
 
+if(CONFIG_HW75_PROTO_UART_COMM)
+    list(APPEND PROTO_DEFS uart_comm.proto)
+endif()
+
 nanopb_generate_cpp(PROTO_SRCS PROTO_HDRS ${PROTO_DEFS})
 zephyr_library_sources(${PROTO_SRCS} ${PROTO_HDRS})
 

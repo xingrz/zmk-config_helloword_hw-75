@@ -7,3 +7,7 @@ config HW75_PROTO
 config HW75_PROTO_USB_COMM
 	bool
 	select HW75_PROTO
+
+config HW75_PROTO_UART_COMM
+	bool
+	select HW75_PROTO

@@ -1,0 +1,26 @@
+/*
+ * Copyright (c) 2022-2023 XiNGRZ
+ * SPDX-License-Identifier: MIT
+ */
+
+syntax = "proto2";
+
+package uart.comm;
+
+enum Action {
+	NOP = 0;
+	PING = 1;
+}
+
+message MessageK2D
+{
+	required Action action = 1;
+	oneof payload
+	{
+		Nop nop = 2;
+	}
+}
+
+message Nop
+{
+}
