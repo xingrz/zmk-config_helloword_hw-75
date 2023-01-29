@@ -1,0 +1,4 @@
+# Copyright (c) 2022-2023 XiNGRZ
+# SPDX-License-Identifier: MIT
+
+rsource "Kconfig.uart_slip"

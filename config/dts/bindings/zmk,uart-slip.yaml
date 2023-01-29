@@ -1,0 +1,15 @@
+# Copyright (c) 2022-2023 XiNGRZ
+# SPDX-License-Identifier: MIT
+
+description: |
+  A transport layer built on top of UART
+
+compatible: "zmk,uart-slip"
+
+properties:
+  label:
+    type: string
+    required: true
+  uart:
+    type: phandle
+    required: true

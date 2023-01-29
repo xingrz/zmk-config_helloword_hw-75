@@ -1,0 +1,27 @@
+# Copyright (c) 2022-2023 XiNGRZ
+# SPDX-License-Identifier: MIT
+
+DT_COMPAT_ZMK_UART_SLIP := zmk,uart-slip
+
+config UART_SLIP
+	bool "A transport layer built on top of UART"
+	default $(dt_compat_enabled,$(DT_COMPAT_ZMK_UART_SLIP))
+	depends on SERIAL
+	select UART_INTERRUPT_DRIVEN
+	select RING_BUFFER
+
+if UART_SLIP
+
+config UART_SLIP_INIT_PRIORITY
+	int
+	default 60
+
+config UART_SLIP_RX_RING_BUFFER_SIZE
+	int
+	default 1024
+
+module = UART_SLIP
+module-str = uart_slip
+source "subsys/logging/Kconfig.template.log_config"
+
+endif # UART_SLIP
