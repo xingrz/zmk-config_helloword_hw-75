@@ -13,26 +13,20 @@ LOG_MODULE_DECLARE(zmk, CONFIG_ZMK_LOG_LEVEL);
 
 #include <zmk/event_manager.h>
 #include <zmk/events/activity_state_changed.h>
-#include <app/events/knob_state_changed.h>
-
-#include "indicator_app.h"
 
 #define STRIP_LABEL DT_LABEL(DT_CHOSEN(zmk_underglow))
 
-#define BRI_ACTIVE (5)
-#define BRI_INACTIVE (1)
+#define BRI_ACTIVE (255)
+#define BRI_INACTIVE (10)
 
 #define RGB(R, G, B) .r = (R), .g = (G), .b = (B)
 
 static const struct device *led_strip;
 
-static const struct led_rgb color_red = { RGB(0xFF, 0x00, 0x00) };
 static const struct led_rgb color_green = { RGB(0x00, 0xFF, 0x00) };
 
 static struct led_rgb current;
 static bool active = true;
-
-static uint32_t state = 0;
 
 static inline void apply_color(struct led_rgb *c_out, const struct led_rgb *c_in)
 {
@@ -52,10 +46,10 @@ static int indicator_update()
 {
 	if (!led_strip) {
 		LOG_ERR("LED strip device %s not found", STRIP_LABEL);
-		return -ENODEV;
+		return -EINVAL;
 	}
 
-	apply_color(&current, state ? &color_red : &color_green);
+	apply_color(&current, &color_green); // TODO
 
 	uint8_t bri = active ? BRI_ACTIVE : BRI_INACTIVE;
 
@@ -76,33 +70,13 @@ static int indicator_app_init(const struct device *dev)
 	return indicator_update();
 }
 
-void indicator_set_bits(uint32_t bits)
-{
-	state |= bits;
-	indicator_update();
-}
-
-void indicator_clear_bits(uint32_t bits)
-{
-	state &= ~bits;
-	indicator_update();
-}
-
 static int indicator_app_event_listener(const zmk_event_t *eh)
 {
 	struct zmk_activity_state_changed *activity_ev;
-	struct app_knob_state_changed *knob_ev;
 
 	if ((activity_ev = as_zmk_activity_state_changed(eh)) != NULL) {
 		active = activity_ev->state == ZMK_ACTIVITY_ACTIVE;
 		return indicator_update();
-	} else if ((knob_ev = as_app_knob_state_changed(eh)) != NULL) {
-		if (knob_ev->calibration == KNOB_CALIBRATE_OK) {
-			indicator_clear_bits(INDICATOR_KNOB_CALIBRATING);
-		} else {
-			indicator_set_bits(INDICATOR_KNOB_CALIBRATING);
-		}
-		return 0;
 	}
 
 	return -ENOTSUP;
@@ -110,6 +84,5 @@ static int indicator_app_event_listener(const zmk_event_t *eh)
 
 ZMK_LISTENER(indicator_app, indicator_app_event_listener);
 ZMK_SUBSCRIPTION(indicator_app, zmk_activity_state_changed);
-ZMK_SUBSCRIPTION(indicator_app, app_knob_state_changed);
 
 SYS_INIT(indicator_app_init, APPLICATION, CONFIG_APPLICATION_INIT_PRIORITY);
