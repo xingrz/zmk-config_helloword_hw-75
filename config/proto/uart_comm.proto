@@ -10,6 +10,7 @@ package uart.comm;
 enum Action {
 	NOP = 0;
 	PING = 1;
+	FN_STATE_CHANGED = 2;
 }
 
 message MessageK2D
@@ -18,9 +19,15 @@ message MessageK2D
 	oneof payload
 	{
 		Nop nop = 2;
+		FnState fn_state = 3;
 	}
 }
 
 message Nop
 {
+}
+
+message FnState
+{
+	required bool pressed = 1;
 }

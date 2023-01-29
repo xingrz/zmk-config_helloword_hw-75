@@ -14,6 +14,7 @@
 	keymap {
 		compatible = "zmk,keymap";
 		base {
+			label = "BASE";
 			bindings = <
 				&kp ESC             &kp F1    &kp F2  &kp F3  &kp F4  &kp F5    &kp F6  &kp F7  &kp F8    &kp F9    &kp F10   &kp F11   &kp F12   &kp PAUSE_BREAK
 				&kp GRAVE &kp N1    &kp N2    &kp N3  &kp N4  &kp N5  &kp N6    &kp N7  &kp N8  &kp N9    &kp N0    &kp MINUS &kp EQUAL &kp BSPC  &kp INSERT
@@ -26,6 +27,7 @@
 		};
 
 		fn {
+			label = "FN";
 			bindings = <
 				&trans                          &kp C_BRI_DEC   &kp C_BRI_INC   &none           &none           &none   &none   &kp C_PREV  &kp C_PP  &kp C_NEXT  &kp C_MUTE  &kp C_VOL_DN  &kp C_VOL_UP  &trans
 				&trans          &trans          &trans          &trans          &trans          &trans          &trans  &trans  &trans      &trans    &trans      &trans      &trans        &trans        &trans
