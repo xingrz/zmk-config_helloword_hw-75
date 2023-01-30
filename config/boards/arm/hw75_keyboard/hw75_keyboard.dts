@@ -57,10 +57,12 @@
 			 84  83  82
 		>;
 
-		status {
-			label = "STATUS";
-			led-indexes = <84 83 82>;
-		};
+		/* Cancel the right lower lamp
+		 *
+		 * status {
+		 * 	label = "STATUS";
+		 * 	led-indexes = <84 83 82>;
+		 * };
 	};
 
 	slip: slip {
