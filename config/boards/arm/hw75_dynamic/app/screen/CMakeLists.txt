@@ -5,7 +5,7 @@ zephyr_library()
 
 zephyr_library_include_directories(${ZEPHYR_LVGL_MODULE_DIR})
 zephyr_library_include_directories(${ZEPHYR_BASE}/lib/gui/lvgl)
-zephyr_library_include_directories(${CMAKE_SOURCE_DIR}/include)
+zephyr_library_include_directories(${APPLICATION_SOURCE_DIR}/include)
 
 zephyr_library_sources(icons_19.c)
 zephyr_library_sources(layer_status.c)

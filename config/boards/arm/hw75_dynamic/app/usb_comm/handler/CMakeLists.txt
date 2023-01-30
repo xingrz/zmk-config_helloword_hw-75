@@ -15,14 +15,13 @@ zephyr_library_compile_definitions(
 # handler - knob
 
 zephyr_library_sources(handler_knob.c)
-zephyr_library_include_directories(${ZMK_CONFIG}/drivers/sensor/knob/include)
-zephyr_library_include_directories(${ZMK_CONFIG}/boards/arm/hw75_dynamic/app)
+zephyr_library_include_directories(${BOARD_DIR}/app)
 
 # handler - rgb
 
 zephyr_library_sources(handler_rgb.c)
-zephyr_library_include_directories(${CMAKE_SOURCE_DIR}/include)
+zephyr_library_include_directories(${APPLICATION_SOURCE_DIR}/include)
 
 # handler - eink
+
 zephyr_library_sources(handler_eink.c)
-zephyr_library_include_directories(${ZMK_CONFIG}/drivers/display/include)
