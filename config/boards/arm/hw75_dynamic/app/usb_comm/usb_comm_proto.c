@@ -44,6 +44,7 @@ static struct {
 	  handle_eink_set_image },
 };
 
+#if CONFIG_HW75_USB_COMM_MAX_BYTES_FIELD_SIZE
 static bool read_bytes_field(pb_istream_t *stream, const pb_field_t *field, void **arg)
 {
 	ARG_UNUSED(field);
@@ -66,6 +67,7 @@ static bool read_bytes_field(pb_istream_t *stream, const pb_field_t *field, void
 
 	return true;
 }
+#endif
 
 static void usb_comm_read(void);
 
@@ -85,8 +87,7 @@ static void usb_comm_proto_write_cb(uint8_t ep, int size, void *priv)
 	LOG_HEXDUMP_DBG(usb_tx_buf, MIN(size, 64), "tx");
 }
 
-#define D2H_PAYLOAD_OR_NOP(result, tag) (result ? tag : MessageD2H_nop_tag)
-
+#if CONFIG_HW75_USB_COMM_MAX_BYTES_FIELD_SIZE
 static bool h2d_callback(pb_istream_t *stream, const pb_field_t *field, void **arg)
 {
 	if (field->tag == usb_comm_MessageH2D_eink_image_tag) {
@@ -95,6 +96,7 @@ static bool h2d_callback(pb_istream_t *stream, const pb_field_t *field, void **a
 	}
 	return true;
 }
+#endif
 
 static void usb_comm_proto_read_cb(uint8_t ep, int size, void *priv)
 {
@@ -107,7 +109,9 @@ static void usb_comm_proto_read_cb(uint8_t ep, int size, void *priv)
 	usb_comm_MessageH2D h2d = usb_comm_MessageH2D_init_zero;
 	usb_comm_MessageD2H d2h = usb_comm_MessageD2H_init_zero;
 
+#if CONFIG_HW75_USB_COMM_MAX_BYTES_FIELD_SIZE
 	h2d.cb_payload.funcs.decode = h2d_callback;
+#endif
 
 	if (!pb_decode_delimited(&h2d_stream, usb_comm_MessageH2D_fields, &h2d)) {
 		LOG_ERR("Failed decoding h2d message: %s", h2d_stream.errmsg);
