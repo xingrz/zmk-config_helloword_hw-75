@@ -45,5 +45,11 @@ bool handle_version(const usb_comm_MessageH2D *h2d, usb_comm_MessageD2H *d2h, co
 	res->zmk_version.arg = (void *)zmk_version;
 	res->app_version.funcs.encode = write_string;
 	res->app_version.arg = (void *)app_version;
+
+	res->has_features = true;
+	res->features.has_rgb = res->features.rgb = true;
+	res->features.has_eink = res->features.eink = true;
+	res->features.has_knob = res->features.knob = true;
+
 	return true;
 }

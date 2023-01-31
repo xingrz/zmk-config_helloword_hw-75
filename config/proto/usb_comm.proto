@@ -57,6 +57,14 @@ message Version
 	required string zephyr_version = 1;
 	required string zmk_version = 2;
 	required string app_version = 3;
+	optional Features features = 4;
+
+	message Features
+	{
+		optional bool rgb = 1;
+		optional bool eink = 2;
+		optional bool knob = 3;
+	}
 }
 
 message MotorState
