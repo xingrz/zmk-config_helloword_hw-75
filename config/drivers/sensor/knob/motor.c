@@ -296,6 +296,13 @@ void motor_set_torque_limit(const struct device *dev, float limit)
 	data->pid_velocity.limit = data->voltage_limit;
 }
 
+float motor_get_torque_limit(const struct device *dev)
+{
+	struct motor_data *data = dev->data;
+
+	return data->voltage_limit;
+}
+
 void motor_set_angle_pid(const struct device *dev, float p, float i, float d)
 {
 	struct motor_data *data = dev->data;

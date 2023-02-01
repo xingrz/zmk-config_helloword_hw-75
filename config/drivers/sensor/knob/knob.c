@@ -36,6 +36,7 @@ struct knob_data {
 	float position_max;
 
 	bool encoder_report;
+	int encoder_ppr;
 	float encoder_rpp;
 
 	float last_angle;
@@ -285,6 +286,21 @@ bool knob_get_encoder_report(const struct device *dev)
 	return data->encoder_report;
 }
 
+void knob_set_encoder_ppr(const struct device *dev, int ppr)
+{
+	struct knob_data *data = dev->data;
+	if (ppr > 0) {
+		data->encoder_ppr = ppr;
+		data->encoder_rpp = PI2 / (float)ppr;
+	}
+}
+
+int knob_get_encoder_ppr(const struct device *dev)
+{
+	struct knob_data *data = dev->data;
+	return data->encoder_ppr;
+}
+
 void knob_set_position_limit(const struct device *dev, float min, float max)
 {
 	struct knob_data *data = dev->data;
@@ -390,6 +406,7 @@ int knob_init(const struct device *dev)
 		.position_min = deg_to_rad(190),                                                   \
 		.position_max = deg_to_rad(290),                                                   \
 		.encoder_report = false,                                                           \
+		.encoder_ppr = DT_INST_PROP(n, ppr),                                               \
 		.encoder_rpp = PI2 / (float)DT_INST_PROP(n, ppr),                                  \
 	};                                                                                         \
                                                                                                    \

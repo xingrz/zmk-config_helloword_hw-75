@@ -15,6 +15,7 @@ enum Action {
 	MOTOR_GET_STATE = 2;
 	KNOB_GET_CONFIG = 3;
 	KNOB_SET_CONFIG = 4;
+	KNOB_UPDATE_PREF = 9;
 	RGB_CONTROL = 5;
 	RGB_GET_STATE = 6;
 	RGB_SET_STATE = 8;
@@ -32,6 +33,7 @@ message MessageH2D
 	{
 		Nop nop = 2;
 		KnobConfig knob_config = 3;
+		KnobConfig.Pref knob_pref = 6;
 		RgbControl rgb_control = 4;
 		RgbState rgb_state = 7;
 		RgbIndicator rgb_indicator = 8;
@@ -48,6 +50,7 @@ message MessageD2H
 		Version version = 3;
 		MotorState motor_state = 4;
 		KnobConfig knob_config = 5;
+		KnobConfig.Pref knob_pref = 8;
 		RgbState rgb_state = 6;
 		RgbIndicator rgb_indicator = 9;
 		EinkImage eink_image = 7;
@@ -72,6 +75,7 @@ message Version
 		optional bool rgb_indicator = 6;
 		optional bool eink = 2;
 		optional bool knob = 3;
+		optional bool knob_prefs = 4;
 	}
 }
 
@@ -96,6 +100,7 @@ message KnobConfig
 {
 	required bool demo = 1;
 	required Mode mode = 2;
+	repeated Pref prefs = 5;
 
 	enum Mode {
 		DISABLE = 0;
@@ -105,6 +110,16 @@ message KnobConfig
 		DAMPED = 4;
 		SPIN = 5;
 		RATCHET = 6;
+	}
+
+	message Pref
+	{
+		required uint32 layer_id = 1;
+		optional string layer_name = 2;
+		required bool active = 3;
+		optional Mode mode = 4;
+		optional uint32 ppr = 5;
+		optional float torque_limit = 6;
 	}
 }
 

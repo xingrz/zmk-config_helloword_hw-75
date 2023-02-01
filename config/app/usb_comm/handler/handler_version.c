@@ -60,6 +60,7 @@ static bool handle_version(const usb_comm_MessageH2D *h2d, usb_comm_MessageD2H *
 
 #ifdef CONFIG_HW75_USB_COMM_FEATURE_KNOB
 	res->features.has_knob = res->features.knob = true;
+	res->features.has_knob_prefs = res->features.knob_prefs = true;
 #endif // CONFIG_HW75_USB_COMM_FEATURE_KNOB
 
 	return true;
