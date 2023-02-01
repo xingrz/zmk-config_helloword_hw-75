@@ -63,29 +63,34 @@ static void knob_app_calibrate(struct k_work *work)
 
 K_WORK_DEFINE(calibrate_work, knob_app_calibrate);
 
-static int knob_app_init(const struct device *dev)
+bool knob_app_get_demo(void)
 {
-	ARG_UNUSED(dev);
+	return motor_demo;
+}
 
-	knob = device_get_binding("KNOB");
-	if (!knob) {
-		LOG_ERR("Knob device not found");
-		return -ENODEV;
+void knob_app_set_demo(bool demo)
+{
+	if (!knob || !motor) {
+		return;
 	}
 
-	motor = device_get_binding("MOTOR");
-	if (!motor) {
-		LOG_ERR("Motor device not found");
-		return -ENODEV;
+	if (!motor_is_calibrated(motor)) {
+		return;
 	}
 
-	k_work_queue_start(&knob_work_q, knob_work_stack_area,
-			   K_THREAD_STACK_SIZEOF(knob_work_stack_area), KNOB_APP_THREAD_PRIORITY,
-			   NULL);
+	motor_demo = demo;
+	if (demo) {
+		knob_set_encoder_report(knob, false);
+	} else {
+		knob_set_mode(knob, KNOB_ENCODER);
+		knob_set_encoder_report(knob, true);
+	}
 
-	k_work_submit_to_queue(&knob_work_q, &calibrate_work);
-
-	return 0;
+	ZMK_EVENT_RAISE(new_app_knob_state_changed((struct app_knob_state_changed){
+		.enable = true,
+		.demo = demo,
+		.calibration = KNOB_CALIBRATE_OK,
+	}));
 }
 
 static int knob_app_event_listener(const zmk_event_t *eh)
@@ -115,34 +120,29 @@ static int knob_app_event_listener(const zmk_event_t *eh)
 	return -ENOTSUP;
 }
 
-bool knob_app_get_demo(void)
+static int knob_app_init(const struct device *dev)
 {
-	return motor_demo;
-}
+	ARG_UNUSED(dev);
 
-void knob_app_set_demo(bool demo)
-{
-	if (!knob || !motor) {
-		return;
+	knob = device_get_binding("KNOB");
+	if (!knob) {
+		LOG_ERR("Knob device not found");
+		return -ENODEV;
 	}
 
-	if (!motor_is_calibrated(motor)) {
-		return;
+	motor = device_get_binding("MOTOR");
+	if (!motor) {
+		LOG_ERR("Motor device not found");
+		return -ENODEV;
 	}
 
-	motor_demo = demo;
-	if (demo) {
-		knob_set_encoder_report(knob, false);
-	} else {
-		knob_set_mode(knob, KNOB_ENCODER);
-		knob_set_encoder_report(knob, true);
-	}
+	k_work_queue_start(&knob_work_q, knob_work_stack_area,
+			   K_THREAD_STACK_SIZEOF(knob_work_stack_area), KNOB_APP_THREAD_PRIORITY,
+			   NULL);
 
-	ZMK_EVENT_RAISE(new_app_knob_state_changed((struct app_knob_state_changed){
-		.enable = true,
-		.demo = demo,
-		.calibration = KNOB_CALIBRATE_OK,
-	}));
+	k_work_submit_to_queue(&knob_work_q, &calibrate_work);
+
+	return 0;
 }
 
 ZMK_LISTENER(knob_app, knob_app_event_listener);
