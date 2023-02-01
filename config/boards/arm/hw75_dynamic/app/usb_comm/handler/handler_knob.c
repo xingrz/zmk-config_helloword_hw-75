@@ -51,15 +51,6 @@ bool handle_knob_get_config(const usb_comm_MessageH2D *h2d, usb_comm_MessageD2H 
 	res->demo = knob_app_get_demo();
 	res->mode = (usb_comm_KnobConfig_Mode)knob_get_mode(knob);
 
-	if (res->mode == usb_comm_KnobConfig_Mode_DAMPED) {
-		knob_get_position_limit(knob, &res->damped_min, &res->damped_max);
-		res->has_damped_min = true;
-		res->has_damped_max = true;
-	} else {
-		res->has_damped_min = false;
-		res->has_damped_max = false;
-	}
-
 	return true;
 }
 
@@ -75,10 +66,6 @@ bool handle_knob_set_config(const usb_comm_MessageH2D *h2d, usb_comm_MessageD2H 
 	if (req->demo) {
 		knob_app_set_demo(true);
 		knob_set_mode(knob, (enum knob_mode)req->mode);
-		if (req->mode == usb_comm_KnobConfig_Mode_DAMPED && req->has_damped_min &&
-		    req->has_damped_max) {
-			knob_set_position_limit(knob, req->damped_min, req->damped_max);
-		}
 	} else {
 		knob_app_set_demo(false);
 	}

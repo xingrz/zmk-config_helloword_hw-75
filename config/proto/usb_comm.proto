@@ -88,8 +88,6 @@ message KnobConfig
 {
 	required bool demo = 1;
 	required Mode mode = 2;
-	optional float damped_min = 3;
-	optional float damped_max = 4;
 
 	enum Mode {
 		DISABLE = 0;
