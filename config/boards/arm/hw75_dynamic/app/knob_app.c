@@ -27,6 +27,26 @@ static const struct device *motor;
 
 static bool motor_demo = false;
 
+static struct k_work_delayable knob_enable_report_work;
+
+static void knob_app_enable_report_delayed_work(struct k_work *work)
+{
+	ARG_UNUSED(work);
+	knob_set_encoder_report(knob, true);
+}
+
+static void knob_app_enable_report_delayed(void)
+{
+	k_work_reschedule(&knob_enable_report_work, K_MSEC(500));
+}
+
+static void knob_app_disable_report(void)
+{
+	struct k_work_sync sync;
+	k_work_cancel_delayable_sync(&knob_enable_report_work, &sync);
+	knob_set_encoder_report(knob, false);
+}
+
 K_THREAD_STACK_DEFINE(knob_work_stack_area, KNOB_APP_THREAD_STACK_SIZE);
 static struct k_work_q knob_work_q;
 
@@ -43,7 +63,7 @@ static void knob_app_calibrate(struct k_work *work)
 	int ret = motor_calibrate_auto(motor);
 	if (ret == 0) {
 		knob_set_mode(knob, KNOB_ENCODER);
-		knob_set_encoder_report(knob, true);
+		knob_app_enable_report_delayed();
 
 		ZMK_EVENT_RAISE(new_app_knob_state_changed((struct app_knob_state_changed){
 			.enable = true,
@@ -80,10 +100,10 @@ void knob_app_set_demo(bool demo)
 
 	motor_demo = demo;
 	if (demo) {
-		knob_set_encoder_report(knob, false);
+		knob_app_disable_report();
 	} else {
 		knob_set_mode(knob, KNOB_ENCODER);
-		knob_set_encoder_report(knob, true);
+		knob_app_enable_report_delayed();
 	}
 
 	ZMK_EVENT_RAISE(new_app_knob_state_changed((struct app_knob_state_changed){
@@ -135,6 +155,8 @@ static int knob_app_init(const struct device *dev)
 		LOG_ERR("Motor device not found");
 		return -ENODEV;
 	}
+
+	k_work_init_delayable(&knob_enable_report_work, knob_app_enable_report_delayed_work);
 
 	k_work_queue_start(&knob_work_q, knob_work_stack_area,
 			   K_THREAD_STACK_SIZEOF(knob_work_stack_area), KNOB_APP_THREAD_PRIORITY,
