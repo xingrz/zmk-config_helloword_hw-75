@@ -17,6 +17,7 @@ enum Action {
 	KNOB_SET_CONFIG = 4;
 	RGB_CONTROL = 5;
 	RGB_GET_STATE = 6;
+	RGB_SET_STATE = 8;
 	EINK_SET_IMAGE = 7;
 }
 
@@ -30,6 +31,7 @@ message MessageH2D
 		Nop nop = 2;
 		KnobConfig knob_config = 3;
 		RgbControl rgb_control = 4;
+		RgbState rgb_state = 7;
 		EinkImage eink_image = 5;
 	}
 }
@@ -62,6 +64,7 @@ message Version
 	message Features
 	{
 		optional bool rgb = 1;
+		optional bool rgb_full_control = 5;
 		optional bool eink = 2;
 		optional bool knob = 3;
 	}
@@ -123,6 +126,23 @@ message RgbControl
 message RgbState
 {
 	required bool on = 1;
+	optional HSB color = 2;
+	optional Effect effect = 3;
+	optional uint32 speed = 4;
+
+	message HSB
+	{
+		required uint32 h = 1;
+		required uint32 s = 2;
+		required uint32 b = 3;
+	}
+
+	enum Effect {
+		SOLID = 0;
+		BREATHE = 1;
+		SPECTRUM = 2;
+		SWIRL = 3;
+	}
 }
 
 message EinkImage

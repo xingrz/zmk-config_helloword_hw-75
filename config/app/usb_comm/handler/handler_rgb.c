@@ -60,12 +60,44 @@ bool handle_rgb_get_state(const usb_comm_MessageH2D *h2d, usb_comm_MessageD2H *d
 {
 	usb_comm_RgbState *res = &d2h->payload.rgb_state;
 
-	bool on;
-	if (zmk_rgb_underglow_get_state(&on) != 0) {
+	if (zmk_rgb_underglow_get_state(&res->on) != 0) {
 		return false;
 	}
 
-	res->on = on;
+	struct zmk_led_hsb color = zmk_rgb_underglow_calc_hue(0);
+	res->color.h = color.h;
+	res->color.s = color.s;
+	res->color.b = color.b;
+	res->has_color = true;
+
+	res->effect = zmk_rgb_underglow_calc_effect(0);
+	res->has_effect = true;
 
 	return true;
+}
+
+bool handle_rgb_set_state(const usb_comm_MessageH2D *h2d, usb_comm_MessageD2H *d2h,
+			  const void *bytes, uint32_t bytes_len)
+{
+	const usb_comm_RgbState *req = &h2d->payload.rgb_state;
+
+	if (req->on) {
+		zmk_rgb_underglow_on();
+	} else {
+		zmk_rgb_underglow_off();
+	}
+
+	if (req->has_color) {
+		zmk_rgb_underglow_set_hsb((struct zmk_led_hsb){
+			.h = req->color.h,
+			.s = req->color.s,
+			.b = req->color.b,
+		});
+	}
+
+	if (req->has_effect) {
+		zmk_rgb_underglow_select_effect((int)req->effect);
+	}
+
+	return handle_rgb_get_state(h2d, d2h, bytes, bytes_len);
 }

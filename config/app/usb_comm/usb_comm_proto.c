@@ -50,6 +50,7 @@ static struct {
 #ifdef CONFIG_HW75_USB_COMM_FEATURE_RGB
 	{ usb_comm_Action_RGB_CONTROL, usb_comm_MessageD2H_rgb_state_tag, handle_rgb_control },
 	{ usb_comm_Action_RGB_GET_STATE, usb_comm_MessageD2H_rgb_state_tag, handle_rgb_get_state },
+	{ usb_comm_Action_RGB_SET_STATE, usb_comm_MessageD2H_rgb_state_tag, handle_rgb_set_state },
 #endif // CONFIG_HW75_USB_COMM_FEATURE_RGB
 
 #ifdef CONFIG_HW75_USB_COMM_FEATURE_EINK
