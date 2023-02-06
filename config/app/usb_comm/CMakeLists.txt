@@ -5,8 +5,7 @@ zephyr_library()
 
 zephyr_library_link_libraries(hw75_proto)
 
-zephyr_library_sources(usb_comm.c)
-zephyr_library_sources(usb_comm_bos.c)
+zephyr_library_sources(usb_comm_hid.c)
 zephyr_library_sources(usb_comm_proto.c)
 
 add_subdirectory(handler)

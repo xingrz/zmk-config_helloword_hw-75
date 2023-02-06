@@ -4,10 +4,21 @@
 config HW75_USB_COMM
 	bool
 	depends on USB_DEVICE_DRIVER
-	select USB_DEVICE_BOS
 	select HW75_PROTO_USB_COMM
 
 if HW75_USB_COMM
+
+config HW75_USB_COMM_DEVICE_NAME
+	string "Name of USB HID device to be used for communication"
+	default "HID_1"
+
+config HW75_USB_COMM_THREAD_PRIORITY
+	int
+	default 10
+
+config HW75_USB_COMM_THREAD_STACK_SIZE
+	int
+	default 1024
 
 config HW75_USB_COMM_MAX_TX_MESSAGE_SIZE
 	int

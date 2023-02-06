@@ -14,12 +14,17 @@ LOG_MODULE_DECLARE(usb_comm, CONFIG_HW75_USB_COMM_LOG_LEVEL);
 #include <pb_encode.h>
 #include <pb_decode.h>
 
-#include "usb_comm_proto.h"
+#include "usb_comm_hid.h"
 #include "usb_comm.pb.h"
 
 #include "handler/handler.h"
 
-static uint8_t usb_ep_in, usb_ep_out;
+static struct k_sem usb_comm_sem;
+
+static K_THREAD_STACK_DEFINE(usb_comm_thread_stack, CONFIG_HW75_USB_COMM_THREAD_STACK_SIZE);
+static struct k_thread usb_comm_thread;
+
+static uint32_t usb_rx_idx, usb_rx_len;
 static uint8_t usb_rx_buf[CONFIG_HW75_USB_COMM_MAX_RX_MESSAGE_SIZE];
 static uint8_t usb_tx_buf[CONFIG_HW75_USB_COMM_MAX_TX_MESSAGE_SIZE];
 
@@ -78,24 +83,6 @@ static bool read_bytes_field(pb_istream_t *stream, const pb_field_t *field, void
 }
 #endif
 
-static void usb_comm_read(void);
-
-static void usb_comm_proto_write_cb(uint8_t ep, int size, void *priv);
-static void usb_comm_proto_read_cb(uint8_t ep, int size, void *priv);
-
-void usb_comm_ready(uint8_t ep_in, uint8_t ep_out)
-{
-	usb_ep_in = ep_in;
-	usb_ep_out = ep_out;
-	usb_comm_read();
-}
-
-static void usb_comm_proto_write_cb(uint8_t ep, int size, void *priv)
-{
-	LOG_DBG("ep %x, size %u", ep, size);
-	LOG_HEXDUMP_DBG(usb_tx_buf, MIN(size, 64), "tx");
-}
-
 #if CONFIG_HW75_USB_COMM_MAX_BYTES_FIELD_SIZE
 static bool h2d_callback(pb_istream_t *stream, const pb_field_t *field, void **arg)
 {
@@ -107,12 +94,12 @@ static bool h2d_callback(pb_istream_t *stream, const pb_field_t *field, void **a
 }
 #endif
 
-static void usb_comm_proto_read_cb(uint8_t ep, int size, void *priv)
+static void usb_comm_handle_message()
 {
-	LOG_DBG("ep %x, size %u", ep, size);
-	LOG_HEXDUMP_DBG(usb_rx_buf, MIN(size, 64), "rx");
+	LOG_DBG("mesage size %u", usb_rx_len);
+	LOG_HEXDUMP_DBG(usb_rx_buf, MIN(usb_rx_len, 64), "message data");
 
-	pb_istream_t h2d_stream = pb_istream_from_buffer(usb_rx_buf, size);
+	pb_istream_t h2d_stream = pb_istream_from_buffer(usb_rx_buf, usb_rx_len);
 	pb_ostream_t d2h_stream = pb_ostream_from_buffer(usb_tx_buf, sizeof(usb_tx_buf));
 
 	usb_comm_MessageH2D h2d = usb_comm_MessageH2D_init_zero;
@@ -124,7 +111,7 @@ static void usb_comm_proto_read_cb(uint8_t ep, int size, void *priv)
 
 	if (!pb_decode_delimited(&h2d_stream, usb_comm_MessageH2D_fields, &h2d)) {
 		LOG_ERR("Failed decoding h2d message: %s", h2d_stream.errmsg);
-		goto next;
+		return;
 	}
 
 	LOG_DBG("req action: %d", h2d.action);
@@ -149,18 +136,55 @@ static void usb_comm_proto_read_cb(uint8_t ep, int size, void *priv)
 
 	if (!pb_encode_delimited(&d2h_stream, usb_comm_MessageD2H_fields, &d2h)) {
 		LOG_ERR("Failed encoding d2h message: %s", d2h_stream.errmsg);
-		goto next;
+		return;
 	}
 
-	usb_transfer(usb_ep_in, usb_tx_buf, d2h_stream.bytes_written, USB_TRANS_WRITE,
-		     usb_comm_proto_write_cb, NULL);
-
-next:
-	usb_comm_read();
+	usb_comm_hid_send(usb_tx_buf, d2h_stream.bytes_written);
 }
 
-static void usb_comm_read(void)
+static void usb_comm_handle_packet(uint8_t *data, uint32_t len)
 {
-	usb_transfer(usb_ep_out, usb_rx_buf, sizeof(usb_rx_buf), USB_TRANS_READ,
-		     usb_comm_proto_read_cb, NULL);
+	if (usb_rx_idx + len > sizeof(usb_rx_buf)) {
+		LOG_ERR("RX buffer overflows, index: %d, received: %d", usb_rx_idx, len);
+		usb_rx_idx = 0;
+		return;
+	}
+
+	if (data[0] + 1 > len) {
+		LOG_ERR("Invalid packet header: %d, len: %d", data[0], len);
+		return;
+	}
+
+	memcpy(usb_rx_buf + usb_rx_idx, data + 1, data[0]);
+	usb_rx_idx += data[0];
+
+	if (data[0] + 1 < len) {
+		usb_rx_len = usb_rx_idx;
+		usb_rx_idx = 0;
+		k_sem_give(&usb_comm_sem);
+	}
 }
+
+static void usb_comm_thread_entry(void *p1, void *p2, void *p3)
+{
+	usb_comm_hid_init(usb_comm_handle_packet);
+	while (true) {
+		k_sem_take(&usb_comm_sem, K_FOREVER);
+		usb_comm_handle_message();
+	}
+}
+
+static int usb_comm_init(const struct device *dev)
+{
+	ARG_UNUSED(dev);
+
+	k_sem_init(&usb_comm_sem, 0, 1);
+
+	k_thread_create(&usb_comm_thread, usb_comm_thread_stack,
+			CONFIG_HW75_USB_COMM_THREAD_STACK_SIZE, usb_comm_thread_entry, NULL, NULL,
+			NULL, K_PRIO_COOP(CONFIG_HW75_USB_COMM_THREAD_PRIORITY), 0, K_NO_WAIT);
+
+	return 0;
+}
+
+SYS_INIT(usb_comm_init, APPLICATION, CONFIG_APPLICATION_INIT_PRIORITY);
