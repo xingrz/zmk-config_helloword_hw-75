@@ -32,16 +32,25 @@ static struct {
 	usb_comm_handler_t handler;
 } handlers[] = {
 	{ usb_comm_Action_VERSION, usb_comm_MessageD2H_version_tag, handle_version },
+
+#ifdef CONFIG_HW75_USB_COMM_FEATURE_KNOB
 	{ usb_comm_Action_MOTOR_GET_STATE, usb_comm_MessageD2H_motor_state_tag,
 	  handle_motor_get_state },
 	{ usb_comm_Action_KNOB_GET_CONFIG, usb_comm_MessageD2H_knob_config_tag,
 	  handle_knob_get_config },
 	{ usb_comm_Action_KNOB_SET_CONFIG, usb_comm_MessageD2H_knob_config_tag,
 	  handle_knob_set_config },
+#endif // CONFIG_HW75_USB_COMM_FEATURE_KNOB
+
+#ifdef CONFIG_HW75_USB_COMM_FEATURE_RGB
 	{ usb_comm_Action_RGB_CONTROL, usb_comm_MessageD2H_rgb_state_tag, handle_rgb_control },
 	{ usb_comm_Action_RGB_GET_STATE, usb_comm_MessageD2H_rgb_state_tag, handle_rgb_get_state },
+#endif // CONFIG_HW75_USB_COMM_FEATURE_RGB
+
+#ifdef CONFIG_HW75_USB_COMM_FEATURE_EINK
 	{ usb_comm_Action_EINK_SET_IMAGE, usb_comm_MessageD2H_eink_image_tag,
 	  handle_eink_set_image },
+#endif // CONFIG_HW75_USB_COMM_FEATURE_EINK
 };
 
 #if CONFIG_HW75_USB_COMM_MAX_BYTES_FIELD_SIZE

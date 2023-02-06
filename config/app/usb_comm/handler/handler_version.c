@@ -47,9 +47,18 @@ bool handle_version(const usb_comm_MessageH2D *h2d, usb_comm_MessageD2H *d2h, co
 	res->app_version.arg = (void *)app_version;
 
 	res->has_features = true;
+
+#ifdef CONFIG_HW75_USB_COMM_FEATURE_RGB
 	res->features.has_rgb = res->features.rgb = true;
+#endif // CONFIG_HW75_USB_COMM_FEATURE_RGB
+
+#ifdef CONFIG_HW75_USB_COMM_FEATURE_EINK
 	res->features.has_eink = res->features.eink = true;
+#endif // CONFIG_HW75_USB_COMM_FEATURE_EINK
+
+#ifdef CONFIG_HW75_USB_COMM_FEATURE_KNOB
 	res->features.has_knob = res->features.knob = true;
+#endif // CONFIG_HW75_USB_COMM_FEATURE_KNOB
 
 	return true;
 }
