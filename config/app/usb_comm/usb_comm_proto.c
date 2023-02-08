@@ -97,7 +97,7 @@ static bool h2d_callback(pb_istream_t *stream, const pb_field_t *field, void **a
 
 static void usb_comm_handle_message()
 {
-	LOG_DBG("mesage size %u", usb_rx_len);
+	LOG_DBG("message size %u", usb_rx_len);
 	LOG_HEXDUMP_DBG(usb_rx_buf, MIN(usb_rx_len, 64), "message data");
 
 	pb_istream_t h2d_stream = pb_istream_from_buffer(usb_rx_buf, usb_rx_len);
