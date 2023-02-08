@@ -26,8 +26,6 @@ static int storage_init(const struct device *dev)
 	}
 
 	LOG_DBG("flash area name: %s", fa->fa_dev_name);
-	LOG_DBG("flash area offset: 0x%08x", fa->fa_off);
-	LOG_DBG("flash area size: %d", fa->fa_size);
 
 	struct flash_sector sectors[8];
 	uint32_t sector_cnt = ARRAY_SIZE(sectors);
