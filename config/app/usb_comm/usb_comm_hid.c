@@ -20,6 +20,8 @@ LOG_MODULE_REGISTER(usb_comm, CONFIG_HW75_USB_COMM_LOG_LEVEL);
 static const struct device *hid_dev;
 static usb_comm_receive_callback_t receive_callback;
 
+static K_SEM_DEFINE(hid_sem, 1, 1);
+
 #define HID_USAGE_PAGE_VENDOR_DEFINED(page)                                                        \
 	HID_ITEM(HID_ITEM_TAG_USAGE_PAGE, HID_ITEM_TYPE_GLOBAL, 2), page, 0xFF
 
@@ -59,7 +61,8 @@ static int hid_comm_set_report_cb(const struct device *dev, struct usb_setup_pac
 
 static void hid_comm_in_ready_cb(const struct device *dev)
 {
-	LOG_DBG("host ready");
+	ARG_UNUSED(dev);
+	k_sem_give(&hid_sem);
 }
 
 static const struct hid_ops ops = {
@@ -102,11 +105,14 @@ int usb_comm_hid_send(uint8_t *data, uint32_t len)
 		data += tx_len;
 		len -= tx_len;
 
+		k_sem_take(&hid_sem, K_MSEC(30));
+
 		LOG_DBG("packet size %u", sizeof(tx_buf));
 		LOG_HEXDUMP_DBG(tx_buf, sizeof(tx_buf), "packet data");
 
 		ret = hid_int_ep_write(hid_dev, tx_buf, sizeof(tx_buf), &written);
 		if (ret != 0) {
+			k_sem_give(&hid_sem);
 			LOG_ERR("HID write failed: %d", ret);
 			return ret;
 		}
