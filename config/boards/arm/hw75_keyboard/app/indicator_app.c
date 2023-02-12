@@ -58,7 +58,7 @@ static int indicator_update()
 	apply_brightness(&color, &current, bri);
 
 	LOG_DBG("Update indicator, color: %02X%02X%02X, brightness: %d -> %02X%02X%02X", current.r,
-		current.b, current.b, bri, color.r, color.g, color.b);
+		current.g, current.b, bri, color.r, color.g, color.b);
 
 	return led_strip_remap_set(led_strip, "STATUS", &color);
 }
