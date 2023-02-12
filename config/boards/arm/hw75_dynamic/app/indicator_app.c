@@ -29,6 +29,8 @@ static const struct device *led_strip;
 static const struct led_rgb color_red = { RGB(0xFF, 0x00, 0x00) };
 static const struct led_rgb color_green = { RGB(0x00, 0xFF, 0x00) };
 
+static struct k_mutex lock;
+
 static struct led_rgb current;
 static bool active = true;
 
@@ -48,11 +50,11 @@ static inline void apply_brightness(struct led_rgb *c_out, const struct led_rgb 
 	c_out->b = (uint8_t)((int)c_in->b * bri / 255);
 }
 
-static int indicator_update()
+static void indicator_update(struct k_work *work)
 {
 	if (!led_strip) {
 		LOG_ERR("LED strip device %s not found", STRIP_LABEL);
-		return -ENODEV;
+		return;
 	}
 
 	apply_color(&current, state ? &color_red : &color_green);
@@ -66,26 +68,34 @@ static int indicator_update()
 	LOG_DBG("Update indicator, color: %02X%02X%02X, brightness: %d -> %02X%02X%02X", current.r,
 		current.g, current.b, bri, color.r, color.g, color.b);
 
-	return led_strip_remap_set(led_strip, "STATUS", &color);
+	led_strip_remap_set(led_strip, "STATUS", &color);
 }
+
+K_WORK_DEFINE(indicator_update_work, indicator_update);
 
 static int indicator_app_init(const struct device *dev)
 {
 	ARG_UNUSED(dev);
 	led_strip = device_get_binding(STRIP_LABEL);
-	return indicator_update();
+	k_mutex_init(&lock);
+	k_work_submit_to_queue(&k_sys_work_q, &indicator_update_work);
+	return 0;
 }
 
 void indicator_set_bits(uint32_t bits)
 {
+	k_mutex_lock(&lock, K_FOREVER);
 	state |= bits;
-	indicator_update();
+	k_mutex_unlock(&lock);
+	k_work_submit_to_queue(&k_sys_work_q, &indicator_update_work);
 }
 
 void indicator_clear_bits(uint32_t bits)
 {
+	k_mutex_lock(&lock, K_FOREVER);
 	state &= ~bits;
-	indicator_update();
+	k_mutex_unlock(&lock);
+	k_work_submit_to_queue(&k_sys_work_q, &indicator_update_work);
 }
 
 static int indicator_app_event_listener(const zmk_event_t *eh)
@@ -95,7 +105,8 @@ static int indicator_app_event_listener(const zmk_event_t *eh)
 
 	if ((activity_ev = as_zmk_activity_state_changed(eh)) != NULL) {
 		active = activity_ev->state == ZMK_ACTIVITY_ACTIVE;
-		return indicator_update();
+		k_work_submit_to_queue(&k_sys_work_q, &indicator_update_work);
+		return 0;
 	} else if ((knob_ev = as_app_knob_state_changed(eh)) != NULL) {
 		if (knob_ev->calibration == KNOB_CALIBRATE_OK) {
 			indicator_clear_bits(INDICATOR_KNOB_CALIBRATING);
