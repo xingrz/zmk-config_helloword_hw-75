@@ -29,6 +29,7 @@ struct led_strip_remap_data {
 	struct led_rgb *pixels;
 	struct led_rgb *output;
 	struct led_strip_remap_indicator_state *indicators;
+	struct k_mutex lock;
 };
 
 struct led_strip_remap_config {
@@ -45,6 +46,9 @@ static int led_strip_remap_apply(const struct device *dev)
 {
 	struct led_strip_remap_data *data = dev->data;
 	const struct led_strip_remap_config *config = dev->config;
+	int ret;
+
+	k_mutex_lock(&data->lock, K_FOREVER);
 
 	for (uint32_t i = 0; i < config->map_len; i++) {
 		memcpy(&data->output[i], &data->pixels[i], sizeof(struct led_rgb));
@@ -66,7 +70,11 @@ static int led_strip_remap_apply(const struct device *dev)
 		}
 	}
 
-	return led_strip_update_rgb(config->led_strip, data->output, config->map_len);
+	ret = led_strip_update_rgb(config->led_strip, data->output, config->map_len);
+
+	k_mutex_unlock(&data->lock);
+
+	return ret;
 }
 
 static int led_strip_remap_update_rgb(const struct device *dev, struct led_rgb *pixels,
@@ -79,9 +87,13 @@ static int led_strip_remap_update_rgb(const struct device *dev, struct led_rgb *
 		num_pixels = config->map_len;
 	}
 
+	k_mutex_lock(&data->lock, K_FOREVER);
+
 	for (uint32_t i = 0; i < num_pixels; i++) {
 		memcpy(&data->pixels[config->map[i]], &pixels[i], sizeof(struct led_rgb));
 	}
+
+	k_mutex_unlock(&data->lock);
 
 	return led_strip_remap_apply(dev);
 }
@@ -98,6 +110,8 @@ int led_strip_remap_set(const struct device *dev, const char *label, struct led_
 	struct led_strip_remap_data *data = dev->data;
 	const struct led_strip_remap_config *config = dev->config;
 
+	k_mutex_lock(&data->lock, K_FOREVER);
+
 	const struct led_strip_remap_indicator *indicator;
 	struct led_strip_remap_indicator_state *indicator_state;
 	for (uint32_t i = 0; i < config->indicator_cnt; i++) {
@@ -112,6 +126,8 @@ int led_strip_remap_set(const struct device *dev, const char *label, struct led_
 		indicator_state->active = true;
 	}
 
+	k_mutex_unlock(&data->lock);
+
 	return led_strip_remap_apply(dev);
 }
 
@@ -119,6 +135,8 @@ int led_strip_remap_clear(const struct device *dev, const char *label)
 {
 	struct led_strip_remap_data *data = dev->data;
 	const struct led_strip_remap_config *config = dev->config;
+
+	k_mutex_lock(&data->lock, K_FOREVER);
 
 	const struct led_strip_remap_indicator *indicator;
 	struct led_strip_remap_indicator_state *indicator_state;
@@ -133,12 +151,17 @@ int led_strip_remap_clear(const struct device *dev, const char *label)
 		indicator_state->active = false;
 	}
 
+	k_mutex_unlock(&data->lock);
+
 	return led_strip_remap_apply(dev);
 }
 
 static int led_strip_remap_init(const struct device *dev)
 {
+	struct led_strip_remap_data *data = dev->data;
 	const struct led_strip_remap_config *config = dev->config;
+
+	k_mutex_init(&data->lock);
 
 	if (config->chain_length != config->led_strip_len) {
 		LOG_ERR("%s: chain-length (%d) should be the same with led-strip device %s (%d)",
