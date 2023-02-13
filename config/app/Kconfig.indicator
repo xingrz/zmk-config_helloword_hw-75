@@ -1,0 +1,19 @@
+# Copyright (c) 2022-2023 XiNGRZ
+# SPDX-License-Identifier: MIT
+
+config HW75_INDICATOR
+	bool "LED indicator"
+	depends on LED_STRIP_REMAP
+	default y if ZMK_RGB_UNDERGLOW
+
+if HW75_INDICATOR
+
+config HW75_INDICATOR_BRIGHTNESS_ACTIVE
+	int "Brightness of indicator in active state"
+	default 255
+
+config HW75_INDICATOR_BRIGHTNESS_INACTIVE
+	int "Brightness of indicator in inactive state"
+	default 10
+
+endif # HW75_INDICATOR
