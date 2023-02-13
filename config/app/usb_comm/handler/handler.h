@@ -26,6 +26,10 @@ bool handle_rgb_get_state(const usb_comm_MessageH2D *h2d, usb_comm_MessageD2H *d
 			  const void *bytes, uint32_t bytes_len);
 bool handle_rgb_set_state(const usb_comm_MessageH2D *h2d, usb_comm_MessageD2H *d2h,
 			  const void *bytes, uint32_t bytes_len);
+bool handle_rgb_get_indicator(const usb_comm_MessageH2D *h2d, usb_comm_MessageD2H *d2h,
+			      const void *bytes, uint32_t bytes_len);
+bool handle_rgb_set_indicator(const usb_comm_MessageH2D *h2d, usb_comm_MessageD2H *d2h,
+			      const void *bytes, uint32_t bytes_len);
 
 bool handle_eink_set_image(const usb_comm_MessageH2D *h2d, usb_comm_MessageD2H *d2h,
 			   const void *bytes, uint32_t bytes_len);

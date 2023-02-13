@@ -51,6 +51,7 @@ bool handle_version(const usb_comm_MessageH2D *h2d, usb_comm_MessageD2H *d2h, co
 #ifdef CONFIG_HW75_USB_COMM_FEATURE_RGB
 	res->features.has_rgb = res->features.rgb = true;
 	res->features.has_rgb_full_control = res->features.rgb_full_control = true;
+	res->features.has_rgb_indicator = res->features.rgb_indicator = true;
 #endif // CONFIG_HW75_USB_COMM_FEATURE_RGB
 
 #ifdef CONFIG_HW75_USB_COMM_FEATURE_EINK

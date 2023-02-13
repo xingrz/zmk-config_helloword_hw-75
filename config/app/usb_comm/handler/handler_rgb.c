@@ -7,6 +7,7 @@
 #include "usb_comm.pb.h"
 
 #include <zmk/rgb_underglow.h>
+#include <app/indicator.h>
 
 bool handle_rgb_control(const usb_comm_MessageH2D *h2d, usb_comm_MessageD2H *d2h, const void *bytes,
 			uint32_t bytes_len)
@@ -100,4 +101,39 @@ bool handle_rgb_set_state(const usb_comm_MessageH2D *h2d, usb_comm_MessageD2H *d
 	}
 
 	return handle_rgb_get_state(h2d, d2h, bytes, bytes_len);
+}
+
+bool handle_rgb_get_indicator(const usb_comm_MessageH2D *h2d, usb_comm_MessageD2H *d2h,
+			      const void *bytes, uint32_t bytes_len)
+{
+	usb_comm_RgbIndicator *res = &d2h->payload.rgb_indicator;
+
+	const struct indicator_settings *settings = indicator_get_settings();
+
+	res->enable = settings->enable;
+	res->has_enable = true;
+	res->brightness_active = settings->brightness_active;
+	res->has_brightness_active = true;
+	res->brightness_inactive = settings->brightness_inactive;
+	res->has_brightness_inactive = true;
+
+	return true;
+}
+
+bool handle_rgb_set_indicator(const usb_comm_MessageH2D *h2d, usb_comm_MessageD2H *d2h,
+			      const void *bytes, uint32_t bytes_len)
+{
+	const usb_comm_RgbIndicator *req = &h2d->payload.rgb_indicator;
+
+	if (req->has_enable) {
+		indicator_set_enable(req->enable);
+	}
+	if (req->has_brightness_active) {
+		indicator_set_brightness_active(req->brightness_active);
+	}
+	if (req->has_brightness_inactive) {
+		indicator_set_brightness_inactive(req->brightness_inactive);
+	}
+
+	return handle_rgb_get_indicator(h2d, d2h, bytes, bytes_len);
 }

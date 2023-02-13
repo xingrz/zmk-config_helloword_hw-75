@@ -18,6 +18,8 @@ enum Action {
 	RGB_CONTROL = 5;
 	RGB_GET_STATE = 6;
 	RGB_SET_STATE = 8;
+	RGB_GET_INDICATOR = 10;
+	RGB_SET_INDICATOR = 11;
 	EINK_SET_IMAGE = 7;
 }
 
@@ -32,6 +34,7 @@ message MessageH2D
 		KnobConfig knob_config = 3;
 		RgbControl rgb_control = 4;
 		RgbState rgb_state = 7;
+		RgbIndicator rgb_indicator = 8;
 		EinkImage eink_image = 5;
 	}
 }
@@ -46,6 +49,7 @@ message MessageD2H
 		MotorState motor_state = 4;
 		KnobConfig knob_config = 5;
 		RgbState rgb_state = 6;
+		RgbIndicator rgb_indicator = 9;
 		EinkImage eink_image = 7;
 	}
 }
@@ -65,6 +69,7 @@ message Version
 	{
 		optional bool rgb = 1;
 		optional bool rgb_full_control = 5;
+		optional bool rgb_indicator = 6;
 		optional bool eink = 2;
 		optional bool knob = 3;
 	}
@@ -143,6 +148,13 @@ message RgbState
 		SPECTRUM = 2;
 		SWIRL = 3;
 	}
+}
+
+message RgbIndicator
+{
+	optional bool enable = 1;
+	optional uint32 brightness_active = 2;
+	optional uint32 brightness_inactive = 3;
 }
 
 message EinkImage
