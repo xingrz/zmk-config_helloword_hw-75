@@ -152,12 +152,12 @@
 
 		code_partition: partition@4000 {
 			label = "code_partition";
-			reg = <0x00004000 DT_SIZE_K(110)>;
+			reg = <0x00004000 DT_SIZE_K(104)>;
 		};
 
-		storage_partition: partition@1f800 {
+		storage_partition: partition@1e000 {
 			label = "storage";
-			reg = <0x0001f800 DT_SIZE_K(2)>;
+			reg = <0x0001e000 DT_SIZE_K(8)>;
 		};
 	};
 };
