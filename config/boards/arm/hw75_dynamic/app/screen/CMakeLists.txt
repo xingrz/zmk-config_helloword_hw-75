@@ -9,12 +9,18 @@ zephyr_library_include_directories(${APPLICATION_SOURCE_DIR}/include)
 
 include(${ZMK_CONFIG}/cmake/ui_strings.cmake)
 
+generate_ui_strings(icons.csv
+    OUTPUT_DEFS ICONS_SRC
+    OUTPUT_TEXT ICONS_TXT
+    UNICODE_HEX
+)
+
 generate_ui_strings(strings.csv
     OUTPUT_DEFS STRINGS_SRC
     OUTPUT_TEXT STRINGS_TXT
 )
 
-zephyr_library_sources(${STRINGS_SRC})
+zephyr_library_sources(${ICONS_SRC} ${STRINGS_SRC})
 zephyr_library_include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
 zephyr_library_sources(layer_status.c)

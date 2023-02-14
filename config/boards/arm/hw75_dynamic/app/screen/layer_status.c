@@ -16,6 +16,8 @@ LOG_MODULE_DECLARE(zmk, CONFIG_ZMK_LOG_LEVEL);
 #include <zmk/event_manager.h>
 #include <zmk/events/layer_state_changed.h>
 
+#include "icons.h"
+
 #define DISPLAY_NODE DT_CHOSEN(zephyr_display)
 
 #define SCREEN_W DT_PROP(DISPLAY_NODE, width)
@@ -29,17 +31,13 @@ LOG_MODULE_DECLARE(zmk, CONFIG_ZMK_LOG_LEVEL);
 
 #define LAYER_LABEL(node) COND_CODE_0(DT_NODE_HAS_PROP(node, label), (NULL), (DT_LABEL(node))),
 
-LV_FONT_DECLARE(icons_19);
+LV_FONT_DECLARE(mono_19);
 LV_FONT_DECLARE(zfull_9);
 
-#define UI_SYMBOL_VOLUME "\xEF\x80\xA8"
-#define UI_SYMBOL_BRIGHTNESS "\xEF\x86\x85"
-#define UI_SYMBOL_SCROLL "\xEF\x83\x9C"
-
 static const char *layer_icons[KEYMAP_LAYERS_NUM] = {
-	UI_SYMBOL_VOLUME,
-	UI_SYMBOL_BRIGHTNESS,
-	UI_SYMBOL_SCROLL,
+	ICON_VOL,
+	ICON_BRI,
+	ICON_SCR,
 };
 
 static const char *layer_names[KEYMAP_LAYERS_NUM] = { DT_FOREACH_CHILD(KEYMAP_NODE, LAYER_LABEL) };
@@ -111,7 +109,7 @@ int layer_status_init(lv_obj_t *parent, lv_group_t *group)
 	lv_style_set_text_color(&st_item, LV_STATE_DEFAULT, LV_COLOR_BLACK);
 	lv_style_set_bg_color(&st_item, LV_STATE_FOCUSED, LV_COLOR_BLACK);
 	lv_style_set_text_color(&st_item, LV_STATE_FOCUSED, LV_COLOR_WHITE);
-	lv_style_set_text_font(&st_item, LV_STATE_DEFAULT, &icons_19);
+	lv_style_set_text_font(&st_item, LV_STATE_DEFAULT, &mono_19);
 
 	lv_obj_t *cont = lv_cont_create(parent, NULL);
 	lv_cont_set_layout(cont, LV_LAYOUT_COLUMN_MID);
