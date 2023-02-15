@@ -13,7 +13,7 @@ if HW75_UART_COMM
 
 config HW75_UART_COMM_MAX_TX_MESSAGE_SIZE
 	int
-	default 1024
+	default 64
 
 module = HW75_UART_COMM
 module-str = uart_comm
