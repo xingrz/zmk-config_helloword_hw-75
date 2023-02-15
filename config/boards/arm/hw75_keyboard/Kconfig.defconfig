@@ -19,6 +19,7 @@ choice ZMK_HID_REPORT_TYPE
 endchoice
 
 rsource "Kconfig.rgb"
+rsource "Kconfig.rtt"
 rsource "Kconfig.uf2"
 rsource "Kconfig.usb"
 
