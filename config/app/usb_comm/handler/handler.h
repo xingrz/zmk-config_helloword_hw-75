@@ -5,31 +5,24 @@
 
 #pragma once
 
+#include <device.h>
+
 #include "usb_comm.pb.h"
 
 typedef bool (*usb_comm_handler_t)(const usb_comm_MessageH2D *h2d, usb_comm_MessageD2H *d2h,
 				   const void *bytes, uint32_t bytes_len);
 
-bool handle_version(const usb_comm_MessageH2D *h2d, usb_comm_MessageD2H *d2h, const void *bytes,
-		    uint32_t bytes_len);
+struct usb_comm_handler_config {
+	usb_comm_Action action;
+	pb_size_t response_payload;
+	usb_comm_handler_t handler;
+};
 
-bool handle_motor_get_state(const usb_comm_MessageH2D *h2d, usb_comm_MessageD2H *d2h,
-			    const void *bytes, uint32_t bytes_len);
-bool handle_knob_get_config(const usb_comm_MessageH2D *h2d, usb_comm_MessageD2H *d2h,
-			    const void *bytes, uint32_t bytes_len);
-bool handle_knob_set_config(const usb_comm_MessageH2D *h2d, usb_comm_MessageD2H *d2h,
-			    const void *bytes, uint32_t bytes_len);
+#define USB_COMM_DEFINE_HANDLER(name) static STRUCT_SECTION_ITERABLE(usb_comm_handler_config, name)
 
-bool handle_rgb_control(const usb_comm_MessageH2D *h2d, usb_comm_MessageD2H *d2h, const void *bytes,
-			uint32_t bytes_len);
-bool handle_rgb_get_state(const usb_comm_MessageH2D *h2d, usb_comm_MessageD2H *d2h,
-			  const void *bytes, uint32_t bytes_len);
-bool handle_rgb_set_state(const usb_comm_MessageH2D *h2d, usb_comm_MessageD2H *d2h,
-			  const void *bytes, uint32_t bytes_len);
-bool handle_rgb_get_indicator(const usb_comm_MessageH2D *h2d, usb_comm_MessageD2H *d2h,
-			      const void *bytes, uint32_t bytes_len);
-bool handle_rgb_set_indicator(const usb_comm_MessageH2D *h2d, usb_comm_MessageD2H *d2h,
-			      const void *bytes, uint32_t bytes_len);
-
-bool handle_eink_set_image(const usb_comm_MessageH2D *h2d, usb_comm_MessageD2H *d2h,
-			   const void *bytes, uint32_t bytes_len);
+#define USB_COMM_HANDLER_DEFINE(_action, _payload, _handler)                                       \
+	USB_COMM_DEFINE_HANDLER(usb_comm_handler_##_handler) = {                                   \
+		.action = _action,                                                                 \
+		.response_payload = _payload,                                                      \
+		.handler = _handler,                                                               \
+	};

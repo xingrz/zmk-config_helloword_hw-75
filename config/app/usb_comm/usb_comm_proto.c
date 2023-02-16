@@ -31,38 +31,6 @@ static uint8_t usb_tx_buf[CONFIG_HW75_USB_COMM_MAX_TX_MESSAGE_SIZE];
 static uint8_t bytes_field[CONFIG_HW75_USB_COMM_MAX_BYTES_FIELD_SIZE];
 static uint32_t bytes_field_len = 0;
 
-static struct {
-	usb_comm_Action action;
-	pb_size_t which_payload;
-	usb_comm_handler_t handler;
-} handlers[] = {
-	{ usb_comm_Action_VERSION, usb_comm_MessageD2H_version_tag, handle_version },
-
-#ifdef CONFIG_HW75_USB_COMM_FEATURE_KNOB
-	{ usb_comm_Action_MOTOR_GET_STATE, usb_comm_MessageD2H_motor_state_tag,
-	  handle_motor_get_state },
-	{ usb_comm_Action_KNOB_GET_CONFIG, usb_comm_MessageD2H_knob_config_tag,
-	  handle_knob_get_config },
-	{ usb_comm_Action_KNOB_SET_CONFIG, usb_comm_MessageD2H_knob_config_tag,
-	  handle_knob_set_config },
-#endif // CONFIG_HW75_USB_COMM_FEATURE_KNOB
-
-#ifdef CONFIG_HW75_USB_COMM_FEATURE_RGB
-	{ usb_comm_Action_RGB_CONTROL, usb_comm_MessageD2H_rgb_state_tag, handle_rgb_control },
-	{ usb_comm_Action_RGB_GET_STATE, usb_comm_MessageD2H_rgb_state_tag, handle_rgb_get_state },
-	{ usb_comm_Action_RGB_SET_STATE, usb_comm_MessageD2H_rgb_state_tag, handle_rgb_set_state },
-	{ usb_comm_Action_RGB_GET_INDICATOR, usb_comm_MessageD2H_rgb_indicator_tag,
-	  handle_rgb_get_indicator },
-	{ usb_comm_Action_RGB_SET_INDICATOR, usb_comm_MessageD2H_rgb_indicator_tag,
-	  handle_rgb_set_indicator },
-#endif // CONFIG_HW75_USB_COMM_FEATURE_RGB
-
-#ifdef CONFIG_HW75_USB_COMM_FEATURE_EINK
-	{ usb_comm_Action_EINK_SET_IMAGE, usb_comm_MessageD2H_eink_image_tag,
-	  handle_eink_set_image },
-#endif // CONFIG_HW75_USB_COMM_FEATURE_EINK
-};
-
 #if CONFIG_HW75_USB_COMM_MAX_BYTES_FIELD_SIZE
 static bool read_bytes_field(pb_istream_t *stream, const pb_field_t *field, void **arg)
 {
@@ -123,10 +91,11 @@ static void usb_comm_handle_message()
 	d2h.action = h2d.action;
 	d2h.which_payload = usb_comm_MessageD2H_nop_tag;
 
-	for (size_t i = 0; i < ARRAY_SIZE(handlers); i++) {
-		if (handlers[i].action == h2d.action) {
-			if (handlers[i].handler(&h2d, &d2h, bytes_field, bytes_field_len)) {
-				d2h.which_payload = handlers[i].which_payload;
+	STRUCT_SECTION_FOREACH(usb_comm_handler_config, config)
+	{
+		if (config->action == h2d.action) {
+			if (config->handler(&h2d, &d2h, bytes_field, bytes_field_len)) {
+				d2h.which_payload = config->response_payload;
 			}
 			break;
 		}

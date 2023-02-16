@@ -9,8 +9,11 @@
 #include <zmk/rgb_underglow.h>
 #include <app/indicator.h>
 
-bool handle_rgb_control(const usb_comm_MessageH2D *h2d, usb_comm_MessageD2H *d2h, const void *bytes,
-			uint32_t bytes_len)
+static bool handle_rgb_get_state(const usb_comm_MessageH2D *h2d, usb_comm_MessageD2H *d2h,
+				 const void *bytes, uint32_t bytes_len);
+
+static bool handle_rgb_control(const usb_comm_MessageH2D *h2d, usb_comm_MessageD2H *d2h,
+			       const void *bytes, uint32_t bytes_len)
 {
 	const usb_comm_RgbControl *req = &h2d->payload.rgb_control;
 
@@ -56,8 +59,11 @@ bool handle_rgb_control(const usb_comm_MessageH2D *h2d, usb_comm_MessageD2H *d2h
 	return handle_rgb_get_state(h2d, d2h, NULL, 0);
 }
 
-bool handle_rgb_get_state(const usb_comm_MessageH2D *h2d, usb_comm_MessageD2H *d2h,
-			  const void *bytes, uint32_t bytes_len)
+USB_COMM_HANDLER_DEFINE(usb_comm_Action_RGB_CONTROL, usb_comm_MessageD2H_rgb_state_tag,
+			handle_rgb_control);
+
+static bool handle_rgb_get_state(const usb_comm_MessageH2D *h2d, usb_comm_MessageD2H *d2h,
+				 const void *bytes, uint32_t bytes_len)
 {
 	usb_comm_RgbState *res = &d2h->payload.rgb_state;
 
@@ -77,8 +83,11 @@ bool handle_rgb_get_state(const usb_comm_MessageH2D *h2d, usb_comm_MessageD2H *d
 	return true;
 }
 
-bool handle_rgb_set_state(const usb_comm_MessageH2D *h2d, usb_comm_MessageD2H *d2h,
-			  const void *bytes, uint32_t bytes_len)
+USB_COMM_HANDLER_DEFINE(usb_comm_Action_RGB_GET_STATE, usb_comm_MessageD2H_rgb_state_tag,
+			handle_rgb_get_state);
+
+static bool handle_rgb_set_state(const usb_comm_MessageH2D *h2d, usb_comm_MessageD2H *d2h,
+				 const void *bytes, uint32_t bytes_len)
 {
 	const usb_comm_RgbState *req = &h2d->payload.rgb_state;
 
@@ -103,8 +112,11 @@ bool handle_rgb_set_state(const usb_comm_MessageH2D *h2d, usb_comm_MessageD2H *d
 	return handle_rgb_get_state(h2d, d2h, bytes, bytes_len);
 }
 
-bool handle_rgb_get_indicator(const usb_comm_MessageH2D *h2d, usb_comm_MessageD2H *d2h,
-			      const void *bytes, uint32_t bytes_len)
+USB_COMM_HANDLER_DEFINE(usb_comm_Action_RGB_SET_STATE, usb_comm_MessageD2H_rgb_state_tag,
+			handle_rgb_set_state);
+
+static bool handle_rgb_get_indicator(const usb_comm_MessageH2D *h2d, usb_comm_MessageD2H *d2h,
+				     const void *bytes, uint32_t bytes_len)
 {
 	usb_comm_RgbIndicator *res = &d2h->payload.rgb_indicator;
 
@@ -120,8 +132,11 @@ bool handle_rgb_get_indicator(const usb_comm_MessageH2D *h2d, usb_comm_MessageD2
 	return true;
 }
 
-bool handle_rgb_set_indicator(const usb_comm_MessageH2D *h2d, usb_comm_MessageD2H *d2h,
-			      const void *bytes, uint32_t bytes_len)
+USB_COMM_HANDLER_DEFINE(usb_comm_Action_RGB_GET_INDICATOR, usb_comm_MessageD2H_rgb_indicator_tag,
+			handle_rgb_get_indicator);
+
+static bool handle_rgb_set_indicator(const usb_comm_MessageH2D *h2d, usb_comm_MessageD2H *d2h,
+				     const void *bytes, uint32_t bytes_len)
 {
 	const usb_comm_RgbIndicator *req = &h2d->payload.rgb_indicator;
 
@@ -137,3 +152,6 @@ bool handle_rgb_set_indicator(const usb_comm_MessageH2D *h2d, usb_comm_MessageD2
 
 	return handle_rgb_get_indicator(h2d, d2h, bytes, bytes_len);
 }
+
+USB_COMM_HANDLER_DEFINE(usb_comm_Action_RGB_SET_INDICATOR, usb_comm_MessageD2H_rgb_indicator_tag,
+			handle_rgb_set_indicator);

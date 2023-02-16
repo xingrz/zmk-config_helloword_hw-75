@@ -17,8 +17,8 @@ static const struct device *motor;
 
 static struct motor_state state = {};
 
-bool handle_motor_get_state(const usb_comm_MessageH2D *h2d, usb_comm_MessageD2H *d2h,
-			    const void *bytes, uint32_t bytes_len)
+static bool handle_motor_get_state(const usb_comm_MessageH2D *h2d, usb_comm_MessageD2H *d2h,
+				   const void *bytes, uint32_t bytes_len)
 {
 	usb_comm_MotorState *res = &d2h->payload.motor_state;
 
@@ -39,8 +39,11 @@ bool handle_motor_get_state(const usb_comm_MessageH2D *h2d, usb_comm_MessageD2H 
 	return true;
 }
 
-bool handle_knob_get_config(const usb_comm_MessageH2D *h2d, usb_comm_MessageD2H *d2h,
-			    const void *bytes, uint32_t bytes_len)
+USB_COMM_HANDLER_DEFINE(usb_comm_Action_MOTOR_GET_STATE, usb_comm_MessageD2H_motor_state_tag,
+			handle_motor_get_state);
+
+static bool handle_knob_get_config(const usb_comm_MessageH2D *h2d, usb_comm_MessageD2H *d2h,
+				   const void *bytes, uint32_t bytes_len)
 {
 	usb_comm_KnobConfig *res = &d2h->payload.knob_config;
 
@@ -54,8 +57,11 @@ bool handle_knob_get_config(const usb_comm_MessageH2D *h2d, usb_comm_MessageD2H 
 	return true;
 }
 
-bool handle_knob_set_config(const usb_comm_MessageH2D *h2d, usb_comm_MessageD2H *d2h,
-			    const void *bytes, uint32_t bytes_len)
+USB_COMM_HANDLER_DEFINE(usb_comm_Action_KNOB_GET_CONFIG, usb_comm_MessageD2H_knob_config_tag,
+			handle_knob_get_config);
+
+static bool handle_knob_set_config(const usb_comm_MessageH2D *h2d, usb_comm_MessageD2H *d2h,
+				   const void *bytes, uint32_t bytes_len)
 {
 	const usb_comm_KnobConfig *req = &h2d->payload.knob_config;
 
@@ -72,6 +78,9 @@ bool handle_knob_set_config(const usb_comm_MessageH2D *h2d, usb_comm_MessageD2H 
 
 	return handle_knob_get_config(h2d, d2h, NULL, 0);
 }
+
+USB_COMM_HANDLER_DEFINE(usb_comm_Action_KNOB_SET_CONFIG, usb_comm_MessageD2H_knob_config_tag,
+			handle_knob_set_config);
 
 static int handler_knob_init(const struct device *dev)
 {

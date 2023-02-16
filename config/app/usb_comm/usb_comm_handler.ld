@@ -1,0 +1,1 @@
+ITERABLE_SECTION_RAM(usb_comm_handler_config, 4)
