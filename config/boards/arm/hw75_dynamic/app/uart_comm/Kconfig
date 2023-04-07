@@ -4,8 +4,6 @@
 config HW75_UART_COMM
 	bool
 	select SERIAL
-	select CONSOLE
-	select UART_PIPE
 	select HW75_PROTO_UART_COMM
 	default y
 
