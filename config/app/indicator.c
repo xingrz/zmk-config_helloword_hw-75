@@ -17,7 +17,7 @@ LOG_MODULE_DECLARE(zmk, CONFIG_ZMK_LOG_LEVEL);
 
 #include <app/indicator.h>
 
-#define STRIP_LABEL DT_LABEL(DT_CHOSEN(zmk_underglow))
+#define STRIP_CHOSEN DT_CHOSEN(zmk_underglow)
 #define STRIP_INDICATOR_LABEL "STATUS"
 
 #define RGB(R, G, B) .r = (R), .g = (G), .b = (B)
@@ -56,11 +56,6 @@ static inline void apply_brightness(struct led_rgb *c_out, const struct led_rgb 
 
 static void indicator_update(struct k_work *work)
 {
-	if (!led_strip) {
-		LOG_ERR("LED strip device %s not found", STRIP_LABEL);
-		return;
-	}
-
 	if (!settings.enable) {
 		led_strip_remap_clear(led_strip, STRIP_INDICATOR_LABEL);
 		return;
@@ -165,11 +160,6 @@ K_WORK_DELAYABLE_DEFINE(indicator_clear_preview_work, indicator_clear_preview);
 
 static void indicator_preview_brightness(uint8_t brightness)
 {
-	if (!led_strip) {
-		LOG_ERR("LED strip device %s not found", STRIP_LABEL);
-		return;
-	}
-
 	struct led_rgb color;
 	apply_color(&color, &current);
 	apply_brightness(&color, &current, brightness);
@@ -230,11 +220,7 @@ static int indicator_init(const struct device *dev)
 	ARG_UNUSED(dev);
 	int ret;
 
-	led_strip = device_get_binding(STRIP_LABEL);
-	if (!led_strip) {
-		LOG_ERR("LED strip device %s not found", STRIP_LABEL);
-		return -ENODEV;
-	}
+	led_strip = DEVICE_DT_GET(STRIP_CHOSEN);
 
 #ifdef CONFIG_SETTINGS
 	ret = settings_subsys_init();
