@@ -8,10 +8,6 @@ compatible: "ams,as5047"
 include: spi-device.yaml
 
 properties:
-  label:
-    type: string
-    required: true
-
   cs-delay-us:
     type: int
     required: false

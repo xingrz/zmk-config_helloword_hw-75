@@ -8,9 +8,6 @@ compatible: "zmk,kscan-gpio-74hc165"
 include: [kscan.yaml, spi-device.yaml]
 
 properties:
-  label:
-    required: true
-
   chain-length:
     type: int
     required: true

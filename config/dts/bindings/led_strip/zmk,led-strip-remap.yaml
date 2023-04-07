@@ -8,9 +8,6 @@ description: |
 compatible: "zmk,led-strip-remap"
 
 properties:
-  label:
-    type: string
-    required: true
   chain-length:
     type: int
     required: true

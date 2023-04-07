@@ -8,10 +8,6 @@ compatible: "zmk,display-sw-rotate"
 include: display-controller.yaml
 
 properties:
-  label:
-    type: string
-    required: true
-
   display:
     type: phandle
     required: true

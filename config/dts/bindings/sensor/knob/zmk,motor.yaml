@@ -6,10 +6,6 @@ description: Driver for FOC motor
 compatible: "zmk,motor"
 
 properties:
-  label:
-    type: string
-    required: true
-
   inverter:
     type: phandle
     required: true

@@ -8,10 +8,6 @@ compatible: "zmk,inverter-stm32"
 include: base.yaml
 
 properties:
-  label:
-    type: string
-    required: true
-
   enable-gpios:
     type: phandle-array
 

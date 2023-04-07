@@ -7,9 +7,6 @@ description: |
 compatible: "zmk,uart-slip"
 
 properties:
-  label:
-    type: string
-    required: true
   uart:
     type: phandle
     required: true

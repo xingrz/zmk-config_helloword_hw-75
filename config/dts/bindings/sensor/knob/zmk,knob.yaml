@@ -6,10 +6,6 @@ description: Sensor driver for FOC-emulated rotary encoder
 compatible: "zmk,knob"
 
 properties:
-  label:
-    type: string
-    required: true
-
   motor:
     type: phandle
     required: true
