@@ -19,6 +19,7 @@ LOG_MODULE_DECLARE(zmk, CONFIG_ZMK_LOG_LEVEL);
 #define LVKP_MSGQ_COUNT 10
 K_MSGQ_DEFINE(lvkp_msgq, sizeof(lv_indev_data_t), LVKP_MSGQ_COUNT, 4);
 
+static lv_indev_drv_t indev_drv;
 static lv_indev_t *indev = NULL;
 
 static int on_keymap_binding_pressed(struct zmk_behavior_binding *binding,
@@ -30,7 +31,7 @@ static int on_keymap_binding_pressed(struct zmk_behavior_binding *binding,
 
 	lv_indev_data_t data = {
 		.key = binding->param1,
-		.state = LV_INDEV_STATE_PR,
+		.state = LV_INDEV_STATE_PRESSED,
 	};
 
 	int ret = k_msgq_put(&lvkp_msgq, &data, K_NO_WAIT);
@@ -50,7 +51,7 @@ static int on_keymap_binding_released(struct zmk_behavior_binding *binding,
 
 	lv_indev_data_t data = {
 		.key = binding->param1,
-		.state = LV_INDEV_STATE_REL,
+		.state = LV_INDEV_STATE_RELEASED,
 	};
 
 	int ret = k_msgq_put(&lvkp_msgq, &data, K_NO_WAIT);
@@ -66,7 +67,7 @@ static const struct behavior_driver_api behavior_lvgl_key_press_driver_api = {
 	.binding_released = on_keymap_binding_released
 };
 
-static bool indev_read_cb(lv_indev_drv_t *drv, lv_indev_data_t *data)
+static void indev_read_cb(lv_indev_drv_t *drv, lv_indev_data_t *data)
 {
 	ARG_UNUSED(drv);
 
@@ -74,13 +75,12 @@ static bool indev_read_cb(lv_indev_drv_t *drv, lv_indev_data_t *data)
 		LOG_DBG("Got key %d: %d", data->key, data->state);
 	}
 
-	return k_msgq_num_used_get(&lvkp_msgq) > 0;
+	data->continue_reading = k_msgq_num_used_get(&lvkp_msgq) > 0;
 }
 
 lv_indev_t *behavior_lvgl_get_indev(void)
 {
 	if (!indev) {
-		lv_indev_drv_t indev_drv;
 		lv_indev_drv_init(&indev_drv);
 		indev_drv.type = LV_INDEV_TYPE_KEYPAD;
 		indev_drv.read_cb = indev_read_cb;

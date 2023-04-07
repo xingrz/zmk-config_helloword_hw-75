@@ -15,7 +15,7 @@ lv_obj_t *zmk_display_status_screen()
 {
 	lv_group_t *group = lv_group_create();
 
-	lv_obj_t *screen = lv_obj_create(NULL, NULL);
+	lv_obj_t *screen = lv_obj_create(NULL);
 	layer_status_init(screen, group);
 
 	lv_indev_t *indev = behavior_lvgl_get_indev();
