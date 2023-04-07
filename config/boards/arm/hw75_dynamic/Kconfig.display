@@ -11,14 +11,14 @@ choice ZMK_DISPLAY_WORK_QUEUE
 	default ZMK_DISPLAY_WORK_QUEUE_DEDICATED
 endchoice
 
-config LVGL_VDB_SIZE
+config LV_Z_VDB_SIZE
 	default 100
 
-config LVGL_BITS_PER_PIXEL
+config LV_Z_BITS_PER_PIXEL
 	default 1
 
-choice LVGL_COLOR_DEPTH
-	default LVGL_COLOR_DEPTH_16
+choice LV_COLOR_DEPTH
+	default LV_COLOR_DEPTH_16
 endchoice
 
 endif # ZMK_DISPLAY
