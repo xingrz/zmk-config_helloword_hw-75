@@ -15,7 +15,8 @@
 #include "report.h"
 
 #define KEYMAP_NODE DT_INST(0, zmk_keymap)
-#define LAYER_LABEL(node) COND_CODE_0(DT_NODE_HAS_PROP(node, label), (NULL), (DT_LABEL(node))),
+#define LAYER_LABEL(node)                                                                          \
+	COND_CODE_0(DT_NODE_HAS_PROP(node, label), (NULL), (DT_PROP(node, label))),
 
 static const char *layer_names[] = { DT_FOREACH_CHILD(KEYMAP_NODE, LAYER_LABEL) };
 
