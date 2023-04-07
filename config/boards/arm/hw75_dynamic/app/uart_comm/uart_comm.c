@@ -15,14 +15,14 @@ LOG_MODULE_REGISTER(uart_comm, CONFIG_HW75_UART_COMM_LOG_LEVEL);
 
 #include "handler/handler.h"
 
-#define SLIP_LABEL DT_LABEL(DT_NODELABEL(slip))
+#define SLIP_NODE DT_ALIAS(uart_comm)
 
 static uint8_t uart_rx_buf[CONFIG_HW75_UART_COMM_MAX_RX_MESSAGE_SIZE];
 
 K_THREAD_STACK_MEMBER(thread_stack, CONFIG_HW75_UART_COMM_THREAD_STACK_SIZE);
 struct k_thread thread;
 
-static const struct device *slip;
+static const struct device *slip = DEVICE_DT_GET(SLIP_NODE);
 
 static struct {
 	uart_comm_Action action;
@@ -70,12 +70,6 @@ static void uart_comm_thread(void *p1, void *p2, void *p3)
 static int uart_comm_init(const struct device *dev)
 {
 	ARG_UNUSED(dev);
-
-	slip = device_get_binding(SLIP_LABEL);
-	if (!slip) {
-		LOG_ERR("SLIP device not found");
-		return -ENODEV;
-	}
 
 	k_thread_create(&thread, thread_stack, CONFIG_HW75_UART_COMM_THREAD_STACK_SIZE,
 			(k_thread_entry_t)uart_comm_thread, NULL, NULL, NULL,

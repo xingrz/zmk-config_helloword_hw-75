@@ -23,6 +23,10 @@
 		zmk,underglow = &led_strip;
 	};
 
+	aliases {
+		uart-comm = &slip;
+	};
+
 	oled: display-sw-rotate {
 		compatible = "zmk,display-sw-rotate";
 		width = <32>;

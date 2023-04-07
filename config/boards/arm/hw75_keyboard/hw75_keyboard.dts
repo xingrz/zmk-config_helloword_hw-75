@@ -22,6 +22,10 @@
 		zmk,underglow = &led_strip;
 	};
 
+	aliases {
+		uart-comm = &slip;
+	};
+
 	default_transform: keymap_transform {
 		compatible = "zmk,matrix-transform";
 		rows = <11>;

@@ -1,11 +1,13 @@
 # Copyright (c) 2022-2023 XiNGRZ
 # SPDX-License-Identifier: MIT
 
+DT_ALIAS_UART_COMM := uart-comm
+
 config HW75_UART_COMM
 	bool
 	select SERIAL
 	select HW75_PROTO_UART_COMM
-	default y
+	default $(dt_alias_enabled,$(DT_ALIAS_UART_COMM))
 
 if HW75_UART_COMM
 
