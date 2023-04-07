@@ -208,7 +208,7 @@ static const struct led_strip_driver_api led_strip_remap_api = {
 
 #define LED_STRIP_REMAP_INDICATOR(node_id, n)                                                      \
 	{                                                                                          \
-		.label = DT_LABEL(node_id),                                                        \
+		.label = DT_PROP(node_id, label),                                                  \
 		.led_indexes = led_strip_remap_indicator_indexes_##n,                              \
 		.led_cnt = DT_PROP_LEN(node_id, led_indexes),                                      \
 	},
