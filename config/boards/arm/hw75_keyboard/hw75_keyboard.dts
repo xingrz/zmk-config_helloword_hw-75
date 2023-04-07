@@ -89,6 +89,10 @@
 	apb2-prescaler = <1>;
 };
 
+&pinctrl {
+	swj-cfg = "jtag-disable";
+};
+
 &usb {
 	pinctrl-0 = <&usb_dm_pa11 &usb_dp_pa12>;
 	pinctrl-names = "default";
