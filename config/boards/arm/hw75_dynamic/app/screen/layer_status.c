@@ -29,7 +29,8 @@ LOG_MODULE_DECLARE(zmk, CONFIG_ZMK_LOG_LEVEL);
 #define LAYER_CHILD_LEN(node) 1 +
 #define KEYMAP_LAYERS_NUM (DT_FOREACH_CHILD(KEYMAP_NODE, LAYER_CHILD_LEN) 0)
 
-#define LAYER_LABEL(node) COND_CODE_0(DT_NODE_HAS_PROP(node, label), (NULL), (DT_LABEL(node))),
+#define LAYER_LABEL(node)                                                                          \
+	COND_CODE_0(DT_NODE_HAS_PROP(node, label), (NULL), (DT_PROP(node, label))),
 
 LV_FONT_DECLARE(mono_19);
 LV_FONT_DECLARE(zfull_9);
