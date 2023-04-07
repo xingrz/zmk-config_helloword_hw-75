@@ -6,7 +6,7 @@
 #include "handler.h"
 #include "usb_comm.pb.h"
 
-#include <device.h>
+#include <zephyr/device.h>
 #include <knob/drivers/knob.h>
 #include <knob/drivers/motor.h>
 

@@ -6,7 +6,7 @@
 #pragma once
 
 #include <stdint.h>
-#include <kernel.h>
+#include <zephyr/kernel.h>
 
 static inline uint32_t time_us()
 {

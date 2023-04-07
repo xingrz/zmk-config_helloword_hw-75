@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include <device.h>
+#include <zephyr/device.h>
 
 #include "usb_comm.pb.h"
 

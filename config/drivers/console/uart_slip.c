@@ -5,16 +5,16 @@
 
 #define DT_DRV_COMPAT zmk_uart_slip
 
-#include <device.h>
-#include <kernel.h>
+#include <zephyr/device.h>
+#include <zephyr/kernel.h>
 
-#include <logging/log.h>
+#include <zephyr/logging/log.h>
 LOG_MODULE_REGISTER(uart_slip, CONFIG_UART_SLIP_LOG_LEVEL);
 
-#include <drivers/uart.h>
-#include <drivers/console/uart_slip.h>
+#include <zephyr/drivers/uart.h>
+#include <zephyr/drivers/console/uart_slip.h>
 
-#include <sys/ring_buffer.h>
+#include <zephyr/sys/ring_buffer.h>
 
 #define SLIP_END 0300
 #define SLIP_ESC 0333

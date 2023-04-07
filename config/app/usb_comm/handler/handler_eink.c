@@ -6,11 +6,10 @@
 #include "handler.h"
 #include "usb_comm.pb.h"
 
-#include <device.h>
-#include <drivers/display.h>
-#include <drivers/display/ssd16xx.h>
+#include <zephyr/device.h>
+#include <zephyr/drivers/display.h>
 
-#include <logging/log.h>
+#include <zephyr/logging/log.h>
 LOG_MODULE_DECLARE(zmk, CONFIG_ZMK_LOG_LEVEL);
 
 #include <eink_app.h>

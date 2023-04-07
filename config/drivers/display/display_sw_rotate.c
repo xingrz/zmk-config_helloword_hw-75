@@ -5,12 +5,12 @@
 
 #define DT_DRV_COMPAT zmk_display_sw_rotate
 
-#include <drivers/display.h>
+#include <zephyr/drivers/display.h>
 
-#include <zephyr.h>
-#include <device.h>
+#include <zephyr/kernel.h>
+#include <zephyr/device.h>
 
-#include <logging/log.h>
+#include <zephyr/logging/log.h>
 LOG_MODULE_DECLARE(zmk, CONFIG_ZMK_LOG_LEVEL);
 
 #define BITS_PER_ITEM 8

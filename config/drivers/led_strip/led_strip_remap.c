@@ -5,13 +5,13 @@
 
 #define DT_DRV_COMPAT zmk_led_strip_remap
 
-#include <drivers/led_strip.h>
-#include <drivers/led_strip_remap.h>
+#include <zephyr/drivers/led_strip.h>
+#include <zephyr/drivers/led_strip_remap.h>
 
-#include <zephyr.h>
-#include <device.h>
+#include <zephyr/kernel.h>
+#include <zephyr/device.h>
 
-#include <logging/log.h>
+#include <zephyr/logging/log.h>
 LOG_MODULE_DECLARE(zmk, CONFIG_ZMK_LOG_LEVEL);
 
 struct led_strip_remap_indicator {

@@ -6,7 +6,7 @@
 #include <zmk/display/status_screen.h>
 #include <drivers/behavior/lvgl_key_press.h>
 
-#include <logging/log.h>
+#include <zephyr/logging/log.h>
 LOG_MODULE_DECLARE(zmk, CONFIG_ZMK_LOG_LEVEL);
 
 #include "layer_status.h"

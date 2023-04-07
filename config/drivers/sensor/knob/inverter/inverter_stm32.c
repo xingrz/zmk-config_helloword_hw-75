@@ -5,11 +5,11 @@
 
 #define DT_DRV_COMPAT zmk_inverter_stm32
 
-#include <device.h>
-#include <devicetree.h>
-#include <drivers/gpio.h>
-#include <logging/log.h>
-#include <sys/util_macro.h>
+#include <zephyr/device.h>
+#include <zephyr/devicetree.h>
+#include <zephyr/drivers/gpio.h>
+#include <zephyr/logging/log.h>
+#include <zephyr/sys/util_macro.h>
 
 #include <soc.h>
 #include <stm32_ll_tim.h>

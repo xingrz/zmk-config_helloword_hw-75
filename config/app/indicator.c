@@ -3,14 +3,14 @@
  * SPDX-License-Identifier: MIT
  */
 
-#include <kernel.h>
-#include <device.h>
-#include <settings/settings.h>
+#include <zephyr/kernel.h>
+#include <zephyr/device.h>
+#include <zephyr/settings/settings.h>
 
-#include <logging/log.h>
+#include <zephyr/logging/log.h>
 LOG_MODULE_DECLARE(zmk, CONFIG_ZMK_LOG_LEVEL);
 
-#include <drivers/led_strip_remap.h>
+#include <zephyr/drivers/led_strip_remap.h>
 
 #include <zmk/event_manager.h>
 #include <zmk/events/activity_state_changed.h>

@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: MIT
  */
 
-#include <kernel.h>
+#include <zephyr/kernel.h>
 #include <string.h>
 
 #include <knob/time.h>

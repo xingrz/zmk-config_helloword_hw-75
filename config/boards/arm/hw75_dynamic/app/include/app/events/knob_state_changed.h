@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include <zephyr.h>
+#include <zephyr/kernel.h>
 #include <zmk/event_manager.h>
 
 #include <knob/drivers/knob.h>

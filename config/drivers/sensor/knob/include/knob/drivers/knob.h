@@ -7,7 +7,7 @@
 #define KNOB_INCLUDE_DRIVERS_KNOB_H_
 
 #include <stdbool.h>
-#include <device.h>
+#include <zephyr/device.h>
 
 /**
  * @file

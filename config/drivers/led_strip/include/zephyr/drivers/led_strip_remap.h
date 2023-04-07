@@ -10,7 +10,7 @@
 
 #pragma once
 
-#include <drivers/led_strip.h>
+#include <zephyr/drivers/led_strip.h>
 
 #ifdef __cplusplus
 extern "C" {

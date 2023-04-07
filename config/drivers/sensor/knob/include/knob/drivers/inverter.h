@@ -6,7 +6,7 @@
 #ifndef KNOB_INCLUDE_DRIVERS_INVERTER_H_
 #define KNOB_INCLUDE_DRIVERS_INVERTER_H_
 
-#include <device.h>
+#include <zephyr/device.h>
 
 /**
  * @defgroup knob_drivers_inverter Inverter API

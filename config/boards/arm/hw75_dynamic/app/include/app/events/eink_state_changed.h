@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include <zephyr.h>
+#include <zephyr/kernel.h>
 #include <zmk/event_manager.h>
 
 struct app_eink_state_changed {

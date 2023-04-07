@@ -5,16 +5,16 @@
 
 #define DT_DRV_COMPAT zmk_knob
 
-#include <device.h>
-#include <kernel.h>
-#include <drivers/sensor.h>
+#include <zephyr/device.h>
+#include <zephyr/kernel.h>
+#include <zephyr/drivers/sensor.h>
 
 #include <knob/math.h>
 #include <knob/encoder_state.h>
 #include <knob/drivers/motor.h>
 #include <knob/drivers/knob.h>
 
-#include <logging/log.h>
+#include <zephyr/logging/log.h>
 LOG_MODULE_REGISTER(knob, CONFIG_ZMK_LOG_LEVEL);
 
 struct knob_data {

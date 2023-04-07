@@ -5,12 +5,12 @@
 
 #define DT_DRV_COMPAT ams_as5047
 
-#include <device.h>
-#include <devicetree.h>
-#include <drivers/spi.h>
-#include <logging/log.h>
-#include <sys/byteorder.h>
-#include <sys/util_macro.h>
+#include <zephyr/device.h>
+#include <zephyr/devicetree.h>
+#include <zephyr/drivers/spi.h>
+#include <zephyr/logging/log.h>
+#include <zephyr/sys/byteorder.h>
+#include <zephyr/sys/util_macro.h>
 
 #include <knob/math.h>
 #include <knob/drivers/encoder.h>

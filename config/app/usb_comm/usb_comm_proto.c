@@ -3,13 +3,13 @@
  * SPDX-License-Identifier: MIT
  */
 
-#include <kernel.h>
-#include <device.h>
+#include <zephyr/kernel.h>
+#include <zephyr/device.h>
 
-#include <logging/log.h>
+#include <zephyr/logging/log.h>
 LOG_MODULE_DECLARE(usb_comm, CONFIG_HW75_USB_COMM_LOG_LEVEL);
 
-#include <usb/usb_device.h>
+#include <zephyr/usb/usb_device.h>
 
 #include <pb_encode.h>
 #include <pb_decode.h>

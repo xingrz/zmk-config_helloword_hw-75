@@ -8,7 +8,7 @@
 
 #include <stdint.h>
 #include <stdbool.h>
-#include <device.h>
+#include <zephyr/device.h>
 
 /**
  * @file

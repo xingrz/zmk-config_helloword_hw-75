@@ -5,10 +5,10 @@
 
 #define DT_DRV_COMPAT zmk_behavior_lvgl_key_press
 
-#include <device.h>
+#include <zephyr/device.h>
 #include <drivers/behavior.h>
 
-#include <logging/log.h>
+#include <zephyr/logging/log.h>
 LOG_MODULE_DECLARE(zmk, CONFIG_ZMK_LOG_LEVEL);
 
 #include <zmk/behavior.h>
