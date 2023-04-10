@@ -41,14 +41,9 @@ sudo npm install -g lv_font_conv
 ### 编译
 
 ```sh
-export ZEPHYR_TOOLCHAIN_VARIANT=gnuarmemb
-export GNUARMEMB_TOOLCHAIN_PATH=/path/to/gcc-arm-none-eabi-10.3-2021.10
-
 west init -l config
 west update
 west zephyr-export
-pip install -r zephyr/scripts/requirements.txt
-
 west build -s zmk/app -b hw75_dynamic -- -DZMK_CONFIG=$PWD/config
 west flash
 ```
@@ -66,7 +61,7 @@ west build -s zmk/app -b hw75_dynamic -- -DZMK_CONFIG=$PWD/config \
 查看日志：
 
 ```sh
-pyocd rtt --pack=Keil.STM32F4xx_DFP.2.16.0.pack --target stm32f405rg
+pyocd rtt -t stm32f405rg
 ```
 
 ## 致谢

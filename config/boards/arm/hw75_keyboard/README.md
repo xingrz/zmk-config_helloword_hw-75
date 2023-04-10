@@ -43,9 +43,6 @@ ZMK 默认带了几种灯效。可以通过 Fn 组合键切换：
 参考 [ZMK 的上手文档](https://zmk.dev/docs/development/setup#prerequisites)。
 
 ```sh
-export ZEPHYR_TOOLCHAIN_VARIANT=gnuarmemb
-export GNUARMEMB_TOOLCHAIN_PATH=/path/to/gcc-arm-none-eabi-10.3-2021.10
-
 west init -l config
 west update
 west zephyr-export
