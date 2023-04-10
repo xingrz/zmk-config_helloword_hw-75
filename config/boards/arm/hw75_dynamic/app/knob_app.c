@@ -19,11 +19,14 @@ LOG_MODULE_DECLARE(zmk, CONFIG_ZMK_LOG_LEVEL);
 
 #include "knob_app.h"
 
+#define KNOB_NODE DT_ALIAS(knob)
+#define MOTOR_NODE DT_PHANDLE(KNOB_NODE, motor)
+
 #define KNOB_APP_THREAD_STACK_SIZE 1024
 #define KNOB_APP_THREAD_PRIORITY 10
 
-static const struct device *knob;
-static const struct device *motor;
+static const struct device *knob = DEVICE_DT_GET(KNOB_NODE);
+static const struct device *motor = DEVICE_DT_GET(MOTOR_NODE);
 
 static bool motor_demo = false;
 
@@ -143,18 +146,6 @@ static int knob_app_event_listener(const zmk_event_t *eh)
 static int knob_app_init(const struct device *dev)
 {
 	ARG_UNUSED(dev);
-
-	knob = device_get_binding("KNOB");
-	if (!knob) {
-		LOG_ERR("Knob device not found");
-		return -ENODEV;
-	}
-
-	motor = device_get_binding("MOTOR");
-	if (!motor) {
-		LOG_ERR("Motor device not found");
-		return -ENODEV;
-	}
 
 	k_work_init_delayable(&knob_enable_report_work, knob_app_enable_report_delayed_work);
 

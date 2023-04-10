@@ -12,8 +12,11 @@
 
 #include <knob_app.h>
 
-static const struct device *knob;
-static const struct device *motor;
+#define KNOB_NODE DT_ALIAS(knob)
+#define MOTOR_NODE DT_PHANDLE(KNOB_NODE, motor)
+
+static const struct device *knob = DEVICE_DT_GET(KNOB_NODE);
+static const struct device *motor = DEVICE_DT_GET(MOTOR_NODE);
 
 static struct motor_state state = {};
 
@@ -81,22 +84,3 @@ static bool handle_knob_set_config(const usb_comm_MessageH2D *h2d, usb_comm_Mess
 
 USB_COMM_HANDLER_DEFINE(usb_comm_Action_KNOB_SET_CONFIG, usb_comm_MessageD2H_knob_config_tag,
 			handle_knob_set_config);
-
-static int handler_knob_init(const struct device *dev)
-{
-	ARG_UNUSED(dev);
-
-	knob = device_get_binding("KNOB");
-	if (!knob) {
-		return -EIO;
-	}
-
-	motor = device_get_binding("MOTOR");
-	if (!motor) {
-		return -EIO;
-	}
-
-	return 0;
-}
-
-SYS_INIT(handler_knob_init, APPLICATION, CONFIG_APPLICATION_INIT_PRIORITY);

@@ -5,3 +5,4 @@ rsource "screen/Kconfig"
 rsource "uart_comm/Kconfig"
 
 rsource "Kconfig.eink"
+rsource "Kconfig.knob"
