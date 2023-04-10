@@ -10,7 +10,6 @@
 LOG_MODULE_DECLARE(zmk, CONFIG_ZMK_LOG_LEVEL);
 
 #include <zephyr/drivers/display.h>
-#include <zephyr/drivers/display/ssd16xx.h>
 
 #include <zmk/event_manager.h>
 #include <app/events/eink_state_changed.h>
@@ -23,14 +22,11 @@ LOG_MODULE_DECLARE(zmk, CONFIG_ZMK_LOG_LEVEL);
 
 static const struct device *eink;
 
-static const struct device *ssd16xx;
-static bool ssd16xx_inited = false;
-
 ZMK_EVENT_IMPL(app_eink_state_changed);
 
 int eink_update(const uint8_t *image, uint32_t image_len)
 {
-	if (!eink || !ssd16xx) {
+	if (!eink) {
 		LOG_ERR("E-Ink device not found");
 		return -ENODEV;
 	}
@@ -53,11 +49,6 @@ int eink_update(const uint8_t *image, uint32_t image_len)
 		.busy = true,
 	}));
 
-	if (!ssd16xx_inited) {
-		ssd16xx_clear(ssd16xx);
-		ssd16xx_inited = true;
-	}
-
 	int ret = display_write(eink, 0, 0, &desc, image);
 	if (ret != 0) {
 		LOG_ERR("Failed updating E-ink image: %d", ret);
@@ -78,8 +69,7 @@ static int eink_init(const struct device *dev)
 	ARG_UNUSED(dev);
 
 	eink = device_get_binding("EINK");
-	ssd16xx = device_get_binding("SSD16XX");
-	if (!eink || !ssd16xx) {
+	if (!eink) {
 		LOG_ERR("E-Ink device not found");
 		return -ENODEV;
 	}

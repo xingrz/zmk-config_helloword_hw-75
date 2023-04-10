@@ -1,4 +1,5 @@
 /*
+ * Copyright (c) 2022-2023 XiNGRZ
  * Copyright (c) 2022 Andreas Sandberg
  * Copyright (c) 2018-2020 PHYTEC Messtechnik GmbH
  *
@@ -34,6 +35,9 @@ LOG_MODULE_REGISTER(ssd16xx);
 #define SSD16XX_TR_SCALE_FACTOR		256U
 
 struct ssd16xx_data {
+#ifdef CONFIG_HW75_SSD16XX_NO_BLANK_ON_INIT
+	bool controller_inited;
+#endif
 	bool read_supported;
 	uint8_t scan_mode;
 	uint8_t update_cmd;
@@ -80,6 +84,10 @@ struct ssd16xx_config {
 	uint8_t gate_line_width;
 	bool override_gate_line_width;
 };
+
+#ifdef CONFIG_HW75_SSD16XX_NO_BLANK_ON_INIT
+static int ssd16xx_controller_init(const struct device *dev);
+#endif
 
 static inline void ssd16xx_busy_wait(const struct device *dev)
 {
@@ -405,6 +413,12 @@ static int ssd16xx_write(const struct device *dev, const uint16_t x,
 		return -EINVAL;
 	}
 
+#ifdef CONFIG_HW75_SSD16XX_NO_BLANK_ON_INIT
+	if (!data->controller_inited) {
+		ssd16xx_controller_init(dev);
+	}
+#endif
+
 	err = ssd16xx_set_window(dev, x, y, desc);
 	if (err < 0) {
 		return err;
@@ -484,6 +498,13 @@ static int ssd16xx_read(const struct device *dev,
 			const struct display_buffer_descriptor *desc,
 			void *buf)
 {
+#ifdef CONFIG_HW75_SSD16XX_NO_BLANK_ON_INIT
+	const struct ssd16xx_data *data = dev->data;
+	if (!data->controller_inited) {
+		ssd16xx_controller_init(dev);
+	}
+#endif
+
 	return ssd16xx_read_ram(dev, SSD16XX_RAM_BLACK, x, y, desc, buf);
 }
 
@@ -747,6 +768,10 @@ static int ssd16xx_controller_init(const struct device *dev)
 
 	LOG_DBG("");
 
+#ifdef CONFIG_HW75_SSD16XX_NO_BLANK_ON_INIT
+	data->controller_inited = true;
+#endif
+
 	data->blanking_on = false;
 
 	err = gpio_pin_set_dt(&config->reset_gpio, 1);
@@ -885,7 +910,11 @@ static int ssd16xx_init(const struct device *dev)
 		return err;
 	}
 
+#ifndef CONFIG_HW75_SSD16XX_NO_BLANK_ON_INIT
 	return ssd16xx_controller_init(dev);
+#else
+	return 0;
+#endif
 }
 
 static struct display_driver_api ssd16xx_driver_api = {
