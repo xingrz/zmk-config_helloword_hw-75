@@ -16,21 +16,16 @@ LOG_MODULE_DECLARE(zmk, CONFIG_ZMK_LOG_LEVEL);
 
 #include "eink_app.h"
 
-#define EINK_NODE DT_NODELABEL(eink)
+#define EINK_NODE DT_ALIAS(eink)
 #define EINK_WIDTH DT_PROP(EINK_NODE, width)
 #define EINK_HEIGHT DT_PROP(EINK_NODE, height)
 
-static const struct device *eink;
+static const struct device *eink = DEVICE_DT_GET(EINK_NODE);
 
 ZMK_EVENT_IMPL(app_eink_state_changed);
 
 int eink_update(const uint8_t *image, uint32_t image_len)
 {
-	if (!eink) {
-		LOG_ERR("E-Ink device not found");
-		return -ENODEV;
-	}
-
 	if (image_len != EINK_WIDTH * EINK_HEIGHT / 8) {
 		LOG_ERR("Invalid image length: %d", image_len);
 		return -EINVAL;
@@ -63,18 +58,3 @@ int eink_update(const uint8_t *image, uint32_t image_len)
 
 	return 0;
 }
-
-static int eink_init(const struct device *dev)
-{
-	ARG_UNUSED(dev);
-
-	eink = device_get_binding("EINK");
-	if (!eink) {
-		LOG_ERR("E-Ink device not found");
-		return -ENODEV;
-	}
-
-	return 0;
-}
-
-SYS_INIT(eink_init, APPLICATION, CONFIG_APPLICATION_INIT_PRIORITY);

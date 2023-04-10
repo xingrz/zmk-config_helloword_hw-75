@@ -25,6 +25,7 @@
 
 	aliases {
 		uart-comm = &slip;
+		eink = &eink;
 	};
 
 	oled: display-sw-rotate {
