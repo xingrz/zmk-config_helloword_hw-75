@@ -16,7 +16,6 @@ config ZMK_USB
 
 rsource "Kconfig.display"
 rsource "Kconfig.rgb"
-rsource "Kconfig.rtt"
 rsource "Kconfig.uf2"
 rsource "Kconfig.usb"
 

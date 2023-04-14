@@ -1,9 +1,0 @@
-# Copyright (c) 2022-2023 XiNGRZ
-# SPDX-License-Identifier: MIT
-
-config ZMK_RTT_LOGGING
-	bool "Enable RTT logging to help debug"
-	select LOG
-	select USE_SEGGER_RTT
-	select CONSOLE
-	select RTT_CONSOLE
