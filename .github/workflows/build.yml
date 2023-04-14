@@ -90,11 +90,22 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
       - name: Download artifacts
         uses: actions/download-artifact@v3
         with:
           name: firmware
           path: firmware
+
+      - name: Prepare release notes
+        id: release
+        run: |
+          EOF=$(dd if=/dev/urandom bs=15 count=1 status=none | base64)
+          echo "RELEASE_BODY<<$EOF" >> $GITHUB_OUTPUT
+          sed 's/{{TAG}}/${{ github.ref_name }}/g' .github/RELEASE_TEMPLATE.md >> $GITHUB_OUTPUT
+          echo "$EOF" >> $GITHUB_OUTPUT
 
       - name: Publish release
         uses: svenstaro/upload-release-action@v2
@@ -103,3 +114,6 @@ jobs:
           file_glob: true
           tag: ${{ github.ref }}
           repo_token: ${{ secrets.GITHUB_TOKEN }}
+          body: |
+            ${{ steps.release.outputs.RELEASE_BODY }}
+          prerelease: true
