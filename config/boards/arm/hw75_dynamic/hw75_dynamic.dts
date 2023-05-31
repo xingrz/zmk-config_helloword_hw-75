@@ -141,7 +141,7 @@
 	cs-gpios = <&gpioa 4 GPIO_ACTIVE_LOW>;
 
 	ssd16xx: ssd16xx@0 {
-		compatible = "solomon,ssd16xxfb";
+		compatible = "solomon,ssd1675a";
 
 		reg = <0>;
 		spi-max-frequency = <4000000>;
@@ -153,12 +153,12 @@
 		dc-gpios = <&gpioc 0 GPIO_ACTIVE_LOW>;
 		busy-gpios = <&gpioc 1 GPIO_ACTIVE_HIGH>;
 
-		pp-width-bits = <8>;
-		pp-height-bits = <16>;
-		gdv = [16];
-		sdv = [0a];
-		vcom = <0xa8>;
-		border-waveform = <0x33>;
+		full {
+			gdv = [16];
+			sdv = [0a];
+			vcom = <0xa8>;
+			border-waveform = <0x33>;
+		};
 	};
 };
 
