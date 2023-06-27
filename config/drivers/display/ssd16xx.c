@@ -457,7 +457,12 @@ static int ssd16xx_write(const struct device *dev, const uint16_t x,
 	const struct ssd16xx_data *data = dev->data;
 	const bool have_partial_refresh =
 		config->profiles[SSD16XX_PROFILE_PARTIAL] != NULL;
+#ifdef CONFIG_HW75_SSD16XX_NO_BLANK_ON_INIT
+	const bool partial_refresh = data->controller_inited &&
+				     !data->blanking_on && have_partial_refresh;
+#else
 	const bool partial_refresh = !data->blanking_on && have_partial_refresh;
+#endif
 	const size_t buf_len = MIN(desc->buf_size,
 				   desc->height * desc->width / 8);
 	int err;
