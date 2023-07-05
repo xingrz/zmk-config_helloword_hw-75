@@ -8,7 +8,7 @@ zephyr_library_sources_ifdef(CONFIG_HW75_HID_MOUSE hid_mouse.c)
 zephyr_library_sources_ifdef(CONFIG_HW75_INDICATOR indicator.c)
 
 zephyr_library_sources_ifdef(CONFIG_LVGL behaviors/behavior_lvgl_key_press.c)
-zephyr_library_sources(behaviors/behavior_sensor_rotate_mouse_wheel.c)
+zephyr_library_sources(behaviors/behavior_mouse_wheel.c)
 
 add_subdirectory_ifdef(CONFIG_HW75_USB_COMM usb_comm)
 

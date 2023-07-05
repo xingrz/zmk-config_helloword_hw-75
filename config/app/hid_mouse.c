@@ -54,13 +54,12 @@ static int hid_mouse_send_report(const uint8_t *report, size_t len)
 	}
 }
 
-int hid_mouse_wheel_report(int direction)
+int hid_mouse_wheel_report(int direction, bool pressed)
 {
-	uint8_t wheel[] = { 0x00, 0x00, 0x00, (uint8_t)(direction & 0xFF) };
-	hid_mouse_send_report(wheel, sizeof(wheel));
+	uint8_t val = pressed ? (uint8_t)(direction & 0xFF) : 0x00;
 
-	uint8_t clear[] = { 0x00, 0x00, 0x00, 0x00 };
-	hid_mouse_send_report(clear, sizeof(clear));
+	uint8_t report[] = { 0x00, 0x00, 0x00, val };
+	hid_mouse_send_report(report, sizeof(report));
 
 	return 0;
 }

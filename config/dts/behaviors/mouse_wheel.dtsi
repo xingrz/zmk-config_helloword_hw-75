@@ -1,0 +1,14 @@
+/*
+ * Copyright (c) 2022-2023 XiNGRZ
+ * SPDX-License-Identifier: MIT
+ */
+
+/ {
+	behaviors {
+		/omit-if-no-ref/ mw: behavior_mouse_wheel {
+			compatible = "zmk,behavior-mouse-wheel";
+			label = "MOUSE_WHEEL";
+			#binding-cells = <1>;
+		};
+	};
+};

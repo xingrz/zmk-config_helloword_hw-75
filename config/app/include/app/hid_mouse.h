@@ -5,4 +5,6 @@
 
 #pragma once
 
-int hid_mouse_wheel_report(int direction);
+#include <stdbool.h>
+
+int hid_mouse_wheel_report(int direction, bool pressed);

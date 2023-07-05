@@ -3,12 +3,15 @@
  * SPDX-License-Identifier: MIT
  */
 
+#include "mouse_wheel.dtsi"
+
 / {
 	behaviors {
-		/omit-if-no-ref/ mw: behavior_sensor_rotate_mouse_wheel {
-			compatible = "zmk,behavior-sensor-rotate-mouse-wheel";
+		/omit-if-no-ref/ inc_dec_mw: behavior_sensor_rotate_mouse_wheel {
+			compatible = "zmk,behavior-sensor-rotate-var";
 			label = "ENC_MOUSE_WHEEL";
 			#sensor-binding-cells = <2>;
+			bindings = <&mw>, <&mw>;
 		};
 	};
 };

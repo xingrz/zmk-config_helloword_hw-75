@@ -73,8 +73,8 @@ static int knob_channel_get(const struct device *dev, enum sensor_channel chan,
 	}
 
 	/* Knob is physically mount reversed */
-	val->val1 = -data->delta;
-	val->val2 = 0;
+	val->val1 = 0;
+	val->val2 = -data->delta;
 
 	return 0;
 }
