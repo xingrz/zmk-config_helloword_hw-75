@@ -25,7 +25,14 @@ static bool handle_eink_set_image(const usb_comm_MessageH2D *h2d, usb_comm_Messa
 
 	res->id = req->id;
 
-	eink_update(bytes, bytes_len);
+	bool partial = req->has_partial && req->partial;
+
+	if (req->has_x && req->has_y && req->has_width && req->has_height) {
+		eink_update_region(bytes, bytes_len, req->x, req->y, req->width, req->height,
+				   partial);
+	} else {
+		eink_update(bytes, bytes_len, partial);
+	}
 
 	return true;
 }
