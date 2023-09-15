@@ -176,4 +176,9 @@ message EinkImage
 {
 	required uint32 id = 1;
 	optional bytes bits = 3;
+	optional uint32 x = 4;
+	optional uint32 y = 5;
+	optional uint32 width = 6;
+	optional uint32 height = 7;
+	optional bool partial = 8;
 }
