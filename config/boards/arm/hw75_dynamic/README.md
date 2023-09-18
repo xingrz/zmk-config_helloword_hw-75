@@ -3,9 +3,14 @@ HW-75 Dynamic
 
 本目录是 HW-75 扩展模块的 ZMK 配置。
 
-## PCB
+## 硬件版本
 
-本配置基于稚晖君在[立创开源](https://oshwhub.com/pengzhihui/b11afae464c54a3e8d0f77e1f92dc7b7)发布的 PCB 适配。
+本配置基于稚晖君在[立创开源](https://oshwhub.com/pengzhihui/b11afae464c54a3e8d0f77e1f92dc7b7)发布的 PCB 适配，但有些许差异：
+
+| 版本 | 文件前缀 | 备注 |
+|--------|--------------------|------|
+| A | `hw75_dynamic@A-zmk` | 稚晖君在[立创开源](https://oshwhub.com/pengzhihui/b11afae464c54a3e8d0f77e1f92dc7b7)的原始设计，三叶虫 (wow) 一期、二期团，大部分开源团使用的版本 |
+| B | `hw75_dynamic@B-zmk` | 三叶虫 (wow) 三期团 |
 
 ## 开发进度
 
@@ -44,8 +49,14 @@ sudo npm install -g lv_font_conv
 west init -l config
 west update
 west zephyr-export
-west build -s zmk/app -b hw75_dynamic -- -DZMK_CONFIG=$PWD/config
+west build -p -s zmk/app -b hw75_dynamic -- -DZMK_CONFIG=$PWD/config
 west flash
+```
+
+默认会构建最新[硬件版本](#硬件版本)的配置。如果你需要构建不同版本，可以使用下面的命令：
+
+```sh
+west build -p -s zmk/app -b hw75_dynamic@A -- -DZMK_CONFIG=$PWD/config -DKEYMAP_FILE=$PWD/config/hw75_dynamic.keymap
 ```
 
 ### 日志
@@ -66,4 +77,4 @@ pyocd rtt -t stm32f405rg
 
 ## 致谢
 
-感谢[三叶虫本虫](https://space.bilibili.com/21972064)提供用于开发的硬件。
+感谢[三叶虫](https://space.bilibili.com/21972064)提供用于开发的硬件。

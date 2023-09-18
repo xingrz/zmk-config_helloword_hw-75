@@ -46,7 +46,7 @@ ZMK 默认带了几种灯效。可以通过 Fn 组合键切换：
 west init -l config
 west update
 west zephyr-export
-west build -s zmk/app -b hw75_keyboard -- -DZMK_CONFIG=$PWD/config
+west build -p -s zmk/app -b hw75_keyboard -- -DZMK_CONFIG=$PWD/config
 west flash
 ```
 
