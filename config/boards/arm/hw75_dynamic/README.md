@@ -12,17 +12,6 @@ HW-75 Dynamic
 | A | `hw75_dynamic@A-zmk` | 稚晖君在[立创开源](https://oshwhub.com/pengzhihui/b11afae464c54a3e8d0f77e1f92dc7b7)的原始设计，三叶虫 (wow) 一期、二期团，大部分开源团使用的版本 |
 | B | `hw75_dynamic@B-zmk` | 三叶虫 (wow) 三期团 |
 
-## 开发进度
-
-本固件正处于开发阶段，一些特性可能暂时缺失或未最终定型，请保持关注。
-
-- [x] 状态显示 (OLED)
-- [x] 旋钮
-- [x] 旋钮力反馈 (FOC)
-- [x] 墨水屏
-- [x] 上位机
-- [x] 键盘联动
-
 ## 烧录
 
 1. 从 [Releases](https://github.com/xingrz/zmk-config_helloword_hw-75/releases/latest) 下载最新的固件；
