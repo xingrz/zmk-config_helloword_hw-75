@@ -10,7 +10,7 @@ HW-75 Dynamic
 | 版本 | 文件前缀 | 备注 |
 |--------|--------------------|------|
 | A | `hw75_dynamic@A-zmk` | 稚晖君在[立创开源](https://oshwhub.com/pengzhihui/b11afae464c54a3e8d0f77e1f92dc7b7)的原始设计，三叶虫 (wow) 一期、二期团，大部分开源团使用的版本 |
-| B | `hw75_dynamic@B-zmk` | 三叶虫 (wow) 三期团 |
+| B | `hw75_dynamic@B-zmk` | 升级版墨水屏（支持局部刷新），三叶虫 (wow) 三期团 |
 
 ## 烧录
 
