@@ -37,7 +37,6 @@ LV_FONT_DECLARE(zfull_9);
 
 static const char *layer_icons[KEYMAP_LAYERS_NUM] = {
 	ICON_VOL,
-	ICON_BRI,
 	ICON_SCR,
 };
 

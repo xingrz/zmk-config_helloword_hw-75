@@ -14,19 +14,13 @@
 / {
 	keymap {
 		compatible = "zmk,keymap";
-		layer_0 {
+		volume {
 			label = "音量";
 			bindings = <&lvkp LV_KEY_PREV &lvkp LV_KEY_NEXT>;
 			sensor-bindings = <&inc_dec_kp C_VOL_DN C_VOL_UP>;
 		};
 
-		layer_1 {
-			label = "亮度";
-			bindings = <&trans &trans>;
-			sensor-bindings = <&inc_dec_kp C_BRI_DEC C_BRI_INC>;
-		};
-
-		layer_2 {
+		scroll {
 			label = "滚动";
 			bindings = <&trans &trans>;
 			sensor-bindings = <&mw MW_UP(1) MW_DN(1)>;
