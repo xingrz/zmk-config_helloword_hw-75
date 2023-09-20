@@ -38,6 +38,8 @@ LV_FONT_DECLARE(zfull_9);
 static const char *layer_icons[KEYMAP_LAYERS_NUM] = {
 	ICON_VOL,
 	ICON_SCR,
+	ICON_ARROW_VER,
+	ICON_ARROW_HOR,
 };
 
 static const char *layer_names[KEYMAP_LAYERS_NUM] = { DT_FOREACH_CHILD(KEYMAP_NODE, LAYER_LABEL) };

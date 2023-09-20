@@ -14,6 +14,7 @@
 / {
 	keymap {
 		compatible = "zmk,keymap";
+
 		volume {
 			label = "音量";
 			bindings = <&lvkp LV_KEY_PREV &lvkp LV_KEY_NEXT>;
@@ -24,6 +25,18 @@
 			label = "滚动";
 			bindings = <&trans &trans>;
 			sensor-bindings = <&mw MW_UP(1) MW_DN(1)>;
+		};
+
+		arrow_vertical {
+			label = "上下";
+			bindings = <&lvkp LV_KEY_PREV &lvkp LV_KEY_NEXT>;
+			sensor-bindings = <&inc_dec_kp UP DOWN>;
+		};
+
+		arrow_horizontal {
+			label = "左右";
+			bindings = <&lvkp LV_KEY_PREV &lvkp LV_KEY_NEXT>;
+			sensor-bindings = <&inc_dec_kp LEFT RIGHT>;
 		};
 	};
 };
