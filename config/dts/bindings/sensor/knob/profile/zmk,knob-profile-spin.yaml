@@ -1,0 +1,8 @@
+# Copyright (c) 2023 XiNGRZ
+# SPDX-License-Identifier: MIT
+
+description: Knob spin profile
+
+compatible: "zmk,knob-profile-spin"
+
+include: knob-profile.yaml

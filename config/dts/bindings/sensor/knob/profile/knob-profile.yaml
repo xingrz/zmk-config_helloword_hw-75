@@ -1,0 +1,18 @@
+# Copyright (c) 2023 XiNGRZ
+# SPDX-License-Identifier: MIT
+
+# Common fields for Knob profiles
+
+properties:
+  reg:
+      type: array
+      required: false
+
+  torque-limit-mv:
+    type: int
+
+  velocity-pid:
+    type: array
+
+  angle-pid:
+    type: array

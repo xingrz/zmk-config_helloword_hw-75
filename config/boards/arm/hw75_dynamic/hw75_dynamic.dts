@@ -73,6 +73,61 @@
 		compatible = "zmk,knob";
 		label = "KNOB";
 		motor = <&motor>;
+
+		#address-cells = <1>;
+		#size-cells = <0>;
+
+		disable@0 {
+			compatible = "zmk,knob-profile-disable";
+			reg = <0>;
+		};
+
+		inertia@1 {
+			compatible = "zmk,knob-profile-inertia";
+			reg = <1>;
+			torque-limit-mv = <1500>;
+			velocity-pid = <300 0 0>;
+			angle-pid = <20000 0 700>;
+		};
+
+		encoder@2 {
+			compatible = "zmk,knob-profile-encoder";
+			reg = <2>;
+			torque-limit-mv = <300>;
+			velocity-pid = <20 0 0>;
+			angle-pid = <100000 0 3500>;
+		};
+
+		spring@3 {
+			compatible = "zmk,knob-profile-spring";
+			reg = <3>;
+			torque-limit-mv = <1500>;
+			velocity-pid = <50 0 0>;
+			angle-pid = <100000 0 3500>;
+		};
+
+		damped@4 {
+			compatible = "zmk,knob-profile-damped";
+			reg = <4>;
+			torque-limit-mv = <1500>;
+			velocity-pid = <50 0 0>;
+			angle-pid = <100000 0 3500>;
+		};
+
+		spin@5 {
+			compatible = "zmk,knob-profile-spin";
+			reg = <5>;
+			torque-limit-mv = <1500>;
+			velocity-pid = <300 0 0>;
+		};
+
+		ratchet@6 {
+			compatible = "zmk,knob-profile-ratchet";
+			reg = <6>;
+			torque-limit-mv = <2500>;
+			velocity-pid = <50 0 0>;
+			angle-pid = <100000 0 3500>;
+		};
 	};
 
 	motor: motor {

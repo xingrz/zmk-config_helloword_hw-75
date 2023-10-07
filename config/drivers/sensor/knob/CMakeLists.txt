@@ -14,5 +14,6 @@ zephyr_library_include_directories(${CMAKE_CURRENT_SOURCE_DIR}/lib/include)
 add_subdirectory(lib)
 add_subdirectory(inverter)
 add_subdirectory(encoder)
+add_subdirectory(profile)
 
 endif()
