@@ -24,6 +24,7 @@ generate_ui_strings(strings.csv
 zephyr_library_sources(${ICONS_SRC} ${STRINGS_SRC})
 zephyr_library_include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
+zephyr_library_sources(knob_indicator.c)
 zephyr_library_sources(knob_status.c)
 zephyr_library_sources(layer_status.c)
 zephyr_library_sources(status_screen.c)
