@@ -226,8 +226,8 @@ int knob_init(const struct device *dev)
 	data->mc = motor_get_control(config->motor);
 
 	data->params.ppr = data->encoder_ppr;
-	data->params.position_min = deg_to_rad(190);
-	data->params.position_max = deg_to_rad(290);
+	data->params.position_min = deg_to_rad(110);
+	data->params.position_max = deg_to_rad(250);
 
 	k_thread_create(&data->thread, data->thread_stack, CONFIG_KNOB_THREAD_STACK_SIZE,
 			(k_thread_entry_t)knob_thread, (void *)dev, 0, NULL,

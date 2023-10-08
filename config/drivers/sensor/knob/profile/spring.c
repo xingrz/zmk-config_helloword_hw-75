@@ -36,7 +36,7 @@ static int knob_spring_enable(const struct device *dev, struct motor_control *mc
 	motor_set_angle_pid(cfg->motor, KNOB_PROFILE_ANGLE_PID);
 #endif /* KNOB_PROFILE_HAS_ANGLE_PID */
 
-	mc->target = deg_to_rad(240);
+	mc->target = deg_to_rad(180);
 
 	return 0;
 }
