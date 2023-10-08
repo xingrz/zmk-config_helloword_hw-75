@@ -21,6 +21,11 @@ struct knob_inertia_config {
 };
 
 struct knob_inertia_data {
+	float encoder_rpp;
+	float last_angle;
+	int32_t pulses;
+	int32_t reported_pulses;
+
 	float last_velocity;
 	float max_velocity;
 };
@@ -44,6 +49,10 @@ static int knob_inertia_enable(const struct device *dev, struct motor_control *m
 
 	mc->target = 0.0f;
 
+	data->last_angle = knob_get_position(cfg->knob);
+	data->pulses = 0;
+	data->reported_pulses = 0;
+
 	data->last_velocity = knob_get_velocity(cfg->knob);
 	data->max_velocity = 0.0f;
 
@@ -52,8 +61,9 @@ static int knob_inertia_enable(const struct device *dev, struct motor_control *m
 
 static int knob_inertia_update_params(const struct device *dev, struct knob_params params)
 {
-	ARG_UNUSED(dev);
-	ARG_UNUSED(params);
+	struct knob_inertia_data *data = dev->data;
+
+	data->encoder_rpp = PI2 / (float)params.ppr;
 
 	return 0;
 }
@@ -62,6 +72,18 @@ static int knob_inertia_tick(const struct device *dev, struct motor_control *mc)
 {
 	const struct knob_inertia_config *cfg = dev->config;
 	struct knob_inertia_data *data = dev->data;
+
+	float dp = knob_get_position(cfg->knob) - data->last_angle;
+	float rpp = data->encoder_rpp;
+	float rpp_2 = rpp / 2.0f;
+
+	if (dp >= rpp_2) {
+		data->last_angle += rpp;
+		data->pulses++;
+	} else if (dp <= -rpp_2) {
+		data->last_angle -= rpp;
+		data->pulses--;
+	}
 
 	float v = knob_get_velocity(cfg->knob);
 	float a = v - data->last_velocity;
@@ -100,6 +122,25 @@ static int knob_inertia_tick(const struct device *dev, struct motor_control *mc)
 	return 0;
 }
 
+static int knob_inertia_report(const struct device *dev, int32_t *val)
+{
+	struct knob_inertia_data *data = dev->data;
+
+	if (data->pulses == data->reported_pulses) {
+		return -EAGAIN;
+	}
+
+	if (data->pulses > data->reported_pulses) {
+		*val = 1;
+	} else {
+		*val = -1;
+	}
+
+	data->reported_pulses = data->pulses;
+
+	return 0;
+}
+
 static int knob_inertia_init(const struct device *dev)
 {
 	ARG_UNUSED(dev);
@@ -111,6 +152,7 @@ static const struct knob_profile_api knob_inertia_api = {
 	.enable = knob_inertia_enable,
 	.update_params = knob_inertia_update_params,
 	.tick = knob_inertia_tick,
+	.report = knob_inertia_report,
 };
 
 static struct knob_inertia_data knob_inertia_data;
