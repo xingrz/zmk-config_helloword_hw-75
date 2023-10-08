@@ -26,6 +26,7 @@ enum knob_mode {
 	KNOB_DAMPED,
 	KNOB_SPIN,
 	KNOB_RATCHET,
+	KNOB_SWITCH,
 };
 
 struct knob_params {

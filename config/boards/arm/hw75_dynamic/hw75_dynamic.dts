@@ -128,6 +128,14 @@
 			velocity-pid = <50 0 0>;
 			angle-pid = <100000 0 3500>;
 		};
+
+		switch@7 {
+			compatible = "zmk,knob-profile-switch";
+			reg = <7>;
+			torque-limit-mv = <1500>;
+			velocity-pid = <50 0 0>;
+			angle-pid = <100000 0 3500>;
+		};
 	};
 
 	motor: motor {
