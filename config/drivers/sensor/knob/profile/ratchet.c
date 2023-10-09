@@ -41,9 +41,9 @@ static int knob_ratchet_enable(const struct device *dev, struct motor_control *m
 	motor_set_angle_pid(cfg->motor, KNOB_PROFILE_ANGLE_PID);
 #endif /* KNOB_PROFILE_HAS_ANGLE_PID */
 
-	mc->target = 0.0f;
-
 	data->last_angle = knob_get_position(cfg->knob);
+
+	mc->target = data->last_angle;
 
 	return 0;
 }
