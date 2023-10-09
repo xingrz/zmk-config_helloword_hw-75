@@ -16,8 +16,17 @@
 #include <zephyr/logging/log.h>
 LOG_MODULE_REGISTER(knob_spring, CONFIG_ZMK_LOG_LEVEL);
 
+#define CENTER (deg_to_rad(180.0f))
+#define UP (deg_to_rad(160.0f))
+#define DN (deg_to_rad(200.0f))
+
 struct knob_spring_config {
 	KNOB_PROFILE_CFG_ROM;
+};
+
+struct knob_spring_data {
+	int32_t value;
+	int32_t last_report;
 };
 
 static int knob_spring_enable(const struct device *dev, struct motor_control *mc)
@@ -36,7 +45,7 @@ static int knob_spring_enable(const struct device *dev, struct motor_control *mc
 	motor_set_angle_pid(cfg->motor, KNOB_PROFILE_ANGLE_PID);
 #endif /* KNOB_PROFILE_HAS_ANGLE_PID */
 
-	mc->target = deg_to_rad(180);
+	mc->target = CENTER;
 
 	return 0;
 }
@@ -51,8 +60,33 @@ static int knob_spring_update_params(const struct device *dev, struct knob_param
 
 static int knob_spring_tick(const struct device *dev, struct motor_control *mc)
 {
-	ARG_UNUSED(dev);
+	const struct knob_spring_config *cfg = dev->config;
+	struct knob_spring_data *data = dev->data;
 	ARG_UNUSED(mc);
+
+	float p = knob_get_position(cfg->knob);
+	if (p < UP) {
+		data->value = 1;
+	} else if (p > DN) {
+		data->value = -1;
+	} else {
+		data->value = 0;
+	}
+
+	return 0;
+}
+
+static int knob_spring_report(const struct device *dev, int32_t *val)
+{
+	struct knob_spring_data *data = dev->data;
+
+	if (data->last_report == data->value) {
+		return 0;
+	}
+
+	*val = data->value;
+
+	data->last_report = data->value;
 
 	return 0;
 }
@@ -68,9 +102,12 @@ static const struct knob_profile_api knob_spring_api = {
 	.enable = knob_spring_enable,
 	.update_params = knob_spring_update_params,
 	.tick = knob_spring_tick,
+	.report = knob_spring_report,
 };
+
+static struct knob_spring_data knob_spring_data;
 
 static const struct knob_spring_config knob_spring_cfg = { KNOB_PROFILE_CFG_INIT };
 
-DEVICE_DT_INST_DEFINE(0, knob_spring_init, NULL, NULL, &knob_spring_cfg, POST_KERNEL,
+DEVICE_DT_INST_DEFINE(0, knob_spring_init, NULL, &knob_spring_data, &knob_spring_cfg, POST_KERNEL,
 		      CONFIG_SENSOR_INIT_PRIORITY, &knob_spring_api);

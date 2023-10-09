@@ -77,6 +77,7 @@ message Version
 		optional bool knob = 3;
 		optional bool knob_prefs = 4;
 		optional bool knob_profile_switch = 7;
+		optional bool knob_spring_report = 8;
 	}
 }
 

@@ -69,6 +69,8 @@ static bool handle_version(const usb_comm_MessageH2D *h2d, usb_comm_MessageD2H *
 	res->features.has_knob_profile_switch = res->features.knob_profile_switch = true;
 #endif // DT_HAS_COMPAT_STATUS_OKAY(zmk_knob_profile_switch)
 
+	res->features.has_knob_spring_report = res->features.knob_spring_report = true;
+
 	return true;
 }
 
