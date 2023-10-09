@@ -32,17 +32,13 @@ LOG_MODULE_DECLARE(zmk, CONFIG_ZMK_LOG_LEVEL);
 #define LAYER_LABEL(node)                                                                          \
 	COND_CODE_0(DT_NODE_HAS_PROP(node, label), (NULL), (DT_PROP(node, label))),
 
+#define LAYER_ICON(node) COND_CODE_0(DT_NODE_HAS_PROP(node, icon), (NULL), (DT_PROP(node, icon))),
+
 LV_FONT_DECLARE(mono_19);
 LV_FONT_DECLARE(zfull_9);
 
-static const char *layer_icons[KEYMAP_LAYERS_NUM] = {
-	ICON_VOL,
-	ICON_SCR,
-	ICON_ARROW_VER,
-	ICON_ARROW_HOR,
-};
-
 static const char *layer_names[KEYMAP_LAYERS_NUM] = { DT_FOREACH_CHILD(KEYMAP_NODE, LAYER_LABEL) };
+static const char layer_icons[KEYMAP_LAYERS_NUM][4] = { DT_FOREACH_CHILD(KEYMAP_NODE, LAYER_ICON) };
 
 static lv_obj_t *layer_name;
 static lv_obj_t *layer_list;

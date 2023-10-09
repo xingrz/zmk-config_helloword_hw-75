@@ -1,0 +1,9 @@
+compatible: "zmk,keymap-ext"
+
+include: "zmk,keymap.yaml"
+
+child-binding:
+  properties:
+    icon:
+      type: uint8-array
+      required: true
