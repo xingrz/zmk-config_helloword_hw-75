@@ -17,8 +17,12 @@
 #define KNOB_NODE DT_ALIAS(knob)
 #define MOTOR_NODE DT_PHANDLE(KNOB_NODE, motor)
 
+#define PROFILE_TORQUE_LIMIT(node) (float)DT_PROP_OR(node, torque_limit_mv, 0) / 1000.0f,
+
 static const struct device *knob = DEVICE_DT_GET(KNOB_NODE);
 static const struct device *motor = DEVICE_DT_GET(MOTOR_NODE);
+
+static const float default_torque_limits[] = { DT_FOREACH_CHILD(KNOB_NODE, PROFILE_TORQUE_LIMIT) };
 
 static struct motor_state state = {};
 
@@ -65,10 +69,6 @@ static bool write_prefs(pb_ostream_t *stream, const pb_field_t *field, void *con
 		return false;
 	}
 
-	enum knob_mode mode = knob_get_mode(knob);
-	int ppr = knob_get_encoder_ppr(knob);
-	float torque_limit = motor_get_torque_limit(motor);
-
 	usb_comm_KnobConfig_Pref pref = usb_comm_KnobConfig_Pref_init_zero;
 	for (int i = 0; i < layers; i++) {
 		if (!pb_encode_tag_for_field(stream, field)) {
@@ -79,11 +79,11 @@ static bool write_prefs(pb_ostream_t *stream, const pb_field_t *field, void *con
 		pref.layer_name.funcs.encode = write_string;
 		pref.layer_name.arg = (void *)names[i];
 		pref.active = prefs[i].active;
-		pref.mode = (usb_comm_KnobConfig_Mode)(prefs[i].active ? prefs[i].mode : mode);
+		pref.mode = (usb_comm_KnobConfig_Mode)prefs[i].mode;
 		pref.has_mode = true;
-		pref.ppr = prefs[i].active ? prefs[i].ppr : ppr;
+		pref.ppr = prefs[i].ppr;
 		pref.has_ppr = true;
-		pref.torque_limit = prefs[i].active ? prefs[i].torque_limit : torque_limit;
+		pref.torque_limit = prefs[i].torque_limit;
 		pref.has_torque_limit = true;
 
 		if (!pb_encode_submessage(stream, usb_comm_KnobConfig_Pref_fields, &pref)) {
@@ -140,34 +140,49 @@ static bool handle_knob_update_pref(const usb_comm_MessageH2D *h2d, usb_comm_Mes
 {
 	const usb_comm_KnobConfig_Pref *req = &h2d->payload.knob_pref;
 	usb_comm_KnobConfig_Pref *res = &d2h->payload.knob_pref;
+	const struct knob_pref *pref;
 
-	{
-		struct knob_pref pref = {
-			.active = req->active,
-			.mode = req->has_mode ? (enum knob_mode)req->mode : KNOB_ENCODER,
-			.ppr = req->has_ppr ? req->ppr : 0,
-			.torque_limit = req->has_torque_limit ? req->torque_limit : 0,
-		};
-		knob_app_set_pref(req->layer_id, &pref);
+	if (req->active) {
+		pref = knob_app_get_pref(req->layer_id);
+		if (pref == NULL) {
+			return false;
+		}
+
+		struct knob_pref next;
+		memcpy(&next, pref, sizeof(next));
+
+		next.active = req->active;
+		if (req->has_mode) {
+			next.mode = (enum knob_mode)req->mode;
+			if (req->mode > 0 && req->mode < ARRAY_SIZE(default_torque_limits)) {
+				next.torque_limit = default_torque_limits[req->mode];
+			}
+		}
+		if (req->has_ppr) {
+			next.ppr = req->ppr;
+		}
+		if (req->has_torque_limit) {
+			next.torque_limit = req->torque_limit;
+		}
+
+		knob_app_set_pref(req->layer_id, &next);
+	} else {
+		knob_app_reset_pref(req->layer_id);
 	}
 
 	{
-		enum knob_mode mode = knob_get_mode(knob);
-		int ppr = knob_get_encoder_ppr(knob);
-		float torque_limit = motor_get_torque_limit(motor);
-
-		const struct knob_pref *pref = knob_app_get_pref(req->layer_id);
+		pref = knob_app_get_pref(req->layer_id);
 		if (pref == NULL) {
 			return false;
 		}
 
 		res->layer_id = req->layer_id;
 		res->active = pref->active;
-		res->mode = (usb_comm_KnobConfig_Mode)(pref->active ? pref->mode : mode);
+		res->mode = (usb_comm_KnobConfig_Mode)pref->mode;
 		res->has_mode = true;
-		res->ppr = pref->active ? pref->ppr : ppr;
+		res->ppr = pref->ppr;
 		res->has_ppr = true;
-		res->torque_limit = pref->active ? pref->torque_limit : torque_limit;
+		res->torque_limit = pref->torque_limit;
 		res->has_torque_limit = true;
 	}
 

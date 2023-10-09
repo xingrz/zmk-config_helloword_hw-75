@@ -7,3 +7,11 @@ child-binding:
     icon:
       type: uint8-array
       required: true
+
+    profile:
+      type: phandle
+
+    ppr:
+      type: int
+      required: false
+      default: 24

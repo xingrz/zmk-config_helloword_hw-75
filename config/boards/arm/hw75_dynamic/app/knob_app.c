@@ -35,7 +35,21 @@ LOG_MODULE_DECLARE(zmk, CONFIG_ZMK_LOG_LEVEL);
 #define LAYER_LABEL(node)                                                                          \
 	COND_CODE_0(DT_NODE_HAS_PROP(node, label), (NULL), (DT_PROP(node, label))),
 
+#define LAYER_PROFILE(node) DT_PROP_OR(node, profile, DT_NODELABEL(profile_encoder))
+
+#define LAYER_PREF(node)                                                                           \
+	{                                                                                          \
+		.active = false,                                                                   \
+		.name = DT_NODE_FULL_NAME(node),                                                   \
+		.mode = DT_REG_ADDR(LAYER_PROFILE(node)),                                          \
+		.ppr = DT_PROP(node, ppr),                                                         \
+		.torque_limit = (float)DT_PROP(LAYER_PROFILE(node), torque_limit_mv) / 1000.0f,    \
+	},
+
 static const char *layer_names[KEYMAP_LAYERS_NUM] = { DT_FOREACH_CHILD(KEYMAP_NODE, LAYER_LABEL) };
+
+static const struct knob_pref layer_prefs[KEYMAP_LAYERS_NUM] = { DT_FOREACH_CHILD(KEYMAP_NODE,
+										  LAYER_PREF) };
 
 static const struct device *knob = DEVICE_DT_GET(KNOB_NODE);
 static const struct device *motor = DEVICE_DT_GET(MOTOR_NODE);
@@ -136,16 +150,31 @@ static int knob_app_settings_load_cb(const char *name, size_t len, settings_read
 				     void *cb_arg, void *param)
 {
 	const char *next;
+	struct knob_pref loader[KEYMAP_LAYERS_NUM];
 	int ret;
 
 	if (settings_name_steq(name, "prefs", &next) && !next) {
-		if (len != sizeof(knob_prefs)) {
+		if (len != sizeof(loader)) {
 			return -EINVAL;
 		}
 
-		ret = read_cb(cb_arg, &knob_prefs, sizeof(knob_prefs));
+		ret = read_cb(cb_arg, &loader, sizeof(loader));
 		if (ret >= 0) {
 			return 0;
+		}
+
+		for (uint8_t i = 0; i < ARRAY_SIZE(loader); i++) {
+			if (!loader[i].active) {
+				continue;
+			}
+
+			for (uint8_t j = 0; j < ARRAY_SIZE(knob_prefs); j++) {
+				if (strcmp(loader[i].name, knob_prefs[j].name) == 0) {
+					memcpy(&knob_prefs[j], &loader[i],
+					       sizeof(struct knob_pref));
+					break;
+				}
+			}
 		}
 
 		LOG_DBG("Loaded knob prefs");
@@ -202,19 +231,11 @@ static void knob_app_apply_pref(uint8_t layer_id)
 	knob_app_disable_report();
 
 	struct knob_pref *pref = &knob_prefs[layer_id];
-	if (pref->active) {
-		if (knob_get_mode(knob) != pref->mode) {
-			knob_set_mode(knob, pref->mode);
-		}
-		knob_set_encoder_ppr(knob, pref->ppr);
-		motor_set_torque_limit(motor, pref->torque_limit);
-	} else {
-		if (knob_get_mode(knob) != KNOB_ENCODER) {
-			knob_set_mode(knob, KNOB_ENCODER);
-		}
-		knob_set_encoder_ppr(knob, 24);
-		motor_set_torque_limit(motor, 0.3f);
+	if (knob_get_mode(knob) != pref->mode) {
+		knob_set_mode(knob, pref->mode);
 	}
+	knob_set_encoder_ppr(knob, pref->ppr);
+	motor_set_torque_limit(motor, pref->torque_limit);
 
 	knob_app_enable_report_delayed();
 
@@ -228,6 +249,20 @@ void knob_app_set_pref(uint8_t layer_id, struct knob_pref *pref)
 	}
 
 	memcpy(&knob_prefs[layer_id], pref, sizeof(struct knob_pref));
+	knob_app_save_prefs();
+
+	if (layer_id == zmk_keymap_highest_layer_active()) {
+		knob_app_apply_pref(layer_id);
+	}
+}
+
+void knob_app_reset_pref(uint8_t layer_id)
+{
+	if (layer_id >= KEYMAP_LAYERS_NUM) {
+		return;
+	}
+
+	memcpy(&knob_prefs[layer_id], &layer_prefs[layer_id], sizeof(struct knob_pref));
 	knob_app_save_prefs();
 
 	if (layer_id == zmk_keymap_highest_layer_active()) {
@@ -269,6 +304,8 @@ static int knob_app_init(const struct device *dev)
 {
 	ARG_UNUSED(dev);
 	int ret;
+
+	memcpy(&knob_prefs, &layer_prefs, sizeof(layer_prefs));
 
 #ifdef CONFIG_SETTINGS
 	ret = settings_subsys_init();
