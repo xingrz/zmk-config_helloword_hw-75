@@ -12,6 +12,37 @@
 #include <dt-bindings/zmk/mouse.h>
 
 / {
+	macros {
+		tasks_forward: tasks-forward {
+			label = "TAKS_FORWARD";
+			compatible = "zmk,behavior-macro";
+			#binding-cells = <0>;
+			bindings = <&macro_press   &kp LALT>,
+				   <&macro_tap     &kp TAB>,
+				   <&macro_release &kp LALT>;
+		};
+
+		tasks_backward: tasks-backward {
+			label = "TAKS_BACKWARD";
+			compatible = "zmk,behavior-macro";
+			#binding-cells = <0>;
+			bindings = <&macro_press   &kp LALT>,
+				   <&macro_press   &kp LSHIFT>,
+				   <&macro_tap     &kp TAB>,
+				   <&macro_release &kp LSHIFT>,
+				   <&macro_release &kp LALT>;
+		};
+	};
+
+	behaviors {
+		switch_tasks: switch-tasks {
+			compatible = "zmk,behavior-sensor-rotate";
+			label = "SWITCH_TASKS";
+			#sensor-binding-cells = <0>;
+			bindings = <&tasks_forward>, <&tasks_backward>;
+		};
+	};
+
 	keymap {
 		compatible = "zmk,keymap-ext", "zmk,keymap";
 
@@ -27,6 +58,14 @@
 			icon = [EF 86 8A];
 			bindings = <&trans &trans>;
 			sensor-bindings = <&mw MW_UP(1) MW_DN(1)>;
+		};
+
+		tasks {
+			label = "窗口";
+			icon = [EF 85 9E];
+			bindings = <&trans &trans>;
+			sensor-bindings = <&switch_tasks>;
+			profile = <&profile_spring>;
 		};
 
 		arrow_vertical {
