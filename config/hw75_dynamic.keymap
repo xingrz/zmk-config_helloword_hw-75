@@ -32,14 +32,14 @@
 		arrow_vertical {
 			label = "上下";
 			icon = [EF 86 93];
-			bindings = <&lvkp LV_KEY_PREV &lvkp LV_KEY_NEXT>;
+			bindings = <&trans &trans>;
 			sensor-bindings = <&inc_dec_kp UP DOWN>;
 		};
 
 		arrow_horizontal {
 			label = "左右";
 			icon = [EF 86 9C];
-			bindings = <&lvkp LV_KEY_PREV &lvkp LV_KEY_NEXT>;
+			bindings = <&trans &trans>;
 			sensor-bindings = <&inc_dec_kp LEFT RIGHT>;
 		};
 	};
