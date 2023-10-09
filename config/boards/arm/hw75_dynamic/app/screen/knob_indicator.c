@@ -14,6 +14,7 @@
 #include <zephyr/logging/log.h>
 LOG_MODULE_DECLARE(zmk, CONFIG_ZMK_LOG_LEVEL);
 
+#include <knob/drivers/knob.h>
 #include <knob/drivers/motor.h>
 
 #include <zmk/activity.h>
@@ -40,6 +41,7 @@ LOG_MODULE_DECLARE(zmk, CONFIG_ZMK_LOG_LEVEL);
 
 #define MINIMUM_MOVEMENT (0.2f)
 
+static const struct device *knob = DEVICE_DT_GET(KNOB_NODE);
 static const struct device *motor = DEVICE_DT_GET(MOTOR_NODE);
 
 static lv_obj_t *indicator;
@@ -79,6 +81,15 @@ static void refresh_work_cb(struct k_work *work)
 		} else {
 			return;
 		}
+	}
+
+	enum knob_mode mode = knob_get_mode(knob);
+	if (mode == KNOB_SPRING || mode == KNOB_DAMPED || mode == KNOB_SWITCH) {
+		/*
+		 * Always use absolute position zero for these modes
+		 * TODO: Need a better way to determine
+		 */
+		dp = state.current_angle - PI;
 	}
 
 	if (visible) {
