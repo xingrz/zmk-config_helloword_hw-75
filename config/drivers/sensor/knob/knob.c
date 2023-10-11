@@ -27,6 +27,8 @@ struct knob_data {
 	K_THREAD_STACK_MEMBER(thread_stack, CONFIG_KNOB_THREAD_STACK_SIZE);
 	struct k_thread thread;
 
+	struct k_work report_work;
+
 	struct motor_control *mc;
 
 	enum knob_mode mode;
@@ -179,6 +181,16 @@ float knob_get_velocity(const struct device *dev)
 	return motor_get_estimate_velocity(config->motor);
 }
 
+static void knob_report_work_handler(struct k_work *work)
+{
+	struct knob_data *data = CONTAINER_OF(work, struct knob_data, report_work);
+	const struct device *dev = CONTAINER_OF(data, struct device, data);
+
+	if (data->handler != NULL) {
+		data->handler(dev, data->trigger);
+	}
+}
+
 static void knob_thread(void *p1, void *p2, void *p3)
 {
 	const struct device *dev = (const struct device *)p1;
@@ -196,10 +208,9 @@ static void knob_thread(void *p1, void *p2, void *p3)
 			data->delta = 0;
 
 			if (data->encoder_report &&
-			    knob_profile_report(data->profile, &data->delta) == 0) {
-				if (data->delta && data->handler != NULL) {
-					data->handler(dev, data->trigger);
-				}
+			    knob_profile_report(data->profile, &data->delta) == 0 &&
+			    data->delta != 0) {
+				k_work_submit(&data->report_work);
 			}
 		}
 
@@ -232,6 +243,8 @@ int knob_init(const struct device *dev)
 	k_thread_create(&data->thread, data->thread_stack, CONFIG_KNOB_THREAD_STACK_SIZE,
 			(k_thread_entry_t)knob_thread, (void *)dev, 0, NULL,
 			K_PRIO_COOP(CONFIG_KNOB_THREAD_PRIORITY), 0, K_NO_WAIT);
+
+	k_work_init(&data->report_work, knob_report_work_handler);
 
 	return 0;
 }
