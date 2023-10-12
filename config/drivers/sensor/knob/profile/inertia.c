@@ -30,14 +30,12 @@ struct knob_inertia_data {
 	float max_velocity;
 };
 
-static int knob_inertia_enable(const struct device *dev, struct motor_control *mc)
+static int knob_inertia_enable(const struct device *dev)
 {
 	const struct knob_inertia_config *cfg = dev->config;
 	struct knob_inertia_data *data = dev->data;
 
 	motor_set_torque_limit(cfg->motor, KNOB_PROFILE_TORQUE_LIMIT);
-
-	mc->mode = VELOCITY;
 
 #if KNOB_PROFILE_HAS_VELOCITY_PID
 	motor_set_velocity_pid(cfg->motor, KNOB_PROFILE_VELOCITY_PID);
@@ -46,8 +44,6 @@ static int knob_inertia_enable(const struct device *dev, struct motor_control *m
 #if KNOB_PROFILE_HAS_ANGLE_PID
 	motor_set_angle_pid(cfg->motor, KNOB_PROFILE_ANGLE_PID);
 #endif /* KNOB_PROFILE_HAS_ANGLE_PID */
-
-	mc->target = 0.0f;
 
 	data->last_angle = knob_get_position(cfg->knob);
 	data->pulses = 0;
@@ -72,6 +68,8 @@ static int knob_inertia_tick(const struct device *dev, struct motor_control *mc)
 {
 	const struct knob_inertia_config *cfg = dev->config;
 	struct knob_inertia_data *data = dev->data;
+
+	mc->mode = VELOCITY;
 
 	float dp = knob_get_position(cfg->knob) - data->last_angle;
 	float rpp = data->encoder_rpp;

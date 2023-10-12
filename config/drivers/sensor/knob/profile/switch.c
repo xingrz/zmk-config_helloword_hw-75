@@ -29,14 +29,12 @@ struct knob_switch_data {
 	bool last_report;
 };
 
-static int knob_switch_enable(const struct device *dev, struct motor_control *mc)
+static int knob_switch_enable(const struct device *dev)
 {
 	const struct knob_switch_config *cfg = dev->config;
 	struct knob_switch_data *data = dev->data;
 
 	motor_set_torque_limit(cfg->motor, KNOB_PROFILE_TORQUE_LIMIT);
-
-	mc->mode = ANGLE;
 
 #if KNOB_PROFILE_HAS_VELOCITY_PID
 	motor_set_velocity_pid(cfg->motor, KNOB_PROFILE_VELOCITY_PID);
@@ -46,7 +44,6 @@ static int knob_switch_enable(const struct device *dev, struct motor_control *mc
 	motor_set_angle_pid(cfg->motor, KNOB_PROFILE_ANGLE_PID);
 #endif /* KNOB_PROFILE_HAS_ANGLE_PID */
 
-	mc->target = OFF;
 	data->state = false;
 
 	return 0;
@@ -64,6 +61,8 @@ static int knob_switch_tick(const struct device *dev, struct motor_control *mc)
 {
 	const struct knob_switch_config *cfg = dev->config;
 	struct knob_switch_data *data = dev->data;
+
+	mc->mode = ANGLE;
 
 	float p = knob_get_position(cfg->knob);
 	if (p < ON + (CENTER - ON) / 2.0f) {

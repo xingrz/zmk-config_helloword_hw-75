@@ -27,14 +27,12 @@ struct knob_encoder_data {
 	int32_t reported_pulses;
 };
 
-static int knob_encoder_enable(const struct device *dev, struct motor_control *mc)
+static int knob_encoder_enable(const struct device *dev)
 {
 	const struct knob_encoder_config *cfg = dev->config;
 	struct knob_encoder_data *data = dev->data;
 
 	motor_set_torque_limit(cfg->motor, KNOB_PROFILE_TORQUE_LIMIT);
-
-	mc->mode = ANGLE;
 
 #if KNOB_PROFILE_HAS_VELOCITY_PID
 	motor_set_velocity_pid(cfg->motor, KNOB_PROFILE_VELOCITY_PID);
@@ -47,8 +45,6 @@ static int knob_encoder_enable(const struct device *dev, struct motor_control *m
 	data->last_angle = knob_get_position(cfg->knob);
 	data->pulses = 0;
 	data->reported_pulses = 0;
-
-	mc->target = data->last_angle;
 
 	return 0;
 }
@@ -66,6 +62,8 @@ static int knob_encoder_tick(const struct device *dev, struct motor_control *mc)
 {
 	const struct knob_encoder_config *cfg = dev->config;
 	struct knob_encoder_data *data = dev->data;
+
+	mc->mode = ANGLE;
 
 	float dp = knob_get_position(cfg->knob) - data->last_angle;
 	float rpp = data->encoder_rpp;

@@ -20,13 +20,11 @@ struct knob_spin_config {
 	KNOB_PROFILE_CFG_ROM;
 };
 
-static int knob_spin_enable(const struct device *dev, struct motor_control *mc)
+static int knob_spin_enable(const struct device *dev)
 {
 	const struct knob_spin_config *cfg = dev->config;
 
 	motor_set_torque_limit(cfg->motor, KNOB_PROFILE_TORQUE_LIMIT);
-
-	mc->mode = VELOCITY;
 
 #if KNOB_PROFILE_HAS_VELOCITY_PID
 	motor_set_velocity_pid(cfg->motor, KNOB_PROFILE_VELOCITY_PID);
@@ -35,8 +33,6 @@ static int knob_spin_enable(const struct device *dev, struct motor_control *mc)
 #if KNOB_PROFILE_HAS_ANGLE_PID
 	motor_set_angle_pid(cfg->motor, KNOB_PROFILE_ANGLE_PID);
 #endif /* KNOB_PROFILE_HAS_ANGLE_PID */
-
-	mc->target = 20.0f;
 
 	return 0;
 }
@@ -52,7 +48,9 @@ static int knob_spin_update_params(const struct device *dev, struct knob_params 
 static int knob_spin_tick(const struct device *dev, struct motor_control *mc)
 {
 	ARG_UNUSED(dev);
-	ARG_UNUSED(mc);
+
+	mc->mode = VELOCITY;
+	mc->target = 20.0f;
 
 	return 0;
 }

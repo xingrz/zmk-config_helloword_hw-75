@@ -29,13 +29,11 @@ struct knob_spring_data {
 	int32_t last_report;
 };
 
-static int knob_spring_enable(const struct device *dev, struct motor_control *mc)
+static int knob_spring_enable(const struct device *dev)
 {
 	const struct knob_spring_config *cfg = dev->config;
 
 	motor_set_torque_limit(cfg->motor, KNOB_PROFILE_TORQUE_LIMIT);
-
-	mc->mode = ANGLE;
 
 #if KNOB_PROFILE_HAS_VELOCITY_PID
 	motor_set_velocity_pid(cfg->motor, KNOB_PROFILE_VELOCITY_PID);
@@ -44,8 +42,6 @@ static int knob_spring_enable(const struct device *dev, struct motor_control *mc
 #if KNOB_PROFILE_HAS_ANGLE_PID
 	motor_set_angle_pid(cfg->motor, KNOB_PROFILE_ANGLE_PID);
 #endif /* KNOB_PROFILE_HAS_ANGLE_PID */
-
-	mc->target = CENTER;
 
 	return 0;
 }
@@ -72,6 +68,9 @@ static int knob_spring_tick(const struct device *dev, struct motor_control *mc)
 	} else {
 		data->value = 0;
 	}
+
+	mc->mode = ANGLE;
+	mc->target = CENTER;
 
 	return 0;
 }

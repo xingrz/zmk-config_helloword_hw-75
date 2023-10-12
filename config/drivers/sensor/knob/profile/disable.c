@@ -27,7 +27,7 @@ struct knob_disable_data {
 	int32_t reported_pulses;
 };
 
-static int knob_disable_enable(const struct device *dev, struct motor_control *mc)
+static int knob_disable_enable(const struct device *dev)
 {
 	const struct knob_disable_config *cfg = dev->config;
 	struct knob_disable_data *data = dev->data;
@@ -52,6 +52,7 @@ static int knob_disable_tick(const struct device *dev, struct motor_control *mc)
 {
 	const struct knob_disable_config *cfg = dev->config;
 	struct knob_disable_data *data = dev->data;
+	ARG_UNUSED(mc);
 
 	float dp = knob_get_position(cfg->knob) - data->last_angle;
 	float rpp = data->encoder_rpp;

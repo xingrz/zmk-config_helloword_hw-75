@@ -24,14 +24,12 @@ struct knob_ratchet_data {
 	float last_angle;
 };
 
-static int knob_ratchet_enable(const struct device *dev, struct motor_control *mc)
+static int knob_ratchet_enable(const struct device *dev)
 {
 	const struct knob_ratchet_config *cfg = dev->config;
 	struct knob_ratchet_data *data = dev->data;
 
 	motor_set_torque_limit(cfg->motor, KNOB_PROFILE_TORQUE_LIMIT);
-
-	mc->mode = ANGLE;
 
 #if KNOB_PROFILE_HAS_VELOCITY_PID
 	motor_set_velocity_pid(cfg->motor, KNOB_PROFILE_VELOCITY_PID);
@@ -42,8 +40,6 @@ static int knob_ratchet_enable(const struct device *dev, struct motor_control *m
 #endif /* KNOB_PROFILE_HAS_ANGLE_PID */
 
 	data->last_angle = knob_get_position(cfg->knob);
-
-	mc->target = data->last_angle;
 
 	return 0;
 }
@@ -61,13 +57,12 @@ static int knob_ratchet_tick(const struct device *dev, struct motor_control *mc)
 	const struct knob_ratchet_config *cfg = dev->config;
 	struct knob_ratchet_data *data = dev->data;
 
+	mc->mode = ANGLE;
+	mc->target = data->last_angle;
+
 	float dp = knob_get_position(cfg->knob) - data->last_angle;
 	float rpp = PI2 / 12;
-	if (dp < 0) {
-		mc->target = data->last_angle;
-	} else if (dp < rpp) {
-		mc->target = data->last_angle + dp - dp * 0.5f;
-	} else {
+	if (dp > rpp) {
 		data->last_angle += rpp;
 	}
 

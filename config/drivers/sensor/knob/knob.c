@@ -102,7 +102,7 @@ void knob_set_mode(const struct device *dev, enum knob_mode mode)
 
 	if (data->profile != NULL) {
 		knob_profile_update_params(data->profile, data->params);
-		knob_profile_enable(data->profile, data->mc);
+		knob_profile_enable(data->profile);
 	}
 }
 
@@ -206,7 +206,6 @@ static void knob_thread(void *p1, void *p2, void *p3)
 			motor_tick(config->motor);
 
 			data->delta = 0;
-
 			if (data->encoder_report &&
 			    knob_profile_report(data->profile, &data->delta) == 0 &&
 			    data->delta != 0) {

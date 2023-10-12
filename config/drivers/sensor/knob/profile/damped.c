@@ -25,13 +25,11 @@ struct knob_damped_data {
 	float position_max;
 };
 
-static int knob_damped_enable(const struct device *dev, struct motor_control *mc)
+static int knob_damped_enable(const struct device *dev)
 {
 	const struct knob_damped_config *cfg = dev->config;
 
 	motor_set_torque_limit(cfg->motor, KNOB_PROFILE_TORQUE_LIMIT);
-
-	mc->mode = VELOCITY;
 
 #if KNOB_PROFILE_HAS_VELOCITY_PID
 	motor_set_velocity_pid(cfg->motor, KNOB_PROFILE_VELOCITY_PID);
@@ -40,8 +38,6 @@ static int knob_damped_enable(const struct device *dev, struct motor_control *mc
 #if KNOB_PROFILE_HAS_ANGLE_PID
 	motor_set_angle_pid(cfg->motor, KNOB_PROFILE_ANGLE_PID);
 #endif /* KNOB_PROFILE_HAS_ANGLE_PID */
-
-	mc->target = 0.0f;
 
 	return 0;
 }
