@@ -3,6 +3,8 @@
  * SPDX-License-Identifier: MIT
  */
 
+#include <arm_math.h>
+
 #include "handler.h"
 #include "usb_comm.pb.h"
 
@@ -16,6 +18,8 @@
 
 #define KNOB_NODE DT_ALIAS(knob)
 #define MOTOR_NODE DT_PHANDLE(KNOB_NODE, motor)
+
+#define DEG(deg) (deg / 360.0f * (PI * 2.0f))
 
 #define PROFILE_TORQUE_LIMIT(node) (float)DT_PROP_OR(node, torque_limit_mv, 0) / 1000.0f,
 
@@ -125,7 +129,13 @@ static bool handle_knob_set_config(const usb_comm_MessageH2D *h2d, usb_comm_Mess
 	if (req->demo) {
 		knob_app_set_demo(true);
 		knob_set_mode(knob, (enum knob_mode)req->mode);
+		if (req->mode == usb_comm_KnobConfig_Mode_DAMPED) {
+			knob_set_position_limit(knob, DEG(110.0f), DEG(250.0f));
+		} else {
+			knob_set_position_limit(knob, 0.0f, 0.0f);
+		}
 	} else {
+		knob_set_position_limit(knob, 0.0f, 0.0f);
 		knob_app_set_demo(false);
 	}
 

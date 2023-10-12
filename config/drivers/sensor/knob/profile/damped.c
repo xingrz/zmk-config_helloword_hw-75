@@ -20,11 +20,6 @@ struct knob_damped_config {
 	KNOB_PROFILE_CFG_ROM;
 };
 
-struct knob_damped_data {
-	float position_min;
-	float position_max;
-};
-
 static int knob_damped_enable(const struct device *dev)
 {
 	const struct knob_damped_config *cfg = dev->config;
@@ -44,34 +39,18 @@ static int knob_damped_enable(const struct device *dev)
 
 static int knob_damped_update_params(const struct device *dev, struct knob_params params)
 {
-	struct knob_damped_data *data = dev->data;
-
-	data->position_min = params.position_min;
-	data->position_max = params.position_max;
+	ARG_UNUSED(dev);
+	ARG_UNUSED(params);
 
 	return 0;
 }
 
 static int knob_damped_tick(const struct device *dev, struct motor_control *mc)
 {
-	const struct knob_damped_config *cfg = dev->config;
-	struct knob_damped_data *data = dev->data;
+	ARG_UNUSED(dev);
 
-	if (data->position_min == data->position_max) {
-		return 0;
-	}
-
-	float p = knob_get_position(cfg->knob);
-	if (p > data->position_max) {
-		mc->mode = ANGLE;
-		mc->target = data->position_max;
-	} else if (p < data->position_min) {
-		mc->mode = ANGLE;
-		mc->target = data->position_min;
-	} else {
-		mc->mode = VELOCITY;
-		mc->target = 0.0f;
-	}
+	mc->mode = VELOCITY;
+	mc->target = 0.0f;
 
 	return 0;
 }
@@ -89,9 +68,7 @@ static const struct knob_profile_api knob_damped_api = {
 	.tick = knob_damped_tick,
 };
 
-static struct knob_damped_data knob_damped_data;
-
 static const struct knob_damped_config knob_damped_cfg = { KNOB_PROFILE_CFG_INIT };
 
-DEVICE_DT_INST_DEFINE(0, knob_damped_init, NULL, &knob_damped_data, &knob_damped_cfg, POST_KERNEL,
+DEVICE_DT_INST_DEFINE(0, knob_damped_init, NULL, NULL, &knob_damped_cfg, POST_KERNEL,
 		      CONFIG_SENSOR_INIT_PRIORITY, &knob_damped_api);

@@ -31,8 +31,6 @@ enum knob_mode {
 
 struct knob_params {
 	int ppr;
-	float position_min;
-	float position_max;
 };
 
 void knob_set_mode(const struct device *dev, enum knob_mode mode);
