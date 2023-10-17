@@ -4,8 +4,6 @@
  * SPDX-License-Identifier: MIT
  */
 
-#include "debounce.h"
-
 #include <zephyr/device.h>
 #include <zephyr/devicetree.h>
 #include <zephyr/drivers/gpio.h>
@@ -14,6 +12,8 @@
 #include <zephyr/kernel.h>
 #include <zephyr/logging/log.h>
 #include <zephyr/sys/util.h>
+
+#include <zmk/debounce.h>
 
 LOG_MODULE_DECLARE(zmk, CONFIG_ZMK_LOG_LEVEL);
 
@@ -42,14 +42,14 @@ struct kscan_74hc165_data {
     /** Timestamp of the current or scheduled scan. */
     int64_t scan_time;
     /** Current state of the inputs as an array of length config->inputs.len */
-    struct debounce_state *pin_state;
+    struct zmk_debounce_state *pin_state;
     uint8_t *read_buf;
 };
 
 struct kscan_74hc165_config {
     struct spi_dt_spec bus;
     struct gpio_dt_spec load_gpio;
-    struct debounce_config debounce_config;
+    struct zmk_debounce_config debounce_config;
     uint16_t chain_length;
     const uint8_t *scan_masks;
     int32_t debounce_scan_period_ms;
@@ -96,8 +96,8 @@ static int kscan_74hc165_read(const struct device *dev) {
     for (int i = 0; i < config->chain_length; i++) {
         bits = data->read_buf[i] | ~config->scan_masks[i];
         for (int j = 0; j < NGPIOS; j++) {
-            debounce_update(&data->pin_state[i * NGPIOS + j], (bits & BIT(j)) == 0,
-                            config->debounce_scan_period_ms, &config->debounce_config);
+            zmk_debounce_update(&data->pin_state[i * NGPIOS + j], (bits & BIT(j)) == 0,
+                                config->debounce_scan_period_ms, &config->debounce_config);
         }
     }
 
@@ -106,15 +106,15 @@ static int kscan_74hc165_read(const struct device *dev) {
 
     for (int i = 0; i < config->chain_length; i++) {
         for (int j = 0; j < NGPIOS; j++) {
-            struct debounce_state *state = &data->pin_state[i * NGPIOS + j];
+            struct zmk_debounce_state *state = &data->pin_state[i * NGPIOS + j];
 
-            if (debounce_get_changed(state)) {
-                const bool pressed = debounce_is_pressed(state);
+            if (zmk_debounce_get_changed(state)) {
+                const bool pressed = zmk_debounce_is_pressed(state);
                 LOG_DBG("Sending event at %i,%i state %s", i, j, pressed ? "on" : "off");
                 data->callback(dev, i, j, pressed);
             }
 
-            continue_scan = continue_scan || debounce_is_active(state);
+            continue_scan = continue_scan || zmk_debounce_is_active(state);
         }
     }
 
@@ -198,7 +198,7 @@ static const struct kscan_driver_api kscan_74hc165_api = {
     BUILD_ASSERT(INST_DEBOUNCE_RELEASE_MS(n) <= DEBOUNCE_COUNTER_MAX,                              \
                  "ZMK_KSCAN_DEBOUNCE_RELEASE_MS or debounce-release-ms is too large");             \
                                                                                                    \
-    static struct debounce_state kscan_74hc165_state_##n[DT_INST_PROP(n, chain_length) * 8];       \
+    static struct zmk_debounce_state kscan_74hc165_state_##n[DT_INST_PROP(n, chain_length) * 8];   \
                                                                                                    \
     static uint8_t kscan_74hc165_read_buf_##n[DT_INST_PROP(n, chain_length)];                      \
                                                                                                    \
