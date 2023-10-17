@@ -12,6 +12,7 @@ LOG_MODULE_DECLARE(zmk, CONFIG_ZMK_LOG_LEVEL);
 
 #include <zephyr/drivers/led_strip_remap.h>
 
+#include <zmk/workqueue.h>
 #include <zmk/event_manager.h>
 #include <zmk/events/activity_state_changed.h>
 
@@ -57,7 +58,9 @@ static inline void apply_brightness(struct led_rgb *c_out, const struct led_rgb 
 static void indicator_update(struct k_work *work)
 {
 	if (!settings.enable) {
+		unsigned int key = irq_lock();
 		led_strip_remap_clear(led_strip, STRIP_INDICATOR_LABEL);
+		irq_unlock(key);
 		return;
 	}
 
@@ -72,14 +75,16 @@ static void indicator_update(struct k_work *work)
 	LOG_DBG("Update indicator, color: %02X%02X%02X, brightness: %d -> %02X%02X%02X", current.r,
 		current.g, current.b, bri, color.r, color.g, color.b);
 
+	unsigned int key = irq_lock();
 	led_strip_remap_set(led_strip, STRIP_INDICATOR_LABEL, &color);
+	irq_unlock(key);
 }
 
 K_WORK_DEFINE(indicator_update_work, indicator_update);
 
 static inline void post_indicator_update(void)
 {
-	k_work_submit_to_queue(&k_sys_work_q, &indicator_update_work);
+	k_work_submit_to_queue(zmk_workqueue_lowprio_work_q(), &indicator_update_work);
 }
 
 uint32_t indicator_set_bits(uint32_t bits)
@@ -167,7 +172,9 @@ static void indicator_preview_brightness(uint8_t brightness)
 	LOG_DBG("Preview indicator, color: %02X%02X%02X, brightness: %d -> %02X%02X%02X", current.r,
 		current.g, current.b, brightness, color.r, color.g, color.b);
 
+	unsigned int key = irq_lock();
 	led_strip_remap_set(led_strip, "STATUS", &color);
+	irq_unlock(key);
 
 	k_work_reschedule(&indicator_clear_preview_work, K_MSEC(2000));
 }
@@ -235,7 +242,7 @@ static int indicator_init(const struct device *dev)
 #endif
 
 	k_mutex_init(&lock);
-	k_work_submit_to_queue(&k_sys_work_q, &indicator_update_work);
+	k_work_submit_to_queue(zmk_workqueue_lowprio_work_q(), &indicator_update_work);
 
 	return 0;
 }
