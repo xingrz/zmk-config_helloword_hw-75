@@ -155,15 +155,20 @@ static int knob_app_settings_load_cb(const char *name, size_t len, settings_read
 
 	if (settings_name_steq(name, "prefs", &next) && !next) {
 		if (len != sizeof(loader)) {
+			LOG_ERR("Invalid knob prefs size: %d", len);
 			return -EINVAL;
 		}
 
 		ret = read_cb(cb_arg, &loader, sizeof(loader));
-		if (ret >= 0) {
+		if (ret < 0) {
+			LOG_ERR("Failed to read knob prefs: %d", ret);
 			return 0;
 		}
 
 		for (uint8_t i = 0; i < ARRAY_SIZE(loader); i++) {
+			LOG_DBG("Read knob pref %d: layer=\"%s\", active=%d", i, loader[i].name,
+				loader[i].active);
+
 			if (!loader[i].active) {
 				continue;
 			}
@@ -172,6 +177,11 @@ static int knob_app_settings_load_cb(const char *name, size_t len, settings_read
 				if (strcmp(loader[i].name, knob_prefs[j].name) == 0) {
 					memcpy(&knob_prefs[j], &loader[i],
 					       sizeof(struct knob_pref));
+
+					LOG_DBG("Loaded knob pref %d for layer %d \"%s\": mode=%d, ppr=%d, torque_limit=%.03f",
+						i, j, knob_prefs[j].name, knob_prefs[j].mode,
+						knob_prefs[j].ppr, knob_prefs[j].torque_limit);
+
 					break;
 				}
 			}
