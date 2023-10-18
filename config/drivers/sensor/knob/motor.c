@@ -204,9 +204,9 @@ static void motor_foc_output_tick(const struct device *dev)
 	if (!data->enable)
 		return;
 
-	float electrical_angle = motor_get_electrical_angle(dev);
+	float electrical_angle = motor_get_electrical_angle(dev) * data->direction;
 
-	float voltage_q = data->set_point_voltage;
+	float voltage_q = data->set_point_voltage * data->direction;
 	float voltage_d = 0.0f;
 
 	motor_set_phase_voltage(dev, voltage_q, voltage_d, electrical_angle);
@@ -319,7 +319,7 @@ float motor_get_estimate_angle(const struct device *dev)
 {
 	struct motor_data *data = dev->data;
 
-	data->raw_angle = (float)data->direction * encoder_get_full_angle(&data->encoder_state);
+	data->raw_angle = encoder_get_full_angle(&data->encoder_state);
 	data->est_angle = lpf_apply(&data->lpf_angle, data->raw_angle);
 
 	return data->est_angle;
@@ -329,7 +329,7 @@ float motor_get_estimate_velocity(const struct device *dev)
 {
 	struct motor_data *data = dev->data;
 
-	data->raw_velocity = (float)data->direction * encoder_get_velocity(&data->encoder_state);
+	data->raw_velocity = encoder_get_velocity(&data->encoder_state);
 	data->est_velocity = lpf_apply(&data->lpf_velocity, data->raw_velocity);
 
 	return data->est_velocity;
@@ -340,8 +340,7 @@ float motor_get_electrical_angle(const struct device *dev)
 	struct motor_data *data = dev->data;
 	const struct motor_config *config = dev->config;
 
-	return norm_rad((float)data->direction * (float)config->pole_pairs *
-				encoder_get_lap_angle(&data->encoder_state) -
+	return norm_rad((float)config->pole_pairs * encoder_get_lap_angle(&data->encoder_state) -
 			data->zero_offset);
 }
 
@@ -356,12 +355,6 @@ struct motor_control *motor_get_control(const struct device *dev)
 {
 	struct motor_data *data = dev->data;
 	return &data->control;
-}
-
-enum motor_direction motor_get_direction(const struct device *dev)
-{
-	struct motor_data *data = dev->data;
-	return data->direction;
 }
 
 void motor_inspect(const struct device *dev, struct motor_state *state)

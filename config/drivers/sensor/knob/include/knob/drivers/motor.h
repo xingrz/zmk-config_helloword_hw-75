@@ -65,8 +65,6 @@ void motor_reset_rotation_count(const struct device *dev);
 
 struct motor_control *motor_get_control(const struct device *dev);
 
-enum motor_direction motor_get_direction(const struct device *dev);
-
 struct motor_state {
 	uint32_t timestamp;
 	enum motor_control_mode control_mode;
