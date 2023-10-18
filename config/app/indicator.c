@@ -18,15 +18,16 @@ LOG_MODULE_DECLARE(zmk, CONFIG_ZMK_LOG_LEVEL);
 
 #include <app/indicator.h>
 
-#define STRIP_CHOSEN DT_CHOSEN(zmk_underglow)
+#define STRIP_CHOSEN          DT_CHOSEN(zmk_underglow)
 #define STRIP_INDICATOR_LABEL "STATUS"
 
-#define RGB(R, G, B) .r = (R), .g = (G), .b = (B)
+#define RGB(R, G, B)  ((struct led_rgb){.r = (R), .g = (G), .b = (B)})
+#define BRI(rgb, bri) RGB(rgb.r *bri / 255, rgb.g * bri / 255, rgb.b * bri / 255)
+
+#define RED   (RGB(0xFF, 0x00, 0x00))
+#define GREEN (RGB(0x00, 0xFF, 0x00))
 
 static const struct device *led_strip;
-
-static const struct led_rgb color_red = { RGB(0xFF, 0x00, 0x00) };
-static const struct led_rgb color_green = { RGB(0x00, 0xFF, 0x00) };
 
 static struct indicator_settings settings = {
 	.enable = true,
@@ -41,18 +42,9 @@ static bool active = true;
 
 static uint32_t state = 0;
 
-static inline void apply_color(struct led_rgb *c_out, const struct led_rgb *c_in)
+static inline struct led_rgb apply_brightness(struct led_rgb color, uint8_t bri)
 {
-	c_out->r = c_in->r;
-	c_out->g = c_in->g;
-	c_out->b = c_in->b;
-}
-
-static inline void apply_brightness(struct led_rgb *c_out, const struct led_rgb *c_in, uint8_t bri)
-{
-	c_out->r = (uint8_t)((int)c_in->r * bri / 255);
-	c_out->g = (uint8_t)((int)c_in->g * bri / 255);
-	c_out->b = (uint8_t)((int)c_in->b * bri / 255);
+	return RGB(color.r * bri / 255, color.g * bri / 255, color.b * bri / 255);
 }
 
 static void indicator_update(struct k_work *work)
@@ -64,13 +56,10 @@ static void indicator_update(struct k_work *work)
 		return;
 	}
 
-	apply_color(&current, state ? &color_red : &color_green);
+	current = state ? RED : GREEN;
 
 	uint8_t bri = active ? settings.brightness_active : settings.brightness_inactive;
-
-	struct led_rgb color;
-	apply_color(&color, &current);
-	apply_brightness(&color, &current, bri);
+	struct led_rgb color = BRI(current, bri);
 
 	LOG_DBG("Update indicator, color: %02X%02X%02X, brightness: %d -> %02X%02X%02X", current.r,
 		current.g, current.b, bri, color.r, color.g, color.b);
@@ -165,9 +154,7 @@ K_WORK_DELAYABLE_DEFINE(indicator_clear_preview_work, indicator_clear_preview);
 
 static void indicator_preview_brightness(uint8_t brightness)
 {
-	struct led_rgb color;
-	apply_color(&color, &current);
-	apply_brightness(&color, &current, brightness);
+	struct led_rgb color = BRI(current, brightness);
 
 	LOG_DBG("Preview indicator, color: %02X%02X%02X, brightness: %d -> %02X%02X%02X", current.r,
 		current.g, current.b, brightness, color.r, color.g, color.b);
