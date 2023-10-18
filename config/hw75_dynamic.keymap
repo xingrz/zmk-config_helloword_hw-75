@@ -50,14 +50,14 @@
 			label = "音量";
 			icon = [EF 86 AE];
 			bindings = <&lvkp LV_KEY_PREV &lvkp LV_KEY_NEXT>;
-			sensor-bindings = <&inc_dec_kp C_VOL_DN C_VOL_UP>;
+			sensor-bindings = <&inc_dec_kp C_VOL_UP C_VOL_DN>;
 		};
 
 		scroll {
 			label = "滚动";
 			icon = [EF 86 8A];
 			bindings = <&trans &trans>;
-			sensor-bindings = <&inc_dec_mw MW_UP(1) MW_DN(1)>;
+			sensor-bindings = <&inc_dec_mw MW_DN(1) MW_UP(1)>;
 		};
 
 		tasks {
