@@ -104,7 +104,7 @@ static void refresh_work_cb(struct k_work *work)
 			position_zero = state.current_angle - dp;
 		}
 
-		item_y -= dp / PI_2 * (float)TRACK_H / 2.0f;
+		item_y += dp / PI_2 * (float)TRACK_H / 2.0f;
 
 		float tail_h = INDICATOR_T * state.target_voltage;
 		tail_h = LV_ABS(tail_h);
