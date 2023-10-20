@@ -104,6 +104,7 @@
 			torque-limit-mv = <1500>;
 			velocity-pid = <50 0 0>;
 			angle-pid = <100000 0 3500>;
+			minimal-movement-deg = <20>;
 		};
 
 		profile_damped: damped@4 {
@@ -135,6 +136,7 @@
 			torque-limit-mv = <1500>;
 			velocity-pid = <50 0 0>;
 			angle-pid = <100000 0 3500>;
+			on-off-distance-deg = <80>;
 		};
 	};
 

@@ -16,15 +16,15 @@
 #include <zephyr/logging/log.h>
 LOG_MODULE_REGISTER(knob_spring, CONFIG_ZMK_LOG_LEVEL);
 
-#define CENTER (deg_to_rad(180.0f))
-#define UP (deg_to_rad(160.0f))
-#define DN (deg_to_rad(200.0f))
-
 struct knob_spring_config {
 	KNOB_PROFILE_CFG_ROM;
+	uint32_t minimal_movement_deg;
 };
 
 struct knob_spring_data {
+	float center;
+	float up;
+	float down;
 	int32_t value;
 	int32_t last_report;
 };
@@ -32,6 +32,7 @@ struct knob_spring_data {
 static int knob_spring_enable(const struct device *dev)
 {
 	const struct knob_spring_config *cfg = dev->config;
+	struct knob_spring_data *data = dev->data;
 
 	motor_set_torque_limit(cfg->motor, KNOB_PROFILE_TORQUE_LIMIT);
 
@@ -42,6 +43,10 @@ static int knob_spring_enable(const struct device *dev)
 #if KNOB_PROFILE_HAS_ANGLE_PID
 	motor_set_angle_pid(cfg->motor, KNOB_PROFILE_ANGLE_PID);
 #endif /* KNOB_PROFILE_HAS_ANGLE_PID */
+
+	data->center = deg_to_rad(180);
+	data->up = data->center - deg_to_rad(cfg->minimal_movement_deg);
+	data->down = data->center + deg_to_rad(cfg->minimal_movement_deg);
 
 	return 0;
 }
@@ -61,16 +66,16 @@ static int knob_spring_tick(const struct device *dev, struct motor_control *mc)
 	ARG_UNUSED(mc);
 
 	float p = knob_get_position(cfg->knob);
-	if (p < UP) {
+	if (p < data->up) {
 		data->value = 1;
-	} else if (p > DN) {
+	} else if (p > data->down) {
 		data->value = -1;
 	} else {
 		data->value = 0;
 	}
 
 	mc->mode = ANGLE;
-	mc->target = CENTER;
+	mc->target = data->center;
 
 	return 0;
 }
@@ -106,7 +111,8 @@ static const struct knob_profile_api knob_spring_api = {
 
 static struct knob_spring_data knob_spring_data;
 
-static const struct knob_spring_config knob_spring_cfg = { KNOB_PROFILE_CFG_INIT };
+static const struct knob_spring_config knob_spring_cfg = {
+	.minimal_movement_deg = DT_INST_PROP(0, minimal_movement_deg), KNOB_PROFILE_CFG_INIT};
 
 DEVICE_DT_INST_DEFINE(0, knob_spring_init, NULL, &knob_spring_data, &knob_spring_cfg, POST_KERNEL,
 		      CONFIG_SENSOR_INIT_PRIORITY, &knob_spring_api);

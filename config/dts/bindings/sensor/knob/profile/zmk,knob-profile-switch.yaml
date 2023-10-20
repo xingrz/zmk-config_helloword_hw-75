@@ -6,3 +6,9 @@ description: Knob switch profile
 compatible: "zmk,knob-profile-switch"
 
 include: knob-profile.yaml
+
+properties:
+  on-off-distance-deg:
+    type: int
+    required: false
+    default: 80

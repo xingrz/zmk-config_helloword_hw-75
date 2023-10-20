@@ -6,3 +6,9 @@ description: Knob spring profile
 compatible: "zmk,knob-profile-spring"
 
 include: knob-profile.yaml
+
+properties:
+  minimal-movement-deg:
+    type: int
+    required: false
+    default: 20

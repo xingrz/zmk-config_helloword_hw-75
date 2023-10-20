@@ -25,10 +25,10 @@
 		((float)DT_INST_PROP_BY_IDX(0, prop, 2) / 1000.0f)
 
 #define KNOB_PROFILE_HAS_VELOCITY_PID DT_INST_NODE_HAS_PROP(0, velocity_pid)
-#define KNOB_PROFILE_VELOCITY_PID Z_KNOB_PROFILE_PID(velocity_pid)
+#define KNOB_PROFILE_VELOCITY_PID     Z_KNOB_PROFILE_PID(velocity_pid)
 
 #define KNOB_PROFILE_HAS_ANGLE_PID DT_INST_NODE_HAS_PROP(0, angle_pid)
-#define KNOB_PROFILE_ANGLE_PID Z_KNOB_PROFILE_PID(angle_pid)
+#define KNOB_PROFILE_ANGLE_PID     Z_KNOB_PROFILE_PID(angle_pid)
 
 #ifdef __cplusplus
 extern "C" {

@@ -16,15 +16,17 @@
 #include <zephyr/logging/log.h>
 LOG_MODULE_REGISTER(knob_switch, CONFIG_ZMK_LOG_LEVEL);
 
-#define CENTER (deg_to_rad(180.0f))
-#define ON (deg_to_rad(140.0f))
-#define OFF (deg_to_rad(220.0f))
-
 struct knob_switch_config {
 	KNOB_PROFILE_CFG_ROM;
+	uint32_t on_off_distance_deg;
 };
 
 struct knob_switch_data {
+	float center;
+	float on;
+	float on_2;
+	float off;
+	float off_2;
 	bool state;
 	bool last_report;
 };
@@ -43,6 +45,12 @@ static int knob_switch_enable(const struct device *dev)
 #if KNOB_PROFILE_HAS_ANGLE_PID
 	motor_set_angle_pid(cfg->motor, KNOB_PROFILE_ANGLE_PID);
 #endif /* KNOB_PROFILE_HAS_ANGLE_PID */
+
+	data->center = deg_to_rad(180);
+	data->off = data->center + deg_to_rad(cfg->on_off_distance_deg) * 0.5f;
+	data->off_2 = data->center + deg_to_rad(cfg->on_off_distance_deg) * 0.25f;
+	data->on = data->center - deg_to_rad(cfg->on_off_distance_deg) * 0.5f;
+	data->on_2 = data->center - deg_to_rad(cfg->on_off_distance_deg) * 0.25f;
 
 	data->state = false;
 
@@ -65,14 +73,14 @@ static int knob_switch_tick(const struct device *dev, struct motor_control *mc)
 	mc->mode = ANGLE;
 
 	float p = knob_get_position(cfg->knob);
-	if (p < ON + (CENTER - ON) / 2.0f) {
-		mc->target = ON;
+	if (p < data->on_2) {
+		mc->target = data->on;
 		data->state = true;
-	} else if (p < OFF - (OFF - CENTER) / 2.0f) {
-		mc->target = CENTER + (p - CENTER) * 2.0f;
-	} else {
-		mc->target = OFF;
+	} else if (p > data->off_2) {
+		mc->target = data->off;
 		data->state = false;
+	} else {
+		mc->target = data->center + (p - data->center) * 2.0f;
 	}
 
 	return 0;
@@ -109,7 +117,8 @@ static const struct knob_profile_api knob_switch_api = {
 
 static struct knob_switch_data knob_switch_data;
 
-static const struct knob_switch_config knob_switch_cfg = { KNOB_PROFILE_CFG_INIT };
+static const struct knob_switch_config knob_switch_cfg = {
+	.on_off_distance_deg = DT_INST_PROP(0, on_off_distance_deg), KNOB_PROFILE_CFG_INIT};
 
 DEVICE_DT_INST_DEFINE(0, knob_switch_init, NULL, &knob_switch_data, &knob_switch_cfg, POST_KERNEL,
 		      CONFIG_SENSOR_INIT_PRIORITY, &knob_switch_api);
