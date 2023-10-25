@@ -5,3 +5,5 @@
 
 #define MW_UP(n) (0xFF - n)
 #define MW_DN(n) (n)
+#define left_click(n) (n)
+#define right_click(n) (n)
