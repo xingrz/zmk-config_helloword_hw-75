@@ -32,24 +32,6 @@
 				   <&macro_release &kp LSHIFT>,
 				   <&macro_release &kp LALT>;
 		};
-
-                cv_forward: cv-forward {
-			label = "CV_FORWARD";
-			compatible = "zmk,behavior-macro";
-			#binding-cells = <0>;
-			bindings = <&macro_press   &kp LCTRL>,
-				   <&macro_tap     &kp C>,
-				   <&macro_release &kp LCTRL>;
-		};
-
-                cv_backward: cv-backward {
-			label = "CV_BACKWARD";
-			compatible = "zmk,behavior-macro";
-			#binding-cells = <0>;
-			bindings = <&macro_press   &kp LCTRL>,
-				   <&macro_tap     &kp V>,
-				   <&macro_release &kp LCTRL>;
- 		};
 	};
 
 	behaviors {
@@ -59,81 +41,45 @@
 			#sensor-binding-cells = <0>;
 			bindings = <&tasks_forward>, <&tasks_backward>;
 		};
-
-                switch_cv: switch-cv {
-			compatible = "zmk,behavior-sensor-rotate";
-			label = "SWITCH_CV";
-			#sensor-binding-cells = <0>;
-			bindings = <&cv_forward>, <&cv_backward>;
-		};
 	};
 
 	keymap {
 		compatible = "zmk,keymap-ext", "zmk,keymap";
 
-                none {
-			label = "摸鱼";
-			icon = [EF 85 93];
+                scroll {
+			label = "滚动";
+			icon = [EF 86 8A];
 			bindings = <&lvkp LV_KEY_PREV &lvkp LV_KEY_NEXT>;
-		};		
-                
+			sensor-bindings = <&inc_dec_mw MW_DN(1) MW_UP(1)>;
+		};
+		
                 volume {
 			label = "音量";
 			icon = [EF 86 AE];
 			bindings = <&trans &trans>;
-			sensor-bindings = <&inc_dec_kp C_VOL_DN C_VOL_UP>;
+			sensor-bindings = <&inc_dec_kp C_VOL_UP C_VOL_DN>;
 		};
 
-                brightness {
-			label = "亮度";
-			icon = [EF 86 98];
+		tasks {
+			label = "窗口";
+			icon = [EF 85 9E];
 			bindings = <&trans &trans>;
-			sensor-bindings = <&inc_dec_kp C_BRI_DEC C_BRI_INC>;
+			sensor-bindings = <&switch_tasks>;
+			profile = <&profile_spring>;
 		};
 
-		scroll {
-			label = "滚动";
-			icon = [EF 86 8A];
-			bindings = <&trans &trans>;
-			sensor-bindings = <&inc_dec_mw MW_UP(1) MW_DN(1)>;
-		};
-
-                mi {
+		arrow_vertical {
 			label = "上下";
 			icon = [EF 86 93];
 			bindings = <&trans &trans>;
-			sensor-bindings = <&inc_dec_kp DOWN UP>;
+			sensor-bindings = <&inc_dec_kp UP DOWN>;
 		};
 
 		arrow_horizontal {
 			label = "左右";
 			icon = [EF 86 9C];
 			bindings = <&trans &trans>;
-			sensor-bindings = <&inc_dec_kp RIGHT LEFT>;
-		};
-
-                arrow_vertical {
-			label = "麦克";
-			icon = [EF 84 95];
-			bindings = <&trans &trans>;
-			sensor-bindings = <&inc_dec_kp HOME HOME>;
-                        profile = <&profile_switch>;
-		};
-
-                tasks {
-			label = "窗口";
-			icon = [EF 85 9E];
-			bindings = <&trans &trans>;
-			sensor-bindings = <&switch_tasks>;
-			profile = <&profile_spring>;
-                };
- 
-                cv {
-			label = "复粘";
-			icon = [EF 84 BC];
-			bindings = <&trans &trans>;
-			sensor-bindings = <&switch_cv>;
-			profile = <&profile_spring>;
+			sensor-bindings = <&inc_dec_kp LEFT RIGHT>;
 		};
 	};
 };
